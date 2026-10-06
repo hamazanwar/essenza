@@ -2421,7 +2421,7 @@ body {
 .shop-page {
   width: 100%;
   min-height: 100vh;
-  padding: 60px 7% 120px;
+  padding: 60px 4% 120px;
   background: #ffffff;
 }
 
@@ -2462,9 +2462,9 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 
-  gap: 45px 35px;
+  column-gap: 18px;
+  row-gap: 35px;
 
-  /* Gap before pagination */
   padding-bottom: 70px;
 }
 
@@ -2474,9 +2474,9 @@ body {
 
 .product-card {
   width: 100%;
-  max-width: 260px;
+  max-width: none;
 
-  margin: 0 auto;
+  margin: 0;
 
   background: #ffffff;
   overflow: hidden;
@@ -2497,8 +2497,7 @@ body {
 
   width: 100%;
 
-  /* Smaller product image */
-  aspect-ratio: 1 / 1.1;
+  aspect-ratio: 1 / 1.05;
 
   background: #f6f6f6;
 
@@ -2800,20 +2799,21 @@ body {
 
 @media (max-width: 1100px) {
   .shop-page {
-    padding-left: 5%;
-    padding-right: 5%;
+    padding-left: 4%;
+    padding-right: 4%;
   }
 
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
 
-    gap: 40px 20px;
+    column-gap: 16px;
+    row-gap: 35px;
 
     padding-bottom: 60px;
   }
 
   .product-card {
-    max-width: 250px;
+    max-width: none;
   }
 }
 
@@ -2855,7 +2855,7 @@ body {
   /* Product card */
 
   .product-card {
-    max-width: 210px;
+    max-width: none;
   }
 
   /* Product info */
@@ -2931,7 +2931,7 @@ body {
   /* Product card */
 
   .product-card {
-    max-width: 170px;
+    max-width: none;
   }
 
   /* Header */
