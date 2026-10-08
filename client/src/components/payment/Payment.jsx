@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -11,6 +12,8 @@ function Payment() {
   const checkoutData = location.state;
 
   const [paymentMethod, setPaymentMethod] = useState("");
+const [placingOrder, setPlacingOrder] = useState(false);
+const [error, setError] = useState("");
 
   if (!checkoutData) {
     return (
@@ -43,18 +46,70 @@ function Payment() {
     total = 0,
   } = checkoutData;
 
-  const handlePayment = () => {
-    if (!paymentMethod) {
+  const handlePayment = async () => {
+  if (!paymentMethod) {
+    return;
+  }
+
+  if (!selectedAddress?._id) {
+    setError("Please select a delivery address.");
+    return;
+  }
+
+  if (paymentMethod === "online") {
+    setError("Online payment will be implemented next.");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
       return;
     }
 
-    console.log("Payment method:", paymentMethod);
-    console.log("Checkout items:", checkoutItems);
-    console.log("Selected address:", selectedAddress);
-    console.log("Total:", total);
+    setPlacingOrder(true);
+    setError("");
 
-    // Order creation will be implemented next.
-  };
+    const orderItems = checkoutItems.map((item) => ({
+      productId: item.productId,
+      variantId: item.variantId,
+      quantity: item.quantity,
+    }));
+
+    const response = await axios.post(
+      "http://localhost:5000/api/orders",
+      {
+        addressId: selectedAddress._id,
+        items: orderItems,
+        paymentMethod: "COD",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("Order created:", response.data);
+
+    navigate("/order-confirmation", {
+      state: {
+        order: response.data.order,
+      },
+    });
+  } catch (error) {
+    console.error("Place order error:", error);
+
+    setError(
+      error.response?.data?.message ||
+        "Failed to place order."
+    );
+  } finally {
+    setPlacingOrder(false);
+  }
+};
 
   return (
     <>
@@ -64,6 +119,11 @@ function Payment() {
         <div className="payment-container">
 
           <h1>PAYMENT</h1>
+          {error && (
+  <p className="payment-error-message">
+    {error}
+  </p>
+)}
 
           {/* DELIVERY ADDRESS */}
 
@@ -220,17 +280,19 @@ function Payment() {
             </div>
 
             <button
-              type="button"
-              className="payment-button"
-              onClick={handlePayment}
-              disabled={!paymentMethod}
-            >
-              {paymentMethod === "cod"
-                ? "PLACE ORDER"
-                : paymentMethod === "online"
-                ? "PAY NOW"
-                : "SELECT PAYMENT METHOD"}
-            </button>
+  type="button"
+  className="payment-button"
+  onClick={handlePayment}
+  disabled={!paymentMethod || placingOrder}
+>
+  {placingOrder
+    ? "PLACING ORDER..."
+    : paymentMethod === "cod"
+    ? "PLACE ORDER"
+    : paymentMethod === "online"
+    ? "PAY NOW"
+    : "SELECT PAYMENT METHOD"}
+</button>
 
           </section>
 

@@ -80,6 +80,18 @@ function Navbar() {
     }
   };
 
+  // ==========================================
+// MY ORDERS CLICK
+// ==========================================
+
+const handleMyOrdersClick = () => {
+  if (isLoggedIn) {
+    navigate("/my-orders");
+  } else {
+    navigate("/register");
+  }
+};
+
   return (
     <nav className="navbar">
 
@@ -246,6 +258,31 @@ function Navbar() {
             />
           </svg>
         </button>
+
+        {/* MY ORDERS */}
+
+<button
+  type="button"
+  className="navbar-icon navbar-icon-button"
+  aria-label="My Orders"
+  onClick={handleMyOrdersClick}
+>
+  <svg
+    viewBox="0 0 24 24"
+    width="21"
+    height="21"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M6 3h12v18H6z" />
+    <path d="M9 7h6" />
+    <path d="M9 11h6" />
+    <path d="M9 15h4" />
+  </svg>
+</button>
 
         {/* PROFILE */}
 

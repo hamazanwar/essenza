@@ -28,6 +28,8 @@ import Cart from "./components/cart/Cart";
 import Wishlist from "./components/wishlist/Wishlist";
 import Checkout from "./components/ckeckout/Checkout";
 import Payment from "./components/payment/Payment";
+import OrderConfirmation from "./components/order/OrderConfirmation";
+import MyOrders from "./components/order/MyOrders";
 
 function App() {
   return (
@@ -56,6 +58,8 @@ function App() {
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/payment" element={<Payment />} />
+      <Route path="/order-confirmation" element={<OrderConfirmation />} />
+      <Route path="/my-orders" element={<MyOrders />} />
 
     </Routes>
   );

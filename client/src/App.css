@@ -5599,3 +5599,771 @@ body {
     position: static;
   }
 }
+
+/* ==========================================
+   ORDER CONFIRMATION OVERLAY
+========================================== */
+
+.order-confirmation-page {
+  min-height: 70vh;
+
+  position: relative;
+}
+
+/* ==========================================
+   OVERLAY
+========================================== */
+
+.order-confirmation-overlay {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100vh;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  z-index: 9999;
+}
+
+/* ==========================================
+   MODAL
+========================================== */
+
+.order-confirmation-modal {
+  position: relative;
+
+  width: 100%;
+  max-width: 520px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  padding: 50px 45px 45px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  border: 1px solid #e5e5e5;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================
+   CLOSE BUTTON
+========================================== */
+
+.order-confirmation-close {
+  position: absolute;
+
+  top: 16px;
+  right: 18px;
+
+  width: 35px;
+  height: 35px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-size: 28px;
+
+  font-weight: 300;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.order-confirmation-close:hover {
+  background: #f2f2f2;
+}
+
+/* ==========================================
+   SUCCESS ICON
+========================================== */
+
+.order-confirmation-icon {
+  width: 65px;
+  height: 65px;
+
+  margin: 0 auto 25px;
+
+  border: 1px solid #111111;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 30px;
+
+  font-weight: 400;
+}
+
+/* ==========================================
+   TITLE
+========================================== */
+
+.order-confirmation-modal h1 {
+  margin: 0 0 15px;
+
+  font-size: 25px;
+
+  font-weight: 500;
+
+  letter-spacing: 3px;
+}
+
+/* ==========================================
+   MESSAGE
+========================================== */
+
+.order-confirmation-message {
+  margin: 0 0 30px;
+
+  font-size: 14px;
+
+  line-height: 1.8;
+
+  color: #666666;
+}
+
+/* ==========================================
+   ORDER DETAILS
+========================================== */
+
+.order-confirmation-details {
+  border-top: 1px solid #eeeeee;
+
+  border-bottom: 1px solid #eeeeee;
+
+  margin-bottom: 30px;
+}
+
+.order-confirmation-detail-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #eeeeee;
+
+  text-align: left;
+}
+
+.order-confirmation-detail-row:last-child {
+  border-bottom: none;
+}
+
+.order-confirmation-detail-row span {
+  font-size: 11px;
+
+  letter-spacing: 1.5px;
+
+  color: #777777;
+}
+
+.order-confirmation-detail-row strong {
+  font-size: 13px;
+
+  font-weight: 500;
+
+  text-align: right;
+
+  color: #111111;
+}
+
+.order-confirmation-detail-row.total {
+  padding-top: 18px;
+
+  padding-bottom: 18px;
+}
+
+.order-confirmation-detail-row.total span,
+.order-confirmation-detail-row.total strong {
+  font-size: 15px;
+
+  color: #111111;
+}
+
+/* ==========================================
+   ACTION BUTTONS
+========================================== */
+
+.order-confirmation-actions {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.order-confirmation-primary-button,
+.order-confirmation-secondary-button {
+  width: 100%;
+
+  padding: 15px;
+
+  border: 1px solid #111111;
+
+  cursor: pointer;
+
+  font-size: 11px;
+
+  letter-spacing: 1.5px;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.order-confirmation-primary-button {
+  background: #111111;
+
+  color: #ffffff;
+}
+
+.order-confirmation-primary-button:hover {
+  background: #333333;
+}
+
+.order-confirmation-secondary-button {
+  background: #ffffff;
+
+  color: #111111;
+}
+
+.order-confirmation-secondary-button:hover {
+  background: #f5f5f5;
+}
+
+/* ==========================================
+   MISSING ORDER DETAILS
+========================================== */
+
+.order-confirmation-modal h2 {
+  margin: 0 0 15px;
+
+  font-size: 20px;
+
+  font-weight: 500;
+
+  letter-spacing: 2px;
+}
+
+.order-confirmation-modal > p {
+  margin: 0 0 25px;
+
+  font-size: 14px;
+
+  color: #666666;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 600px) {
+  .order-confirmation-overlay {
+    padding: 15px;
+  }
+
+  .order-confirmation-modal {
+    max-width: 100%;
+
+    padding: 45px 25px 30px;
+  }
+
+  .order-confirmation-icon {
+    width: 55px;
+    height: 55px;
+
+    font-size: 25px;
+
+    margin-bottom: 20px;
+  }
+
+  .order-confirmation-modal h1 {
+    font-size: 21px;
+
+    letter-spacing: 2px;
+  }
+
+  .order-confirmation-message {
+    font-size: 13px;
+
+    margin-bottom: 25px;
+  }
+
+  .order-confirmation-detail-row {
+    gap: 10px;
+  }
+
+  .order-confirmation-detail-row span {
+    font-size: 10px;
+  }
+
+  .order-confirmation-detail-row strong {
+    font-size: 12px;
+  }
+}
+
+/* ==========================================
+   MY ORDERS PAGE
+========================================== */
+
+.my-orders-page {
+  min-height: 70vh;
+  padding: 60px 6%;
+  background: #ffffff;
+}
+
+.my-orders-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.my-orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 20px;
+}
+
+.my-orders-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+.my-orders-header button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.my-orders-header button:hover {
+  background: #333;
+}
+
+/* ==========================================
+   ERROR
+========================================== */
+
+.my-orders-error {
+  padding: 15px;
+  margin-bottom: 25px;
+  border: 1px solid #ddd;
+  color: #b00020;
+  font-size: 14px;
+}
+
+/* ==========================================
+   EMPTY ORDERS
+========================================== */
+
+.my-orders-empty {
+  text-align: center;
+  padding: 100px 20px;
+  border: 1px solid #e5e5e5;
+}
+
+.my-orders-empty h2 {
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.my-orders-empty p {
+  margin-bottom: 25px;
+  color: #666;
+  font-size: 14px;
+}
+
+.my-orders-empty button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 13px 25px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+/* ==========================================
+   ORDER LIST
+========================================== */
+
+.my-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* ==========================================
+   ORDER CARD
+========================================== */
+
+.my-order-card {
+  border: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+/* ==========================================
+   ORDER HEADER
+========================================== */
+
+.my-order-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 25px;
+  background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.my-order-header span,
+.my-order-footer span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: #777;
+}
+
+.my-order-header strong,
+.my-order-footer strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ==========================================
+   ORDER STATUS
+========================================== */
+
+.my-order-status {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   ORDER ITEMS
+========================================== */
+
+.my-order-items {
+  padding: 20px 25px;
+}
+
+.my-order-item {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.my-order-item:last-child {
+  border-bottom: none;
+}
+
+/* ==========================================
+   PRODUCT IMAGE
+========================================== */
+
+.my-order-item-image {
+  width: 90px;
+  height: 110px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.my-order-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.my-order-item-image span {
+  font-size: 11px;
+  color: #888;
+}
+
+/* ==========================================
+   PRODUCT DETAILS
+========================================== */
+
+.my-order-item-details h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.my-order-item-details p {
+  margin: 4px 0;
+  color: #777;
+  font-size: 12px;
+}
+
+.my-order-item-price {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ==========================================
+   ORDER FOOTER
+========================================== */
+
+.my-order-footer {
+  display: flex;
+  align-items: center;
+  gap: 45px;
+  padding: 20px 25px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.my-order-footer > div:last-of-type {
+  margin-left: auto;
+}
+
+/* ==========================================
+   CANCEL BUTTON
+========================================== */
+
+.my-order-cancel-button {
+  background: transparent;
+  border: 1px solid #000;
+  color: #000;
+  padding: 10px 18px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.my-order-cancel-button:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* ==========================================
+   LOADING
+========================================== */
+
+.my-orders-message {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 768px) {
+
+  .my-orders-page {
+    padding: 40px 20px;
+  }
+
+  .my-orders-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .my-orders-header h1 {
+    font-size: 26px;
+  }
+
+  .my-order-header {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .my-order-status {
+    width: fit-content;
+  }
+
+  .my-order-item {
+    grid-template-columns: 70px 1fr;
+    gap: 15px;
+  }
+
+  .my-order-item-image {
+    width: 70px;
+    height: 90px;
+  }
+
+  .my-order-item-price {
+    grid-column: 2;
+  }
+
+  .my-order-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .my-order-footer > div:last-of-type {
+    margin-left: 0;
+  }
+
+  .my-order-cancel-button {
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   CANCEL ORDER CONFIRMATION
+========================================== */
+
+.cancel-order-confirmation {
+  padding: 25px;
+  border-top: 1px solid #e5e5e5;
+  background: #fafafa;
+}
+
+.cancel-order-confirmation-content {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cancel-order-confirmation-content h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+}
+
+.cancel-order-confirmation-content p {
+  margin: 0 0 22px;
+  color: #666;
+  font-size: 13px;
+}
+
+/* ==========================================
+   CONFIRMATION BUTTONS
+========================================== */
+
+.cancel-order-confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.cancel-order-keep-button,
+.cancel-order-confirm-button {
+  min-width: 130px;
+  padding: 11px 18px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.cancel-order-keep-button {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.cancel-order-keep-button:hover {
+  background: #000;
+  color: #fff;
+}
+
+.cancel-order-confirm-button {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+}
+
+.cancel-order-confirm-button:hover {
+  background: #333;
+}
+
+.cancel-order-keep-button:disabled,
+.cancel-order-confirm-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+  .cancel-order-confirmation {
+    padding: 20px 15px;
+  }
+
+  .cancel-order-confirmation-actions {
+    flex-direction: column;
+  }
+
+  .cancel-order-keep-button,
+  .cancel-order-confirm-button {
+    width: 100%;
+  }
+}
