@@ -18,6 +18,7 @@ const productRoutes = require("./routes/productRoutes");
 const variantRoutes = require("./routes/variantRoutes");
 const productPublicRoutes = require("./routes/productPublicRoutes");
 const cartRoutes = require("./routes/cartRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
 
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/admin/products", productRoutes);
 app.use("/api/admin/variants", variantRoutes);
 app.use("/api/products", productPublicRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 
 

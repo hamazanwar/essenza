@@ -13,6 +13,7 @@ function Shop() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [wishlistProducts, setWishlistProducts] = useState([]);
 
   // Stores current image index for each product
   const [imageIndexes, setImageIndexes] = useState({});
@@ -55,6 +56,50 @@ function Shop() {
     fetchProducts();
   }, [category]);
 
+    // ================================
+  // FETCH WISHLIST
+  // ================================
+
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setWishlistProducts([]);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/wishlist",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const wishlist =
+          response.data.wishlist?.products || [];
+
+        setWishlistProducts(
+          wishlist.map((item) =>
+            item.productId?._id || item.productId,
+          ),
+        );
+      } catch (error) {
+        console.error(
+          "Fetch wishlist error:",
+          error,
+        );
+
+        setWishlistProducts([]);
+      }
+    };
+
+    fetchWishlist();
+  }, []);
+
   // ================================
   // PAGINATION
   // ================================
@@ -67,6 +112,63 @@ function Shop() {
     startIndex,
     startIndex + PRODUCTS_PER_PAGE,
   );
+
+    // ================================
+  // TOGGLE WISHLIST
+  // ================================
+
+  const toggleWishlist = async (productId) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const isWishlisted =
+      wishlistProducts.includes(productId);
+
+    try {
+      if (isWishlisted) {
+        await axios.delete(
+          `http://localhost:5000/api/wishlist/${productId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setWishlistProducts((previous) =>
+          previous.filter(
+            (id) => id !== productId,
+          ),
+        );
+      } else {
+        await axios.post(
+          "http://localhost:5000/api/wishlist",
+          {
+            productId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        setWishlistProducts((previous) => [
+          ...previous,
+          productId,
+        ]);
+      }
+    } catch (error) {
+      console.error(
+        "Toggle wishlist error:",
+        error,
+      );
+    }
+  };
 
   // ================================
   // NEXT IMAGE
@@ -165,6 +267,26 @@ function Shop() {
                   <article className="product-card" key={product._id}>
                     {/* PRODUCT IMAGE */}
                     <div className="product-image-container">
+                      <button
+  type="button"
+  className={`wishlist-button ${
+    wishlistProducts.includes(product._id)
+      ? "wishlist-active"
+      : ""
+  }`}
+  onClick={() =>
+    toggleWishlist(product._id)
+  }
+  aria-label={
+    wishlistProducts.includes(product._id)
+      ? "Remove from wishlist"
+      : "Add to wishlist"
+  }
+>
+  {wishlistProducts.includes(product._id)
+    ? "♥"
+    : "♡"}
+</button> 
                       {images.length > 0 ? (
                         <>
                           <img

@@ -149,18 +149,9 @@ const getCartService = async (userId) => {
 
     const cart = await Cart.findOne({
         userId
-    })
-        .populate(
-            "items.productId",
-            "name productImage"
-        )
-        .populate(
-            "items.variantId",
-            "size price stock"
-        );
+    });
 
     if (!cart) {
-
         return {
             message: "Cart fetched successfully",
             cart: {
@@ -169,6 +160,42 @@ const getCartService = async (userId) => {
             }
         };
     }
+
+    // ==========================================
+    // REMOVE DEACTIVATED PRODUCTS FROM CART
+    // ==========================================
+
+    const activeItems = [];
+
+    for (const item of cart.items) {
+
+        const product = await Product.findOne({
+            _id: item.productId,
+            isActive: true
+        });
+
+        // Keep only active products
+        if (product) {
+            activeItems.push(item);
+        }
+    }
+
+    // Check whether any inactive products were removed
+    const cartChanged =
+        activeItems.length !== cart.items.length;
+
+    if (cartChanged) {
+
+        cart.items = activeItems;
+
+        await cart.save();
+    }
+
+    // ==========================================
+    // POPULATE CART
+    // ==========================================
+
+    await populateCart(cart);
 
     return {
         message: "Cart fetched successfully",
@@ -267,6 +294,32 @@ const updateCartItemQuantityService = async (
         );
 
         error.statusCode = 404;
+
+        throw error;
+    }
+
+        // CHECK PRODUCT IS ACTIVE
+    const product = await Product.findOne({
+        _id: item.productId,
+        isActive: true
+    });
+
+    if (!product) {
+
+        // Remove inactive product from cart
+        cart.items = cart.items.filter(
+            (cartItem) =>
+                cartItem._id.toString() !==
+                itemId.toString()
+        );
+
+        await cart.save();
+
+        const error = new Error(
+            "This product is no longer available"
+        );
+
+        error.statusCode = 400;
 
         throw error;
     }

@@ -34,10 +34,17 @@ function ProductDetails() {
           setSelectedVariant(productData.variants[0]);
         }
       } catch (error) {
-        console.error("Get product details error:", error);
+  console.error("Get product details error:", error);
 
-        setError(error.response?.data?.message || "Something went wrong");
-      } finally {
+  if (error.response?.status === 404) {
+    setError("This product is no longer available.");
+  } else {
+    setError(
+      error.response?.data?.message ||
+        "Something went wrong"
+    );
+  }
+} finally {
         setLoading(false);
       }
     };

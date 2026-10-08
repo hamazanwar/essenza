@@ -21,9 +21,11 @@ import CustomerManagement from "./admin/customer/CustomerManagement";
 import CustomerDetails from "./admin/customer/CustomerDetails";
 import CategoryManagement from "./admin/category/CategoryManagement";
 import ProductManagement from "./admin/product/ProductManagement";
+import AddProduct from "./admin/product/AddProduct";
 import Shop from "./components/shop/Shop";
 import ProductDetails from "./components/product/ProductDetails";
 import Cart from "./components/cart/Cart";
+import Wishlist from "./components/wishlist/Wishlist";
 
 function App() {
   return (
@@ -45,9 +47,11 @@ function App() {
       <Route path="/admin/customers/:id" element={<CustomerDetails />} />
       <Route path="/admin/categories" element={<CategoryManagement />} />
       <Route path="/admin/products" element={<ProductManagement />} />
+      <Route path="/admin/products/add" element={<AddProduct />} />
       <Route path="/shop" element={<Shop />} />
       <Route path="/product/:productId" element={<ProductDetails />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/wishlist" element={<Wishlist />} />
 
     </Routes>
   );

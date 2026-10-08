@@ -1,44 +1,91 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function AdminNavbar() {
+  const navItems = [
+    {
+      label: "Dashboard",
+      path: "/admin/dashboard",
+    },
+    {
+      label: "Products",
+      path: "/admin/products",
+    },
+    {
+      label: "Orders",
+      path: "/admin/orders",
+    },
+    {
+      label: "Categories",
+      path: "/admin/categories",
+    },
+    {
+      label: "Coupons",
+      path: "/admin/coupons",
+    },
+    {
+      label: "Offers",
+      path: "/admin/offers",
+    },
+    {
+      label: "Reviews",
+      path: "/admin/reviews",
+    },
+    {
+      label: "Sales Report",
+      path: "/admin/sales-report",
+    },
+    {
+      label: "Customers",
+      path: "/admin/customers",
+    },
+  ];
+
   return (
-    <nav className="admin-navbar">
-      {/* LEFT - LOGO */}
+    <aside className="admin-sidebar">
+      {/* LOGO */}
+      <div className="admin-sidebar-logo">
+        <NavLink to="/admin/dashboard">
+          ESSENZA
+        </NavLink>
 
-      <div className="admin-navbar-logo">
-        <Link to="/admin/dashboard">ESSENZA</Link>
+        <span>ADMIN PANEL</span>
       </div>
 
-      {/* CENTER - NAVIGATION */}
+      {/* NAVIGATION */}
+      <nav className="admin-sidebar-navigation">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              `admin-sidebar-link ${
+                isActive ? "admin-sidebar-link-active" : ""
+              }`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
 
-      <div className="admin-navbar-links">
-        <Link to="/admin/dashboard">Dashboard</Link>
+      {/* PROFILE */}
+      <div className="admin-sidebar-bottom">
+        <NavLink
+          to="/admin/profile"
+          className={({ isActive }) =>
+            `admin-sidebar-profile ${
+              isActive ? "admin-sidebar-profile-active" : ""
+            }`
+          }
+        >
+          <span className="admin-sidebar-profile-icon">
+            👤
+          </span>
 
-        <Link to="/admin/products">Product</Link>
-
-        <Link to="/admin/orders">Order</Link>
-
-        <Link to="/admin/categories">Category</Link>
-
-        <Link to="/admin/coupons">Coupon</Link>
-
-        <Link to="/admin/offers">Offer</Link>
-
-        <Link to="/admin/reviews">Review</Link>
-
-        <Link to="/admin/sales-report">Sales Report</Link>
-
-        <Link to="/admin/customers">Customer</Link>
+          <span>Admin Profile</span>
+        </NavLink>
       </div>
-
-      {/* RIGHT - ADMIN PROFILE */}
-
-      <div className="admin-navbar-profile">
-        <Link to="/admin/profile" className="admin-profile-link">
-          <span className="admin-profile-icon">👤</span>
-        </Link>
-      </div>
-    </nav>
+    </aside>
   );
 }
 
