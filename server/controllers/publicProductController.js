@@ -7,12 +7,13 @@ const {
 const getActiveProducts = async (req, res) => {
     try {
 
-        const { category } = req.query;
+        const { category, search } = req.query;
 
         const result =
-            await getActiveProductsService(
-                category
-            );
+    await getActiveProductsService(
+        category,
+        search
+    );
 
         res.status(200).json(result);
 

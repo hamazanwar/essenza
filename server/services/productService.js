@@ -84,11 +84,24 @@ const getAllProductsService = async () => {
 };
 
 // GET ACTIVE PRODUCTS FOR USER
-const getActiveProductsService = async (categoryName) => {
+const getActiveProductsService = async (
+    categoryName,
+    searchTerm
+) => {
 
-    const products = await Product.find({
+    const productQuery = {
         isActive: true
-    })
+    };
+
+    // Search products by name
+    if (searchTerm?.trim()) {
+        productQuery.name = {
+            $regex: searchTerm.trim(),
+            $options: "i"
+        };
+    }
+
+    const products = await Product.find(productQuery)
         .populate({
             path: "categoryId",
             select: "name",

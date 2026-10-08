@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import SearchOverlay from "../search/SearchOverlay";
 
 function Navbar() {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -161,30 +163,31 @@ function Navbar() {
 
         {/* SEARCH */}
 
-        <Link
-          to="/search"
-          className="navbar-icon"
-          aria-label="Search"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle
-              cx="11"
-              cy="11"
-              r="7"
-            />
+<button
+  type="button"
+  className="navbar-icon navbar-icon-button"
+  aria-label="Search"
+  onClick={() => setSearchOpen(true)}
+>
+  <svg
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle
+      cx="11"
+      cy="11"
+      r="7"
+    />
 
-            <path d="M20 20l-4-4" />
-          </svg>
-        </Link>
+    <path d="M20 20l-4-4" />
+  </svg>
+</button>
 
         {/* WISHLIST */}
 
@@ -273,6 +276,11 @@ function Navbar() {
         </button>
 
       </div>
+      {searchOpen && (
+  <SearchOverlay
+    onClose={() => setSearchOpen(false)}
+  />
+)}
 
     </nav>
   );
