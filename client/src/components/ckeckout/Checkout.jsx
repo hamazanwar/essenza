@@ -214,19 +214,32 @@ function Checkout() {
   // ==========================================
 
   const handleProceedToPayment = () => {
-    if (!selectedAddressId) {
-      setError("Please select a delivery address.");
-      return;
-    }
+  if (!selectedAddressId) {
+    setError("Please select a delivery address.");
+    return;
+  }
 
-    setError("");
+  const selectedAddress = addresses.find(
+    (address) => address._id === selectedAddressId
+  );
 
-    console.log("Selected address:", selectedAddressId);
-    console.log("Checkout items:", checkoutItems);
-    console.log("Total:", total);
+  if (!selectedAddress) {
+    setError("Selected address not found.");
+    return;
+  }
 
-    // Payment will be implemented next.
-  };
+  setError("");
+
+  navigate("/payment", {
+    state: {
+      checkoutItems,
+      selectedAddress,
+      subtotal,
+      deliveryCharge,
+      total,
+    },
+  });
+};
 
   // ==========================================
   // LOADING
