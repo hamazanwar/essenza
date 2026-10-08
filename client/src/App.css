@@ -4514,3 +4514,60 @@ body {
     font-size: 12px;
   }
 }
+
+/* ==========================================
+   SHOP CONTROLS
+========================================== */
+
+.shop-controls {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+.shop-sort {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop-sort label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #555555;
+}
+
+.shop-sort select {
+  min-width: 190px;
+  padding: 11px 35px 11px 13px;
+  border: 1px solid #dddddd;
+  background: #ffffff;
+  color: #111111;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+}
+
+.shop-sort select:focus {
+  border-color: #111111;
+}
+
+@media (max-width: 600px) {
+  .shop-controls {
+    justify-content: flex-start;
+    margin-bottom: 25px;
+  }
+
+  .shop-sort {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .shop-sort select {
+    min-width: 170px;
+  }
+}

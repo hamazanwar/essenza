@@ -14,6 +14,8 @@ function Shop() {
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [wishlistProducts, setWishlistProducts] = useState([]);
+  const [sortOption, setSortOption] = useState("default");
+  const [priceFilter, setPriceFilter] = useState("all");
 
   // Stores current image index for each product
   const [imageIndexes, setImageIndexes] = useState({});
@@ -56,7 +58,7 @@ function Shop() {
     fetchProducts();
   }, [category]);
 
-    // ================================
+  // ================================
   // FETCH WISHLIST
   // ================================
 
@@ -70,28 +72,19 @@ function Shop() {
       }
 
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/wishlist",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await axios.get("http://localhost:5000/api/wishlist", {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
-        const wishlist =
-          response.data.wishlist?.products || [];
+        const wishlist = response.data.wishlist?.products || [];
 
         setWishlistProducts(
-          wishlist.map((item) =>
-            item.productId?._id || item.productId,
-          ),
+          wishlist.map((item) => item.productId?._id || item.productId),
         );
       } catch (error) {
-        console.error(
-          "Fetch wishlist error:",
-          error,
-        );
+        console.error("Fetch wishlist error:", error);
 
         setWishlistProducts([]);
       }
@@ -101,19 +94,79 @@ function Shop() {
   }, []);
 
   // ================================
+// FILTER PRODUCTS BY PRICE
+// ================================
+
+const filteredProducts = products.filter((product) => {
+  const price = product.variants?.[0]?.price || 0;
+
+  if (priceFilter === "under-500") {
+    return price < 500;
+  }
+
+  if (priceFilter === "500-1000") {
+    return price >= 500 && price <= 1000;
+  }
+
+  if (priceFilter === "1000-2000") {
+    return price > 1000 && price <= 2000;
+  }
+
+  if (priceFilter === "2000-3000") {
+    return price > 2000 && price <= 3000;
+  }
+
+  if (priceFilter === "3000-4000") {
+    return price > 3000 && price <= 4000;
+  }
+
+  if (priceFilter === "above-4000") {
+    return price > 4000;
+  }
+
+  return true;
+});
+
+  // ================================
+  // SORT PRODUCTS
+  // ================================
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortOption === "price-low-high") {
+      const priceA = a.variants?.[0]?.price || 0;
+      const priceB = b.variants?.[0]?.price || 0;
+
+      return priceA - priceB;
+    }
+
+    if (sortOption === "price-high-low") {
+      const priceA = a.variants?.[0]?.price || 0;
+      const priceB = b.variants?.[0]?.price || 0;
+
+      return priceB - priceA;
+    }
+
+    if (sortOption === "newest") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+
+    return 0;
+  });
+
+  // ================================
   // PAGINATION
   // ================================
 
-  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
+  const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
 
   const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
 
-  const currentProducts = products.slice(
+  const currentProducts = sortedProducts.slice(
     startIndex,
     startIndex + PRODUCTS_PER_PAGE,
   );
 
-    // ================================
+  // ================================
   // TOGGLE WISHLIST
   // ================================
 
@@ -125,24 +178,18 @@ function Shop() {
       return;
     }
 
-    const isWishlisted =
-      wishlistProducts.includes(productId);
+    const isWishlisted = wishlistProducts.includes(productId);
 
     try {
       if (isWishlisted) {
-        await axios.delete(
-          `http://localhost:5000/api/wishlist/${productId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        await axios.delete(`http://localhost:5000/api/wishlist/${productId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         setWishlistProducts((previous) =>
-          previous.filter(
-            (id) => id !== productId,
-          ),
+          previous.filter((id) => id !== productId),
         );
       } else {
         await axios.post(
@@ -157,16 +204,10 @@ function Shop() {
           },
         );
 
-        setWishlistProducts((previous) => [
-          ...previous,
-          productId,
-        ]);
+        setWishlistProducts((previous) => [...previous, productId]);
       }
     } catch (error) {
-      console.error(
-        "Toggle wishlist error:",
-        error,
-      );
+      console.error("Toggle wishlist error:", error);
     }
   };
 
@@ -231,6 +272,88 @@ function Shop() {
           <p>Discover the ESSENZA fragrance collection.</p>
         </section>
 
+        <div className="shop-controls">
+
+  {/* PRICE FILTER */}
+
+<div className="shop-sort">
+  <label htmlFor="price-filter">
+    PRICE
+  </label>
+
+  <select
+    id="price-filter"
+    value={priceFilter}
+    onChange={(event) => {
+      setPriceFilter(event.target.value);
+      setCurrentPage(1);
+    }}
+  >
+    <option value="all">
+      Default
+    </option>
+
+    <option value="under-500">
+      Under ₹500
+    </option>
+
+    <option value="500-1000">
+      ₹500 – ₹1,000
+    </option>
+
+    <option value="1000-2000">
+      ₹1,000 – ₹2,000
+    </option>
+
+    <option value="2000-3000">
+      ₹2,000 – ₹3,000
+    </option>
+
+    <option value="3000-4000">
+      ₹3,000 – ₹4,000
+    </option>
+
+    <option value="above-4000">
+      Above ₹4,000
+    </option>
+  </select>
+</div>
+
+  {/* SORT */}
+
+  <div className="shop-sort">
+    <label htmlFor="sort-products">
+      SORT BY
+    </label>
+
+    <select
+      id="sort-products"
+      value={sortOption}
+      onChange={(event) => {
+        setSortOption(event.target.value);
+        setCurrentPage(1);
+      }}
+    >
+      <option value="default">
+        Default
+      </option>
+
+      <option value="newest">
+        Newest
+      </option>
+
+      <option value="price-low-high">
+        Price: Low to High
+      </option>
+
+      <option value="price-high-low">
+        Price: High to Low
+      </option>
+    </select>
+  </div>
+
+</div>
+
         {/* ================================
             LOADING
         ================================= */}
@@ -247,15 +370,17 @@ function Shop() {
             NO PRODUCTS
         ================================= */}
 
-        {!loading && !error && products.length === 0 && (
-          <div className="shop-message">No products found.</div>
-        )}
+        {!loading && !error && sortedProducts.length === 0 && (
+  <div className="shop-message">
+    No products found for this price range.
+  </div>
+)}
 
         {/* ================================
             PRODUCTS
         ================================= */}
 
-        {!loading && !error && products.length > 0 && (
+        {!loading && !error && sortedProducts.length > 0 && (
           <>
             <section className="product-grid">
               {currentProducts.map((product) => {
@@ -268,25 +393,21 @@ function Shop() {
                     {/* PRODUCT IMAGE */}
                     <div className="product-image-container">
                       <button
-  type="button"
-  className={`wishlist-button ${
-    wishlistProducts.includes(product._id)
-      ? "wishlist-active"
-      : ""
-  }`}
-  onClick={() =>
-    toggleWishlist(product._id)
-  }
-  aria-label={
-    wishlistProducts.includes(product._id)
-      ? "Remove from wishlist"
-      : "Add to wishlist"
-  }
->
-  {wishlistProducts.includes(product._id)
-    ? "♥"
-    : "♡"}
-</button> 
+                        type="button"
+                        className={`wishlist-button ${
+                          wishlistProducts.includes(product._id)
+                            ? "wishlist-active"
+                            : ""
+                        }`}
+                        onClick={() => toggleWishlist(product._id)}
+                        aria-label={
+                          wishlistProducts.includes(product._id)
+                            ? "Remove from wishlist"
+                            : "Add to wishlist"
+                        }
+                      >
+                        {wishlistProducts.includes(product._id) ? "♥" : "♡"}
+                      </button>
                       {images.length > 0 ? (
                         <>
                           <img
