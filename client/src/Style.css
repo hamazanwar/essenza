@@ -3747,3 +3747,415 @@
     background: #333333;
 }
 
+/* =========================================================
+   ADMIN ORDER MANAGEMENT
+========================================================= */
+
+.admin-order-management-page {
+  min-height: 100vh;
+  background: #f7f7f7;
+}
+
+.admin-order-management-content {
+  margin-left: 260px;
+  padding: 45px 40px 60px;
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.admin-order-management-content h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.admin-order-management-subtitle {
+  margin-top: 10px;
+  margin-bottom: 35px;
+  font-size: 15px;
+  color: #666;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.admin-order-error {
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: #f5e8e8;
+  color: #8b2222;
+  border: 1px solid #e2caca;
+}
+
+
+/* =========================================================
+   TABLE CONTAINER
+========================================================= */
+
+.admin-order-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.admin-order-table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.admin-order-table th {
+  padding: 18px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #555;
+  background: #fafafa;
+  border-bottom: 1px solid #dddddd;
+  white-space: nowrap;
+}
+
+.admin-order-table td {
+  padding: 20px 16px;
+  vertical-align: top;
+  font-size: 14px;
+  color: #222;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.admin-order-table tbody tr:hover {
+  background: #fafafa;
+}
+
+
+/* =========================================================
+   ORDER ID
+========================================================= */
+
+.admin-order-id {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 7px;
+}
+
+.admin-order-table td small {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #777;
+}
+
+
+/* =========================================================
+   CUSTOMER
+========================================================= */
+
+.admin-order-table td strong {
+  font-weight: 500;
+}
+
+.admin-order-table td:nth-child(2) strong {
+  display: block;
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+.admin-order-products {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 240px;
+}
+
+.admin-order-product {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.admin-order-product img {
+  width: 65px;
+  height: 75px;
+  object-fit: contain;
+  background: #f7f7f7;
+  border: 1px solid #eeeeee;
+  flex-shrink: 0;
+}
+
+.admin-order-product > div {
+  padding-top: 3px;
+}
+
+.admin-order-product strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.admin-order-product small {
+  font-size: 12px;
+  color: #777;
+}
+
+
+/* =========================================================
+   ADDRESS
+========================================================= */
+
+.admin-order-address {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+  max-width: 230px;
+}
+
+.admin-order-address strong {
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.admin-order-address span {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #666;
+}
+
+
+/* =========================================================
+   PAYMENT
+========================================================= */
+
+.admin-order-table td:nth-child(5) strong {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.admin-order-table td:nth-child(5) small {
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.admin-order-table td:nth-child(6) strong {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   STATUS SELECT
+========================================================= */
+
+.admin-order-status-select {
+  min-width: 155px;
+  padding: 10px 12px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  outline: none;
+}
+
+.admin-order-status-select:focus {
+  border-color: #111111;
+}
+
+.admin-order-status-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+
+/* STATUS STATES */
+
+.admin-order-status-pending {
+  border-color: #d6c27a;
+}
+
+.admin-order-status-confirmed {
+  border-color: #9db5d4;
+}
+
+.admin-order-status-shipped {
+  border-color: #a99acb;
+}
+
+.admin-order-status-out {
+  border-color: #c9a36a;
+}
+
+.admin-order-status-delivered {
+  border-color: #8eaf8e;
+}
+
+.admin-order-status-cancelled {
+  border-color: #c99b9b;
+}
+
+
+/* =========================================================
+   NO ORDERS
+========================================================= */
+
+.admin-no-orders {
+  padding: 60px 20px !important;
+  text-align: center;
+  color: #777 !important;
+  font-size: 14px !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+  .admin-order-management-content {
+    margin-left: 260px;
+    padding: 35px 25px 50px;
+  }
+
+  .admin-order-management-content h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-order-management-content {
+    margin-left: 0;
+    padding: 30px 20px 40px;
+  }
+
+  .admin-order-management-content h1 {
+    font-size: 25px;
+  }
+
+  .admin-order-management-subtitle {
+    font-size: 14px;
+    margin-bottom: 25px;
+  }
+
+  .admin-order-table {
+    min-width: 1050px;
+  }
+}
+
+/* =========================================================
+   ADMIN ORDER STATUS CONFIRMATION
+========================================================= */
+
+.admin-order-confirmation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.admin-order-confirmation-box {
+  width: 420px;
+  max-width: calc(100% - 40px);
+
+  padding: 35px;
+
+  background: #ffffff;
+  border: 1px solid #dddddd;
+
+  text-align: center;
+}
+
+.admin-order-confirmation-box h2 {
+  margin: 0 0 18px;
+
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.admin-order-confirmation-box p {
+  margin: 0 0 12px;
+
+  font-size: 14px;
+  line-height: 1.6;
+  color: #666;
+}
+
+.admin-order-confirmation-box > strong {
+  display: block;
+
+  margin-bottom: 28px;
+
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+.admin-order-confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.admin-order-confirmation-actions button {
+  min-width: 120px;
+  padding: 12px 20px;
+
+  border: none;
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+}
+
+.admin-order-confirmation-cancel {
+  background: #eeeeee;
+  color: #111111;
+}
+
+.admin-order-confirmation-confirm {
+  background: #111111;
+  color: #ffffff;
+}
+
+.admin-order-confirmation-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-order-confirmation-cancel:hover:not(:disabled) {
+  background: #dddddd;
+}
+
+.admin-order-confirmation-confirm:hover:not(:disabled) {
+  background: #333333;
+}

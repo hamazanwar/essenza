@@ -30,6 +30,7 @@ import Checkout from "./components/ckeckout/Checkout";
 import Payment from "./components/payment/Payment";
 import OrderConfirmation from "./components/order/OrderConfirmation";
 import MyOrders from "./components/order/MyOrders";
+import AdminOrderManagement from "./admin/order/AdminOrderManagement";
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
       <Route path="/payment" element={<Payment />} />
       <Route path="/order-confirmation" element={<OrderConfirmation />} />
       <Route path="/my-orders" element={<MyOrders />} />
+      <Route path="/admin/orders" element={<AdminOrderManagement />} />
 
     </Routes>
   );
