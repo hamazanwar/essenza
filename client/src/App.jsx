@@ -26,6 +26,7 @@ import Shop from "./components/shop/Shop";
 import ProductDetails from "./components/product/ProductDetails";
 import Cart from "./components/cart/Cart";
 import Wishlist from "./components/wishlist/Wishlist";
+import Checkout from "./components/ckeckout/Checkout";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
       <Route path="/product/:productId" element={<ProductDetails />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/wishlist" element={<Wishlist />} />
+      <Route path="/checkout" element={<Checkout />} />
 
     </Routes>
   );

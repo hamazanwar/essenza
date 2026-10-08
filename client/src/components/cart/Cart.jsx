@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 
 function Cart() {
+  const navigate = useNavigate();
+
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -313,11 +316,12 @@ function Cart() {
                 </div>
 
                 <button
-                  type="button"
-                  className="checkout-button"
-                >
-                  PROCEED TO CHECKOUT
-                </button>
+  type="button"
+  className="checkout-button"
+  onClick={() => navigate("/checkout")}
+>
+  PROCEED TO CHECKOUT
+</button>
 
               </div>
             </>

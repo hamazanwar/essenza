@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import Navbar from "../bars/Navbar";
@@ -7,6 +7,7 @@ import Footer from "../bars/Footer";
 
 function ProductDetails() {
   const { productId } = useParams();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -317,14 +318,32 @@ const [zoomPosition, setZoomPosition] = useState({
                 </button>
 
                 <button
-                  type="button"
-                  className="buy-now-button"
-                  onClick={() => {
-                    // Buy now logic will be added next
-                  }}
-                >
-                  BUY NOW
-                </button>
+  type="button"
+  className="buy-now-button"
+  onClick={() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    if (!selectedVariant) {
+      setError("Please select a product variant.");
+      return;
+    }
+
+    navigate("/checkout", {
+      state: {
+        productId: productId,
+        variantId: selectedVariant._id,
+        quantity: quantity,
+      },
+    });
+  }}
+>
+  BUY NOW
+</button>
               </div>
             )}
             {product.fragranceNotes && (
