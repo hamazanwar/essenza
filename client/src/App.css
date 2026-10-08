@@ -4177,3 +4177,22 @@ body {
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+/* PRODUCT IMAGE ZOOM */
+
+.product-main-image {
+    overflow: hidden;
+    cursor: zoom-in;
+}
+
+.product-main-image img {
+    transition: transform 0.25s ease;
+}
+
+.product-main-image.image-zoomed {
+    cursor: zoom-out;
+}
+
+.product-main-image.image-zoomed img {
+    transform: scale(2);
+}

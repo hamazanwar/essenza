@@ -16,6 +16,12 @@ function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
   const [cartMessage, setCartMessage] = useState("");
 
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
+const [zoomPosition, setZoomPosition] = useState({
+  x: 50,
+  y: 50,
+});
+
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -51,6 +57,24 @@ function ProductDetails() {
 
     getProduct();
   }, [productId]);
+
+  const handleImageMouseMove = (event) => {
+  const imageContainer = event.currentTarget;
+
+  const rect = imageContainer.getBoundingClientRect();
+
+  const x =
+    ((event.clientX - rect.left) / rect.width) * 100;
+
+  const y =
+    ((event.clientY - rect.top) / rect.height) * 100;
+
+  setZoomPosition({
+    x,
+    y,
+  });
+};
+
   const addToCart = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -145,16 +169,36 @@ function ProductDetails() {
         <div className="product-details-container">
           {/* PRODUCT IMAGE GALLERY */}
           <section className="product-gallery">
-            <div className="product-main-image">
-              {product.productImage?.length > 0 ? (
-                <img
-                  src={`http://localhost:5000${product.productImage[selectedImage]}`}
-                  alt={product.name}
-                />
-              ) : (
-                <div className="product-main-image-placeholder">No Image</div>
-              )}
-            </div>
+            <div
+  className={`product-main-image ${
+    isImageZoomed ? "image-zoomed" : ""
+  }`}
+  onMouseEnter={() => {
+    setIsImageZoomed(true);
+  }}
+  onMouseMove={handleImageMouseMove}
+  onMouseLeave={() => {
+    setIsImageZoomed(false);
+    setZoomPosition({
+      x: 50,
+      y: 50,
+    });
+  }}
+>
+  {product.productImage?.length > 0 ? (
+    <img
+      src={`http://localhost:5000${product.productImage[selectedImage]}`}
+      alt={product.name}
+      style={{
+        transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+      }}
+    />
+  ) : (
+    <div className="product-main-image-placeholder">
+      No Image
+    </div>
+  )}
+</div>
 
             {/* THUMBNAILS */}
             {product.productImage?.length > 1 && (
