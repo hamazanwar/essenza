@@ -13,8 +13,13 @@ const getAllCategoriesService = async () => {
 
 // ADD CATEGORY
 const addCategoryService = async (name) => {
+    const trimmedName = name.trim();
+
     const existingCategory = await Category.findOne({
-        name: name.trim()
+        name: {
+            $regex: `^${trimmedName}$`,
+            $options: "i"
+        }
     });
 
     if (existingCategory) {
@@ -24,7 +29,7 @@ const addCategoryService = async (name) => {
     }
 
     const category = await Category.create({
-        name: name.trim()
+        name: trimmedName
     });
 
     return {
@@ -43,10 +48,15 @@ const updateCategoryService = async (categoryId, name) => {
         throw error;
     }
 
-    const existingCategory = await Category.findOne({
-        name: name.trim(),
-        _id: { $ne: categoryId }
-    });
+    const trimmedName = name.trim();
+
+const existingCategory = await Category.findOne({
+    name: {
+        $regex: `^${trimmedName}$`,
+        $options: "i"
+    },
+    _id: { $ne: categoryId }
+});
 
     if (existingCategory) {
         const error = new Error("Category already exists");
@@ -54,7 +64,7 @@ const updateCategoryService = async (categoryId, name) => {
         throw error;
     }
 
-    category.name = name.trim();
+    category.name = trimmedName;
 
     await category.save();
 
