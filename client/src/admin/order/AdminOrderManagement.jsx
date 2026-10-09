@@ -9,6 +9,11 @@ function AdminOrderManagement() {
   const [error, setError] = useState("");
   const [statusConfirmation, setStatusConfirmation] = useState(null);
 const [updatingStatus, setUpdatingStatus] = useState(false);
+const [currentPage, setCurrentPage] = useState(1);
+const ordersPerPage = 15;
+
+const [startDate, setStartDate] = useState("");
+const [endDate, setEndDate] = useState("");
 
   const fetchOrders = async () => {
     try {
@@ -33,9 +38,58 @@ const [updatingStatus, setUpdatingStatus] = useState(false);
     }
   };
 
+  
+const getLocalDateString = (dateValue) => {
+  const date = new Date(dateValue);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+// Filter orders by order creation date
+const filteredOrders = orders.filter((order) => {
+  const orderDate = getLocalDateString(order.createdAt);
+
+  const matchesStartDate =
+    !startDate || orderDate >= startDate;
+
+  const matchesEndDate =
+    !endDate || orderDate <= endDate;
+
+  return matchesStartDate && matchesEndDate;
+});
+
+// Pagination calculations
+const totalPages = Math.max(
+  1,
+  Math.ceil(filteredOrders.length / ordersPerPage)
+);
+
+const startIndex = (currentPage - 1) * ordersPerPage;
+
+const currentOrders = filteredOrders.slice(
+  startIndex,
+  startIndex + ordersPerPage
+);
+
+
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+  const lastPage = Math.max(
+    1,
+    Math.ceil(filteredOrders.length / ordersPerPage)
+  );
+
+  if (currentPage > lastPage) {
+    setCurrentPage(lastPage);
+  }
+}, [filteredOrders.length, currentPage]);
 
   const handleStatusChange = (orderId, newStatus) => {
   setStatusConfirmation({
@@ -127,6 +181,57 @@ const confirmStatusChange = async () => {
         <p className="admin-order-management-subtitle">
           Manage customer orders and update order status
         </p>
+        
+<div className="admin-order-filters">
+  <div className="admin-order-date-field">
+    <label htmlFor="order-start-date">FROM DATE</label>
+    <input
+      id="order-start-date"
+      type="date"
+      value={startDate}
+      max={endDate || undefined}
+      onChange={(event) => {
+        setStartDate(event.target.value);
+        setCurrentPage(1);
+      }}
+    />
+  </div>
+
+  <div className="admin-order-date-field">
+    <label htmlFor="order-end-date">TO DATE</label>
+    <input
+      id="order-end-date"
+      type="date"
+      value={endDate}
+      min={startDate || undefined}
+      onChange={(event) => {
+        setEndDate(event.target.value);
+        setCurrentPage(1);
+      }}
+    />
+  </div>
+
+  <button
+    type="button"
+    className="admin-order-clear-filter"
+    onClick={() => {
+      setStartDate("");
+      setEndDate("");
+      setCurrentPage(1);
+    }}
+  >
+    CLEAR FILTER
+  </button>
+</div>
+
+<p className="admin-order-results-count">
+  Showing {filteredOrders.length === 0 ? 0 : startIndex + 1}
+  {"–"}
+  {Math.min(startIndex + ordersPerPage, filteredOrders.length)}
+  {" of "}
+  {filteredOrders.length} orders
+</p>
+
 
         {loading && (
           <p>Loading orders...</p>
@@ -154,7 +259,7 @@ const confirmStatusChange = async () => {
               </thead>
 
               <tbody>
-                {orders.length === 0 ? (
+               {filteredOrders.length === 0 ? (
                   <tr>
                     <td
                       colSpan="7"
@@ -164,7 +269,7 @@ const confirmStatusChange = async () => {
                     </td>
                   </tr>
                 ) : (
-                  orders.map((order) => (
+                  currentOrders.map((order) => (
                     <tr key={order._id}>
                       {/* ORDER ID */}
                       <td>
@@ -317,6 +422,36 @@ const confirmStatusChange = async () => {
                 )}
               </tbody>
             </table>
+            
+<div className="admin-order-pagination">
+  <button
+    type="button"
+    onClick={() => setCurrentPage((page) => page - 1)}
+    disabled={currentPage === 1}
+  >
+    ← PREVIOUS
+  </button>
+
+  <span>
+    PAGE {currentPage} OF {totalPages}
+  </span>
+
+  <button
+    type="button"
+    onClick={() =>
+      setCurrentPage((page) =>
+        Math.min(page + 1, totalPages)
+      )
+    }
+    disabled={
+      currentPage === totalPages ||
+      filteredOrders.length === 0
+    }
+  >
+    NEXT →
+  </button>
+</div>
+
           </div>
         )}
       </main>
