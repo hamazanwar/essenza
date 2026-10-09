@@ -116,6 +116,150 @@ const createOrderService = async ({
   return order;
 };
 
+
+const createPaidOnlineOrderService = async ({
+  userId,
+  addressId,
+  items,
+  razorpayPaymentId,
+}) => {
+  if (!userId || !addressId || !razorpayPaymentId) {
+    throw new Error("Required payment details are missing.");
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error("Order must contain at least one product.");
+  }
+
+  const address = await Address.findOne({
+    _id: addressId,
+    userId,
+  });
+
+  if (!address) {
+    throw new Error("Delivery address not found.");
+  }
+
+  // Prevent reusing a payment ID to create another order.
+  const existingOrder = await Order.findOne({
+    paymentId: razorpayPaymentId,
+  });
+
+  if (existingOrder) {
+    if (existingOrder.userId.toString() !== userId.toString()) {
+      throw new Error("This payment has already been used.");
+    }
+
+    return existingOrder;
+  }
+
+  const orderItems = [];
+  let subtotal = 0;
+
+  // Validate all items before reducing stock.
+  for (const item of items) {
+    const quantity = Number(item.quantity);
+
+    if (
+      !item.productId ||
+      !item.variantId ||
+      !Number.isSafeInteger(quantity) ||
+      quantity < 1
+    ) {
+      throw new Error("Invalid order item.");
+    }
+
+    const product = await Product.findOne({
+      _id: item.productId,
+      isActive: true,
+    });
+
+    if (!product) {
+      throw new Error("One of the products is no longer available.");
+    }
+
+    const variant = await Variant.findOne({
+      _id: item.variantId,
+      productId: item.productId,
+    });
+
+    if (!variant || variant.stock < quantity) {
+      throw new Error(
+        `${product.name} is unavailable in the requested quantity.`
+      );
+    }
+
+    const totalPrice = variant.price * quantity;
+    subtotal += totalPrice;
+
+    orderItems.push({
+      productId: product._id,
+      variantId: variant._id,
+      productName: product.name,
+      size: variant.size,
+      productImage: product.productImage?.[0] || "",
+      price: variant.price,
+      quantity,
+      totalPrice,
+    });
+  }
+
+  const deliveryCharge = 0;
+  const totalAmount = subtotal + deliveryCharge;
+
+  // Atomically reserve each item's stock.
+  const reservedItems = [];
+
+  try {
+    for (const item of orderItems) {
+      const reservedVariant = await Variant.findOneAndUpdate(
+        {
+          _id: item.variantId,
+          productId: item.productId,
+          stock: { $gte: item.quantity },
+        },
+        {
+          $inc: { stock: -item.quantity },
+        },
+        { new: true }
+      );
+
+      if (!reservedVariant) {
+        throw new Error(
+          `${item.productName} is no longer available in the requested quantity.`
+        );
+      }
+
+      reservedItems.push(item);
+    }
+
+    const order = await Order.create({
+      userId,
+      addressId,
+      items: orderItems,
+      subtotal,
+      deliveryCharge,
+      totalAmount,
+      paymentMethod: "ONLINE",
+      paymentStatus: "PAID",
+      paymentId: razorpayPaymentId,
+      orderStatus: "PENDING",
+    });
+
+    return order;
+  } catch (error) {
+    // Restore stock if order creation fails.
+    for (const item of reservedItems) {
+      await Variant.findByIdAndUpdate(item.variantId, {
+        $inc: { stock: item.quantity },
+      });
+    }
+
+    throw error;
+  }
+};
+
+
 const getMyOrdersService = async (userId) => {
   const orders = await Order.find({ userId })
     .populate("addressId")
@@ -174,5 +318,6 @@ const cancelOrderService = async (userId, orderId) => {
 module.exports = {
   createOrderService,
   getMyOrdersService,
-  cancelOrderService
+  cancelOrderService,
+  createPaidOnlineOrderService
 };

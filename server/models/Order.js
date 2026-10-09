@@ -119,9 +119,9 @@ const orderSchema = new mongoose.Schema(
     },
 
     paymentId: {
-      type: String,
-      default: "",
-    },
+  type: String,
+  default: null,
+},
 
     cancelledAt: {
       type: Date,
@@ -135,6 +135,16 @@ const orderSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+  }
+);
+
+orderSchema.index(
+  { paymentId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      paymentId: { $type: "string", $gt: "" },
+    },
   }
 );
 
