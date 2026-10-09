@@ -12,6 +12,7 @@ const {
 const {
   createOrderService,
   getMyOrdersService,
+  getOrderDetailsService,
   cancelOrderService,
   createPaidOnlineOrderService
 } = require("../services/orderService");
@@ -72,6 +73,34 @@ const getMyOrders = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch orders.",
+    });
+  }
+};
+
+const getOrderDetails = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { orderId } = req.params;
+
+    const order = await getOrderDetailsService(userId, orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error("Get order details error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch order details.",
     });
   }
 };
@@ -382,5 +411,6 @@ module.exports = {
   getMyOrders,
   cancelOrder,
   createOnlinePaymentOrder,
-  verifyOnlinePayment
+  verifyOnlinePayment,
+  getOrderDetails
 };

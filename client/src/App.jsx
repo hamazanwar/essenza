@@ -1,8 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import "./Style.css"
-
+import "./Style.css";
 
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
@@ -31,6 +30,7 @@ import Payment from "./components/payment/Payment";
 import OrderConfirmation from "./components/order/OrderConfirmation";
 import MyOrders from "./components/order/MyOrders";
 import AdminOrderManagement from "./admin/order/AdminOrderManagement";
+import OrderDetails from "./components/order/OrderDetails";
 
 function App() {
   return (
@@ -46,9 +46,9 @@ function App() {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/dashboard" element={<AdminDashboard/>} />
-      <Route path="/admin/profile" element={<AdminProfile/>} />
-      <Route path="/admin/customers" element={<CustomerManagement/>} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/profile" element={<AdminProfile />} />
+      <Route path="/admin/customers" element={<CustomerManagement />} />
       <Route path="/admin/customers/:id" element={<CustomerDetails />} />
       <Route path="/admin/categories" element={<CategoryManagement />} />
       <Route path="/admin/products" element={<ProductManagement />} />
@@ -62,7 +62,7 @@ function App() {
       <Route path="/order-confirmation" element={<OrderConfirmation />} />
       <Route path="/my-orders" element={<MyOrders />} />
       <Route path="/admin/orders" element={<AdminOrderManagement />} />
-
+      <Route path="/my-orders/:orderId" element={<OrderDetails />} />
     </Routes>
   );
 }

@@ -268,6 +268,26 @@ const getMyOrdersService = async (userId) => {
   return orders;
 };
 
+
+const getOrderDetailsService = async (userId, orderId) => {
+  if (!userId) {
+    throw new Error("User authentication is required.");
+  }
+
+  if (!orderId) {
+    throw new Error("Order ID is required.");
+  }
+
+  // Find only an order belonging to the logged-in user.
+  const order = await Order.findOne({
+    _id: orderId,
+    userId,
+  }).populate("addressId");
+
+  return order;
+};
+
+
 const cancelOrderService = async (userId, orderId) => {
   if (!userId) {
     throw new Error("User authentication is required.");
@@ -319,5 +339,6 @@ module.exports = {
   createOrderService,
   getMyOrdersService,
   cancelOrderService,
-  createPaidOnlineOrderService
+  createPaidOnlineOrderService,
+  getOrderDetailsService
 };
