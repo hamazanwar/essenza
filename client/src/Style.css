@@ -4888,3 +4888,131 @@
     width: 100%;
   }
 }
+
+
+/* wallet */
+
+.wallet-admin-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.wallet-admin-stat {
+  padding: 20px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  min-width: 0;
+}
+
+.wallet-admin-stat span {
+  display: block;
+  color: #777;
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.wallet-admin-stat h3 {
+  margin: 0;
+  color: #111;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+
+.wallet-admin-status {
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .wallet-admin-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.wallet-admin-history {
+  margin-top: 32px;
+}
+
+.wallet-admin-history h3 {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+}
+
+.wallet-admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.wallet-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.wallet-admin-table th {
+  background: #111;
+  color: #fff;
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.7px;
+  padding: 15px 12px;
+  white-space: nowrap;
+}
+
+.wallet-admin-table td {
+  border-bottom: 1px solid #e8e8e8;
+  padding: 15px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.wallet-admin-table tbody tr:hover {
+  background: #fafafa;
+}
+
+
+.withdrawal-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.withdrawal-approve-button,
+.withdrawal-reject-button {
+  padding: 8px 12px;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.withdrawal-approve-button {
+  background: #e5f4e8;
+  color: #236b35;
+}
+
+.withdrawal-reject-button {
+  background: #fdeaea;
+  color: #a52828;
+}
+
+.withdrawal-approve-button:disabled,
+.withdrawal-reject-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wallet-review-success {
+  padding: 10px 12px;
+  margin: 12px 0;
+  background: #e5f4e8;
+  color: #236b35;
+  font-size: 13px;
+}

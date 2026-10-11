@@ -7,8 +7,11 @@ const protectAdmin = require("../middleware/adminAuthMiddleware");
 const {
     getAllCustomers,
     updateCustomerStatus,
-    getCustomerDetails
+    getCustomerDetails,
+    getCustomerWallet,
+    reviewWithdrawalRequest
 } = require("../controllers/customerController");
+
 
 
 // Get all customers
@@ -18,5 +21,13 @@ router.get("/", protectAdmin, getAllCustomers);
 router.get("/:id", protectAdmin, getCustomerDetails);
 
 router.patch("/:id/status", protectAdmin, updateCustomerStatus);
+
+router.get("/:id/wallet", protectAdmin, getCustomerWallet);
+
+router.patch(
+    "/:id/wallet/withdrawals/:requestId",
+    protectAdmin,
+    reviewWithdrawalRequest
+);
 
 module.exports = router;
