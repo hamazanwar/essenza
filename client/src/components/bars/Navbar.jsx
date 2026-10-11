@@ -92,6 +92,18 @@ const handleMyOrdersClick = () => {
   }
 };
 
+// ==========================================
+// WALLET CLICK
+// ==========================================
+
+const handleWalletClick = () => {
+  if (isLoggedIn) {
+    navigate("/wallet");
+  } else {
+    navigate("/register");
+  }
+};
+
   return (
     <nav className="navbar">
 
@@ -283,6 +295,35 @@ const handleMyOrdersClick = () => {
     <path d="M9 15h4" />
   </svg>
 </button>
+
+
+        {/* WALLET */}
+
+        <button
+          type="button"
+          className="navbar-icon navbar-icon-button"
+          aria-label="My Wallet"
+          title="My Wallet"
+          onClick={handleWalletClick}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="21"
+            height="21"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="5" width="18" height="15" rx="2" />
+            <path d="M3 9h18" />
+            <path d="M16 15h.01" />
+            <path d="M7 5V3h10v2" />
+          </svg>
+        </button>
+
+
 
         {/* PROFILE */}
 

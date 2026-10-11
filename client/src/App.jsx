@@ -32,6 +32,7 @@ import MyOrders from "./components/order/MyOrders";
 import AdminOrderManagement from "./admin/order/AdminOrderManagement";
 import OrderDetails from "./components/order/OrderDetails";
 import CouponManagement from "./admin/coupon/CouponManagement";
+import Wallet from "./components/wallet/Wallet";
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
       <Route path="/admin/orders" element={<AdminOrderManagement />} />
       <Route path="/my-orders/:orderId" element={<OrderDetails />} />
       <Route path="/admin/coupons" element={<CouponManagement />} />
+      <Route path="/wallet" element={<Wallet />} />
     </Routes>
   );
 }

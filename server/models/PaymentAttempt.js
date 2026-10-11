@@ -7,33 +7,61 @@ const paymentAttemptSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
-    addressId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
+    // ORDER = normal product checkout
+    // WALLET_TOPUP = adding money to the wallet
+    purpose: {
+      type: String,
+      enum: ["ORDER", "WALLET_TOPUP"],
+      default: "ORDER",
       required: true,
     },
 
-    items: [
-      {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        variantId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Variant",
-          required: true,
-        },
-        quantity: {
-          type: Number,
-          required: true,
-          min: 1,
-        },
+    // Required only for product orders
+    addressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+      required: function () {
+        return this.purpose === "ORDER";
       },
-    ],
+    },
+
+    // Required only for product orders
+    items: {
+      type: [
+        {
+          productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
+            required: true,
+          },
+          variantId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Variant",
+            required: true,
+          },
+          quantity: {
+            type: Number,
+            required: true,
+            min: 1,
+          },
+        },
+      ],
+      required: function () {
+        return this.purpose === "ORDER";
+      },
+      validate: {
+        validator: function (items) {
+          return (
+            this.purpose !== "ORDER" ||
+            (Array.isArray(items) && items.length > 0)
+          );
+        },
+        message: "Product orders must contain at least one item.",
+      },
+    },
 
     razorpayOrderId: {
       type: String,
@@ -44,13 +72,15 @@ const paymentAttemptSchema = new mongoose.Schema(
     amount: {
       type: Number,
       required: true,
+      min: 1,
     },
 
-   status: {
-  type: String,
-  enum: ["CREATED", "PROCESSING", "PAID", "FAILED"],
-  default: "CREATED",
-},
+    status: {
+      type: String,
+      enum: ["CREATED", "PROCESSING", "PAID", "FAILED"],
+      default: "CREATED",
+      required: true,
+    },
 
     paymentId: {
       type: String,

@@ -1,3 +1,4 @@
+require("node:dns").setServers(["8.8.8.8"]);
 require("dotenv").config();
 
 const express = require("express");
@@ -22,6 +23,7 @@ const wishlistRoutes = require("./routes/wishlistRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminOrderRoutes = require("./routes/adminOrderRoutes");
 const adminCouponRoutes = require("./routes/adminCouponRoutes");
+const walletRoutes = require("./routes/walletRoutes");
 
 
 const app = express();
@@ -51,7 +53,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/coupons", adminCouponRoutes);
-
+app.use("/api/wallet", walletRoutes);
 
 
 app.get("/", (req, res) => {

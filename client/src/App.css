@@ -6831,3 +6831,252 @@ body {
     font-size: 11px;
   }
 }
+
+
+/* ============================
+   ESSENZA WALLET PAGE
+============================ */
+
+.wallet-page {
+  min-height: 70vh;
+  padding: 55px 24px 80px;
+  background: #faf9f6;
+  color: #171717;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.wallet-container {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.wallet-container > h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+
+.wallet-subtitle {
+  margin: 0 0 32px;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.wallet-balance-card {
+  padding: 35px;
+  background: #171717;
+  color: #fff;
+  border-radius: 5px;
+  margin-bottom: 45px;
+}
+
+.wallet-balance-card > p {
+  margin: 0 0 12px;
+  color: #d0d0d0;
+  font-size: 13px;
+}
+
+.wallet-balance-card > h2 {
+  margin: 0 0 25px;
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -1px;
+}
+
+.wallet-add-button {
+  padding: 12px 23px;
+  background: #d9bd83;
+  color: #171717;
+  border: 1px solid #d9bd83;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.wallet-add-button:hover {
+  background: #e8d3a5;
+}
+
+.wallet-transactions > h2 {
+  margin: 0 0 22px;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.wallet-empty {
+  padding: 35px 20px;
+  background: #fff;
+  border: 1px solid #e9e6df;
+  color: #777;
+  text-align: center;
+  font-size: 14px;
+}
+
+.wallet-transaction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 20px;
+  background: #fff;
+  border-bottom: 1px solid #ece9e3;
+}
+
+.wallet-transaction h3 {
+  margin: 0 0 7px;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.wallet-transaction p {
+  margin: 0;
+  color: #888;
+  font-size: 12px;
+}
+
+.wallet-credit {
+  color: #25834c;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.wallet-debit {
+  color: #bd3b3b;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.wallet-error {
+  margin-bottom: 25px;
+  color: #bd3b3b;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .wallet-page {
+    padding: 35px 16px 55px;
+  }
+
+  .wallet-container > h1 {
+    font-size: 27px;
+  }
+
+  .wallet-balance-card {
+    padding: 25px 20px;
+    margin-bottom: 35px;
+  }
+
+  .wallet-balance-card > h2 {
+    font-size: 31px;
+  }
+
+  .wallet-transaction {
+    padding: 18px 12px;
+    gap: 12px;
+  }
+
+  .wallet-transaction h3 {
+    font-size: 12px;
+  }
+
+  .wallet-credit,
+  .wallet-debit {
+    font-size: 12px;
+  }
+}
+
+.wallet-topup {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.wallet-topup input {
+  width: 200px;
+  padding: 12px;
+  border: 1px solid #777;
+  border-radius: 3px;
+  background: #fff;
+  color: #171717;
+  font: inherit;
+  font-size: 13px;
+}
+
+.wallet-add-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* Wallet success message */
+.wallet-success {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 15px 18px;
+  border: 1px solid #b7dfc5;
+  background: #effaf2;
+  color: #216b3a;
+  font-size: 14px;
+}
+
+.wallet-success button {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Withdraw Money button */
+.wallet-withdraw-button {
+  padding: 12px 20px;
+  border: 1px solid #d9bd83;
+  background: transparent;
+  color: #fff;
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.wallet-withdraw-button:hover {
+  background: #292929;
+}
+
+/* Withdrawal panel */
+.wallet-withdraw-panel {
+  margin-top: 20px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #e9e6df;
+  color: #171717;
+}
+
+.wallet-withdraw-panel h3 {
+  margin-top: 0;
+}
+
+.wallet-withdraw-panel input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 300px;
+  margin: 15px 0;
+  padding: 12px;
+  border: 1px solid #ddd;
+  font: inherit;
+}
+
+.wallet-withdraw-note {
+  color: #777;
+  font-size: 13px;
+}
