@@ -125,14 +125,26 @@ function Cart() {
     }
   };
 
-  // CALCULATE SUBTOTAL
+  
+  // CALCULATE SUBTOTAL USING DISCOUNTED PRICES
   const subtotal =
     cart?.items?.reduce(
       (total, item) =>
         total +
-        item.variantId.price * item.quantity,
+        (item.discountedPrice ?? item.variantId.price) *
+          item.quantity,
       0,
     ) || 0;
+
+  const originalSubtotal =
+    cart?.items?.reduce(
+      (total, item) =>
+        total + item.variantId.price * item.quantity,
+      0,
+    ) || 0;
+
+  const totalDiscount = originalSubtotal - subtotal;
+
 
   if (loading) {
     return (
@@ -225,9 +237,29 @@ function Cart() {
                         Size: {item.variantId?.size}
                       </p>
 
-                      <p>
-                        ₹{item.variantId?.price}
-                      </p>
+                      
+{item.discountAmount > 0 ? (
+  <>
+    <p className="cart-original-price">
+      ₹{item.originalPrice}
+    </p>
+
+    <p className="cart-discounted-price">
+      ₹{item.discountedPrice}
+    </p>
+
+    <p className="cart-offer-badge">
+      {item.discountType === "PERCENTAGE"
+        ? `${item.discountValue}% OFF`
+        : `₹${item.discountValue} OFF`}
+    </p>
+  </>
+) : (
+  <p>
+    ₹{item.variantId?.price}
+  </p>
+)}
+
 
                     </div>
 
@@ -272,11 +304,15 @@ function Cart() {
                     </div>
 
                     {/* ITEM SUBTOTAL */}
-                    <div className="cart-item-subtotal">
-                      ₹
-                      {item.variantId.price *
-                        item.quantity}
-                    </div>
+                    
+<div className="cart-item-subtotal">
+  ₹
+  {(
+    (item.discountedPrice ?? item.variantId.price) *
+    item.quantity
+  ).toFixed(2)}
+</div>
+
 
                     {/* REMOVE */}
                     <button
@@ -305,6 +341,15 @@ function Cart() {
                   <span>
                     ₹{subtotal}
                   </span>
+
+{totalDiscount > 0 && (
+  <div className="cart-summary-row cart-discount-row">
+    <span>Offer Discount</span>
+    <span>-₹{totalDiscount.toFixed(2)}</span>
+  </div>
+)}
+
+
                 </div>
 
                 <div className="cart-summary-row">

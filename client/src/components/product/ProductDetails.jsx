@@ -10,6 +10,9 @@ function ProductDetails() {
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
+  
+const [activeOffers, setActiveOffers] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
@@ -34,6 +37,18 @@ const [zoomPosition, setZoomPosition] = useState({
         );
 
         const productData = response.data.product;
+        
+try {
+  const offerResponse = await axios.get(
+    "http://localhost:5000/api/admin/offers/active"
+  );
+
+  setActiveOffers(offerResponse.data.offers || []);
+} catch (offerError) {
+  console.error("Get active offers error:", offerError);
+  setActiveOffers([]);
+}
+
 
         setProduct(productData);
 
@@ -58,6 +73,38 @@ const [zoomPosition, setZoomPosition] = useState({
 
     getProduct();
   }, [productId]);
+  
+const applicableOffers = activeOffers.filter((offer) => {
+  const productMatches = offer.applicableProducts?.some(
+    (item) => String(item._id || item) === String(product._id)
+  );
+
+  const categoryMatches = offer.applicableCategories?.some(
+    (item) =>
+      String(item._id || item) ===
+      String(product.categoryId?._id || product.categoryId)
+  );
+
+  return productMatches || categoryMatches;
+});
+
+const bestOffer = selectedVariant
+  ? applicableOffers.reduce((best, offer) => {
+      const price = selectedVariant.price;
+
+      const discountedPrice =
+        offer.discountType === "PERCENTAGE"
+          ? price * (1 - offer.discountValue / 100)
+          : Math.max(0, price - offer.discountValue);
+
+      if (!best || discountedPrice < best.discountedPrice) {
+        return { offer, discountedPrice };
+      }
+
+      return best;
+    }, null)
+  : null;
+
 
   const handleImageMouseMove = (event) => {
   const imageContainer = event.currentTarget;
@@ -231,19 +278,43 @@ const [zoomPosition, setZoomPosition] = useState({
             <h1>{product.name}</h1>
 
             <p className="product-details-description">{product.description}</p>
-            {selectedVariant && (
-              <div className="selected-variant-info">
-                <p className="selected-variant-price">
-                  ₹{selectedVariant.price}
-                </p>
+            
+{selectedVariant && (
+  <div className="selected-variant-info">
+    {bestOffer ? (
+      <>
+        <p className="product-offer-badge">
+          {bestOffer.offer.discountType === "PERCENTAGE"
+            ? `${bestOffer.offer.discountValue}% OFF`
+            : `₹${bestOffer.offer.discountValue} OFF`}
+        </p>
 
-                <p className="selected-variant-stock">
-                  {selectedVariant.stock > 0
-                    ? `${selectedVariant.stock} available`
-                    : "Out of stock"}
-                </p>
-              </div>
-            )}
+        <p className="selected-variant-original-price">
+          ₹{selectedVariant.price}
+        </p>
+
+        <p className="selected-variant-price">
+          ₹{Math.round(bestOffer.discountedPrice * 100) / 100}
+        </p>
+
+        <p className="product-offer-name">
+          {bestOffer.offer.name}
+        </p>
+      </>
+    ) : (
+      <p className="selected-variant-price">
+        ₹{selectedVariant.price}
+      </p>
+    )}
+
+    <p className="selected-variant-stock">
+      {selectedVariant.stock > 0
+        ? `${selectedVariant.stock} available`
+        : "Out of stock"}
+    </p>
+  </div>
+)}
+
 
             {product.variants?.length > 0 ? (
               <div className="product-variants">

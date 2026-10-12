@@ -47,6 +47,29 @@ const paymentAttemptSchema = new mongoose.Schema(
             required: true,
             min: 1,
           },
+          
+originalPrice: {
+  type: Number,
+  required: true,
+  min: 0,
+},
+unitPrice: {
+  type: Number,
+  required: true,
+  min: 0,
+},
+discountAmount: {
+  type: Number,
+  required: true,
+  min: 0,
+  default: 0,
+},
+offerId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Offer",
+  default: null,
+},
+
         },
       ],
       required: function () {

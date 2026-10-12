@@ -2,6 +2,7 @@ const Address = require("../models/Address");
 const Product = require("../models/product");
 const Variant = require("../models/variant");
 const PaymentAttempt = require("../models/PaymentAttempt");
+const Offer = require("../models/Offer");
 
 const {
   createRazorpayOrderService,
@@ -163,68 +164,120 @@ const createOnlinePaymentOrder = async (req, res) => {
       });
     }
 
-    let subtotal = 0;
+    
+let subtotal = 0;
+const validatedItems = [];
+const now = new Date();
 
-    for (const item of items) {
-      const quantity = Number(item.quantity);
+for (const item of items) {
+  const quantity = Number(item.quantity);
 
-      if (
-        !item.productId ||
-        !item.variantId ||
-        !Number.isSafeInteger(quantity) ||
-        quantity < 1
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid order item.",
-        });
-      }
+  if (
+    !item.productId ||
+    !item.variantId ||
+    !Number.isSafeInteger(quantity) ||
+    quantity < 1
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid order item.",
+    });
+  }
 
-      const product = await Product.findOne({
-        _id: item.productId,
-        isActive: true,
-      });
+  const product = await Product.findOne({
+    _id: item.productId,
+    isActive: true,
+  });
 
-      if (!product) {
-        return res.status(400).json({
-          success: false,
-          message: "A product is no longer available.",
-        });
-      }
+  if (!product) {
+    return res.status(400).json({
+      success: false,
+      message: "A product is no longer available.",
+    });
+  }
 
-      const variant = await Variant.findOne({
-        _id: item.variantId,
-        productId: item.productId,
-      });
+  const variant = await Variant.findOne({
+    _id: item.variantId,
+    productId: item.productId,
+  });
 
-      if (!variant || variant.stock < quantity) {
-        return res.status(400).json({
-          success: false,
-          message: `${product.name} is unavailable in the requested quantity.`,
-        });
-      }
+  if (!variant || variant.stock < quantity) {
+    return res.status(400).json({
+      success: false,
+      message: `${product.name} is unavailable in the requested quantity.`,
+    });
+  }
 
-      subtotal += variant.price * quantity;
+  const offers = await Offer.find({
+    isActive: true,
+    startDate: { $lte: now },
+    endDate: { $gt: now },
+    $or: [
+      { applicableProducts: product._id },
+      { applicableCategories: product.categoryId },
+    ],
+  });
+
+  let unitPrice = variant.price;
+  let bestOffer = null;
+
+  for (const offer of offers) {
+    const offerPrice =
+      offer.discountType === "PERCENTAGE"
+        ? variant.price * (1 - offer.discountValue / 100)
+        : Math.max(0, variant.price - offer.discountValue);
+
+    if (offerPrice < unitPrice) {
+      unitPrice = offerPrice;
+      bestOffer = offer;
     }
+  }
 
-    const deliveryCharge = 0;
-    const totalAmount = subtotal + deliveryCharge;
+  unitPrice = Math.round(unitPrice * 100) / 100;
+
+  subtotal += unitPrice * quantity;
+
+  validatedItems.push({
+    productId: product._id,
+    variantId: variant._id,
+    quantity,
+    originalPrice: variant.price,
+    unitPrice,
+    discountAmount:
+      Math.round((variant.price - unitPrice) * 100) / 100,
+    offerId: bestOffer?._id || null,
+  });
+}
+
+subtotal = Math.round(subtotal * 100) / 100;
+
+const deliveryCharge = 0;
+
+const totalAmount = Math.round(
+  (subtotal + deliveryCharge) * 100
+) / 100;
 
     const razorpayOrder =
   await createRazorpayOrderService(totalAmount);
 
+
 await PaymentAttempt.create({
   userId,
   addressId,
-  items: items.map((item) => ({
+  items: validatedItems.map((item) => ({
     productId: item.productId,
     variantId: item.variantId,
-    quantity: Number(item.quantity),
+    quantity: item.quantity,
+    originalPrice: item.originalPrice,
+    unitPrice: item.unitPrice,
+    discountAmount: item.discountAmount,
+    offerId: item.offerId,
   })),
   razorpayOrderId: razorpayOrder.id,
   amount: razorpayOrder.amount,
   status: "CREATED",
 });
+
 
     return res.status(201).json({
       success: true,
@@ -353,11 +406,12 @@ const verifyOnlinePayment = async (req, res) => {
 
     // Create the order using the server-saved checkout details.
     const order = await createPaidOnlineOrderService({
-      userId,
-      addressId: claimedAttempt.addressId,
-      items: claimedAttempt.items,
-      razorpayPaymentId: razorpay_payment_id,
-    });
+  userId,
+  addressId: claimedAttempt.addressId,
+  items: claimedAttempt.items,
+  razorpayPaymentId: razorpay_payment_id,
+  expectedAmount: claimedAttempt.amount,
+});
 
     claimedAttempt.status = "PAID";
     claimedAttempt.paymentId = razorpay_payment_id;

@@ -1,6 +1,48 @@
 const Cart = require("../models/cart");
 const Product = require("../models/product");
 const Variant = require("../models/variant");
+const Offer = require("../models/Offer");
+
+
+const getBestOfferPrice = async (product, originalPrice) => {
+    const now = new Date();
+
+    const offers = await Offer.find({
+        isActive: true,
+        startDate: { $lte: now },
+        endDate: { $gt: now },
+        $or: [
+            { applicableProducts: product._id },
+            { applicableCategories: product.categoryId }
+        ]
+    });
+
+    let bestOffer = null;
+    let bestPrice = originalPrice;
+
+    for (const offer of offers) {
+        const discountedPrice =
+            offer.discountType === "PERCENTAGE"
+                ? originalPrice * (1 - offer.discountValue / 100)
+                : Math.max(0, originalPrice - offer.discountValue);
+
+        if (discountedPrice < bestPrice) {
+            bestPrice = discountedPrice;
+            bestOffer = offer;
+        }
+    }
+
+    return {
+        originalPrice,
+        discountedPrice: Math.round(bestPrice * 100) / 100,
+        discountAmount:
+            Math.round((originalPrice - bestPrice) * 100) / 100,
+        offerName: bestOffer?.name || null,
+        discountType: bestOffer?.discountType || null,
+        discountValue: bestOffer?.discountValue || 0
+    };
+};
+
 
 const populateCart = async (cart) => {
     return await cart.populate([
@@ -195,12 +237,57 @@ const getCartService = async (userId) => {
     // POPULATE CART
     // ==========================================
 
+    
+    // Populate product and variant details
     await populateCart(cart);
+
+    // Calculate offer prices for each cart item
+    const itemsWithOffers = await Promise.all(
+        cart.items.map(async (item) => {
+            const product = item.productId;
+            const variant = item.variantId;
+
+            if (!product || !variant) {
+                return item.toObject();
+            }
+
+            // Fetch the full product to get its category
+            const fullProduct = await Product.findById(product._id)
+                .select("categoryId");
+
+            const offerPrice = fullProduct
+                ? await getBestOfferPrice(fullProduct, variant.price)
+                : {
+                    originalPrice: variant.price,
+                    discountedPrice: variant.price,
+                    discountAmount: 0,
+                    offerName: null,
+                    discountType: null,
+                    discountValue: 0
+                };
+
+            return {
+                ...item.toObject(),
+                productId: product,
+                variantId: variant,
+                originalPrice: offerPrice.originalPrice,
+                discountedPrice: offerPrice.discountedPrice,
+                discountAmount: offerPrice.discountAmount,
+                offerName: offerPrice.offerName,
+                discountType: offerPrice.discountType,
+                discountValue: offerPrice.discountValue
+            };
+        })
+    );
 
     return {
         message: "Cart fetched successfully",
-        cart
+        cart: {
+            ...cart.toObject(),
+            items: itemsWithOffers
+        }
     };
+
 };
 
 // ==========================================

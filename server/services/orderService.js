@@ -2,6 +2,8 @@ const Order = require("../models/Order");
 const Address = require("../models/Address");
 const Product = require("../models/product");
 const Variant = require("../models/variant");
+const Offer = require("../models/Offer");
+
 
 const createOrderService = async ({
   userId,
@@ -25,7 +27,6 @@ const createOrderService = async ({
     throw new Error("Invalid payment method.");
   }
 
-  // Check address belongs to the logged-in user
   const address = await Address.findOne({
     _id: addressId,
     userId,
@@ -36,13 +37,19 @@ const createOrderService = async ({
   }
 
   const orderItems = [];
-
   let subtotal = 0;
 
   for (const item of items) {
-    if (!item.productId || !item.variantId || !item.quantity) {
+    if (
+      !item.productId ||
+      !item.variantId ||
+      !Number.isInteger(Number(item.quantity)) ||
+      Number(item.quantity) < 1
+    ) {
       throw new Error("Invalid order item.");
     }
+
+    const quantity = Number(item.quantity);
 
     const product = await Product.findOne({
       _id: item.productId,
@@ -64,13 +71,48 @@ const createOrderService = async ({
       );
     }
 
-    if (variant.stock < item.quantity) {
+    if (variant.stock < quantity) {
       throw new Error(
         `${product.name} has only ${variant.stock} item(s) available.`
       );
     }
 
-    const totalPrice = variant.price * item.quantity;
+    const originalPrice = Number(variant.price);
+    let unitPrice = originalPrice;
+    let offerId = null;
+
+    const now = new Date();
+
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gt: now },
+      $or: [
+        { applicableProducts: product._id },
+        { applicableCategories: product.categoryId },
+      ],
+    });
+
+    for (const offer of offers) {
+      const offerPrice =
+        offer.discountType === "PERCENTAGE"
+          ? originalPrice * (1 - offer.discountValue / 100)
+          : Math.max(0, originalPrice - offer.discountValue);
+
+      const roundedOfferPrice =
+        Math.round(offerPrice * 100) / 100;
+
+      if (roundedOfferPrice < unitPrice) {
+        unitPrice = roundedOfferPrice;
+        offerId = offer._id;
+      }
+    }
+
+    const discountAmount =
+      Math.round((originalPrice - unitPrice) * 100) / 100;
+
+    const totalPrice =
+      Math.round(unitPrice * quantity * 100) / 100;
 
     subtotal += totalPrice;
 
@@ -80,14 +122,20 @@ const createOrderService = async ({
       productName: product.name,
       size: variant.size,
       productImage: product.productImage?.[0] || "",
-      price: variant.price,
-      quantity: item.quantity,
+      price: unitPrice,
+      originalPrice,
+      discountAmount,
+      offerId,
+      quantity,
       totalPrice,
     });
   }
 
+  subtotal = Math.round(subtotal * 100) / 100;
+
   const deliveryCharge = 0;
-  const totalAmount = subtotal + deliveryCharge;
+  const totalAmount =
+    Math.round((subtotal + deliveryCharge) * 100) / 100;
 
   const order = await Order.create({
     userId,
@@ -97,24 +145,19 @@ const createOrderService = async ({
     deliveryCharge,
     totalAmount,
     paymentMethod,
-    paymentStatus: paymentMethod === "COD" ? "PENDING" : "PENDING",
+    paymentStatus: "PENDING",
     orderStatus: "PENDING",
   });
 
-  // Reduce stock after creating the order
-  for (const item of items) {
-    await Variant.findByIdAndUpdate(
-      item.variantId,
-      {
-        $inc: {
-          stock: -item.quantity,
-        },
-      }
-    );
+  for (const item of orderItems) {
+    await Variant.findByIdAndUpdate(item.variantId, {
+      $inc: { stock: -item.quantity },
+    });
   }
 
   return order;
 };
+
 
 
 const createPaidOnlineOrderService = async ({
@@ -122,6 +165,7 @@ const createPaidOnlineOrderService = async ({
   addressId,
   items,
   razorpayPaymentId,
+  expectedAmount,
 }) => {
   if (!userId || !addressId || !razorpayPaymentId) {
     throw new Error("Required payment details are missing.");
@@ -189,23 +233,55 @@ const createPaidOnlineOrderService = async ({
       );
     }
 
-    const totalPrice = variant.price * quantity;
-    subtotal += totalPrice;
+    
+const originalPrice = Number(item.originalPrice ?? variant.price);
+const unitPrice = Number(item.unitPrice ?? variant.price);
 
-    orderItems.push({
-      productId: product._id,
-      variantId: variant._id,
-      productName: product.name,
-      size: variant.size,
-      productImage: product.productImage?.[0] || "",
-      price: variant.price,
-      quantity,
-      totalPrice,
-    });
+if (
+  !Number.isFinite(originalPrice) ||
+  !Number.isFinite(unitPrice) ||
+  originalPrice !== variant.price ||
+  unitPrice < 0 ||
+  unitPrice > originalPrice
+) {
+  throw new Error("Invalid saved product pricing.");
+}
+
+const totalPrice = Math.round(unitPrice * 100 * quantity) / 100;
+subtotal += totalPrice;
+
+orderItems.push({
+  productId: product._id,
+  variantId: variant._id,
+  productName: product.name,
+  size: variant.size,
+  productImage: product.productImage?.[0] || "",
+  price: unitPrice,
+  originalPrice,
+  discountAmount: Math.round((originalPrice - unitPrice) * 100) / 100,
+  offerId: item.offerId || null,
+  quantity,
+  totalPrice,
+});
+
   }
 
   const deliveryCharge = 0;
-  const totalAmount = subtotal + deliveryCharge;
+
+subtotal = Math.round(subtotal * 100) / 100;
+
+const totalAmount = Math.round(
+  (subtotal + deliveryCharge) * 100
+) / 100;
+
+if (
+  !Number.isSafeInteger(expectedAmount) ||
+  Math.round(totalAmount * 100) !== expectedAmount
+) {
+  throw new Error(
+    "Order total does not match the verified payment amount."
+  );
+}
 
   // Atomically reserve each item's stock.
   const reservedItems = [];

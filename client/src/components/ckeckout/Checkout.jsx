@@ -78,17 +78,62 @@ function Checkout() {
     return;
   }
 
-  setCheckoutItems([
-    {
-      productId: product._id,
-      productName: product.name,
-      productImage: product.productImage?.[0] || "",
-      variantId: variant._id,
-      size: variant.size,
-      price: variant.price,
-      quantity: selectedQuantity,
-    },
-  ]);
+  
+const offerResponse = await axios.get(
+  "http://localhost:5000/api/admin/offers/active"
+);
+
+const activeOffers = offerResponse.data.offers || [];
+
+const applicableOffers = activeOffers.filter((offer) => {
+  const productMatches = offer.applicableProducts?.some(
+    (item) => String(item._id || item) === String(product._id)
+  );
+
+  const categoryMatches = offer.applicableCategories?.some(
+    (item) =>
+      String(item._id || item) ===
+      String(product.categoryId?._id || product.categoryId)
+  );
+
+  return productMatches || categoryMatches;
+});
+
+const bestOffer = applicableOffers.reduce(
+  (best, offer) => {
+    const discountedPrice =
+      offer.discountType === "PERCENTAGE"
+        ? variant.price * (1 - offer.discountValue / 100)
+        : Math.max(0, variant.price - offer.discountValue);
+
+    return !best || discountedPrice < best.discountedPrice
+      ? { offer, discountedPrice }
+      : best;
+  },
+  null
+);
+
+const discountedPrice = bestOffer
+  ? Math.round(bestOffer.discountedPrice * 100) / 100
+  : variant.price;
+
+setCheckoutItems([
+  {
+    productId: product._id,
+    productName: product.name,
+    productImage: product.productImage?.[0] || "",
+    variantId: variant._id,
+    size: variant.size,
+    price: variant.price,
+    originalPrice: variant.price,
+    discountedPrice,
+    discountAmount: Math.round((variant.price - discountedPrice) * 100) / 100,
+    offerName: bestOffer?.offer.name || null,
+    discountType: bestOffer?.offer.discountType || null,
+    discountValue: bestOffer?.offer.discountValue || 0,
+    quantity: selectedQuantity,
+  },
+]);
 
   return;
 }
@@ -110,15 +155,24 @@ function Checkout() {
           return;
         }
 
-        const formattedItems = cartItems.map((item) => ({
-          productId: item.productId?._id,
-          productName: item.productId?.name,
-          productImage: item.productId?.productImage?.[0] || "",
-          variantId: item.variantId?._id,
-          size: item.variantId?.size,
-          price: item.variantId?.price || 0,
-          quantity: item.quantity,
-        }));
+        
+const formattedItems = cartItems.map((item) => ({
+  productId: item.productId?._id,
+  productName: item.productId?.name,
+  productImage: item.productId?.productImage?.[0] || "",
+  variantId: item.variantId?._id,
+  size: item.variantId?.size,
+  price: item.variantId?.price || 0,
+  originalPrice: item.originalPrice ?? item.variantId?.price ?? 0,
+  discountedPrice:
+    item.discountedPrice ?? item.variantId?.price ?? 0,
+  discountAmount: item.discountAmount ?? 0,
+  offerName: item.offerName ?? null,
+  discountType: item.discountType ?? null,
+  discountValue: item.discountValue ?? 0,
+  quantity: item.quantity,
+}));
+
 
         setCheckoutItems(formattedItems);
       } catch (error) {
@@ -196,18 +250,27 @@ function Checkout() {
     fetchAddresses();
   }, [navigate]);
 
-  // ==========================================
+ 
   // PRICE CALCULATIONS
-  // ==========================================
 
-  const subtotal = checkoutItems.reduce(
-    (total, item) => total + item.price * item.quantity,
+  const originalSubtotal = checkoutItems.reduce(
+    (total, item) =>
+      total + (item.originalPrice ?? item.price) * item.quantity,
     0
   );
+
+  const subtotal = checkoutItems.reduce(
+    (total, item) =>
+      total + (item.discountedPrice ?? item.price) * item.quantity,
+    0
+  );
+
+  const totalDiscount = originalSubtotal - subtotal;
 
   const deliveryCharge = 0;
 
   const total = subtotal + deliveryCharge;
+
 
   // ==========================================
   // PROCEED TO PAYMENT
@@ -429,11 +492,37 @@ function Checkout() {
 
                   </div>
 
-                  <div className="checkout-item-price">
+                  
+<div className="checkout-item-price">
+  {item.discountAmount > 0 ? (
+    <>
+      <p className="checkout-original-price">
+        ₹{(item.originalPrice * item.quantity).toFixed(2)}
+      </p>
 
-                    ₹{item.price * item.quantity}
+      <p className="checkout-discounted-price">
+        ₹{(item.discountedPrice * item.quantity).toFixed(2)}
+      </p>
 
-                  </div>
+      <p className="checkout-offer-badge">
+        {item.discountType === "PERCENTAGE"
+          ? `${item.discountValue}% OFF`
+          : `₹${item.discountValue} OFF`}
+      </p>
+
+      {item.offerName && (
+        <p className="checkout-offer-name">
+          {item.offerName}
+        </p>
+      )}
+    </>
+  ) : (
+    <p>
+      ₹{(item.price * item.quantity).toFixed(2)}
+    </p>
+  )}
+</div>
+
 
                 </div>
               ))}
@@ -454,6 +543,14 @@ function Checkout() {
               <span>Subtotal</span>
               <span>₹{subtotal}</span>
             </div>
+            
+{totalDiscount > 0 && (
+  <div className="checkout-summary-row checkout-discount-row">
+    <span>Offer Discount</span>
+    <span>-₹{totalDiscount.toFixed(2)}</span>
+  </div>
+)}
+
 
             <div className="checkout-summary-row">
               <span>Delivery</span>
