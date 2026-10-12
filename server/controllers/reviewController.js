@@ -4,7 +4,10 @@ const {
   getProductReviewsService,
   getMyReviewsService,
   updateMyReviewService,
-  deleteMyReviewService
+  deleteMyReviewService,
+  getAllReviewsAdminService,
+  updateReviewVisibilityService,
+  deleteReviewAdminService
 } = require("../services/reviewService");
 
 const createReview = async (req, res) => {
@@ -124,10 +127,77 @@ const deleteMyReview = async (req, res) => {
 };
 
 
+const getAllReviewsAdmin = async (req, res) => {
+  try {
+    const reviews = await getAllReviewsAdminService();
+
+    return res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    console.error("Get admin reviews error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch reviews.",
+    });
+  }
+};
+
+const updateReviewVisibility = async (req, res) => {
+  try {
+    const { isVisible } = req.body;
+
+    const review = await updateReviewVisibilityService(
+      req.params.reviewId,
+      isVisible
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Review visibility updated successfully.",
+      review,
+    });
+  } catch (error) {
+    const statusCode =
+      error.message === "Review not found." ? 404 : 400;
+
+    return res.status(statusCode).json({
+      success: false,
+      message: error.message || "Failed to update review visibility.",
+    });
+  }
+};
+
+const deleteReviewAdmin = async (req, res) => {
+  try {
+    await deleteReviewAdminService(req.params.reviewId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Review deleted successfully.",
+    });
+  } catch (error) {
+    const statusCode =
+      error.message === "Review not found." ? 404 : 400;
+
+    return res.status(statusCode).json({
+      success: false,
+      message: error.message || "Failed to delete review.",
+    });
+  }
+};
+
+
+
 module.exports = {
   createReview,
   getProductReviews,
   getMyReviews,
   updateMyReview,
-  deleteMyReview
+  deleteMyReview,
+  getAllReviewsAdmin,
+  updateReviewVisibility,
+  deleteReviewAdmin
 };

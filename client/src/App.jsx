@@ -34,6 +34,7 @@ import OrderDetails from "./components/order/OrderDetails";
 import CouponManagement from "./admin/coupon/CouponManagement";
 import Wallet from "./components/wallet/Wallet";
 import OfferManagement from "./admin/offer/OfferManagement";
+import AdminReviews from "./admin/review/AdminReviews";
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
       <Route path="/admin/coupons" element={<CouponManagement />} />
       <Route path="/wallet" element={<Wallet />} />
       <Route path="/admin/offers" element={<OfferManagement />} />
+      <Route path="/admin/reviews" element={<AdminReviews />} />
     </Routes>
   );
 }

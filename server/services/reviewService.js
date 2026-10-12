@@ -169,10 +169,55 @@ const deleteMyReviewService = async ({ userId, reviewId }) => {
 };
 
 
+const getAllReviewsAdminService = async () => {
+  return Review.find()
+    .populate("userId", "name email")
+    .populate("productId", "name productImage")
+    .populate("orderId", "createdAt")
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+const updateReviewVisibilityService = async (reviewId, isVisible) => {
+  if (typeof isVisible !== "boolean") {
+    throw new Error("Review visibility must be true or false.");
+  }
+
+  const review = await Review.findByIdAndUpdate(
+    reviewId,
+    { isVisible },
+    { new: true, runValidators: true }
+  )
+    .populate("userId", "name email")
+    .populate("productId", "name productImage")
+    .lean();
+
+  if (!review) {
+    throw new Error("Review not found.");
+  }
+
+  return review;
+};
+
+const deleteReviewAdminService = async (reviewId) => {
+  const review = await Review.findByIdAndDelete(reviewId);
+
+  if (!review) {
+    throw new Error("Review not found.");
+  }
+
+  return review;
+};
+
+
+
 module.exports = {
   createReviewService,
   getProductReviewsService,
   getMyReviewsService,
   updateMyReviewService,
-  deleteMyReviewService
+  deleteMyReviewService,
+  getAllReviewsAdminService,
+  updateReviewVisibilityService,
+  deleteReviewAdminService
 };
