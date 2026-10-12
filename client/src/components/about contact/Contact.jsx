@@ -20,8 +20,8 @@ function Contact() {
           </h1>
 
           <p className="contact-intro">
-            Have a question about ESSENZA, our fragrances, or your order?
-            We'd love to hear from you.
+            Have a question about ESSENZA, our fragrances, or your order? We'd
+            love to hear from you.
           </p>
         </section>
 
@@ -38,17 +38,11 @@ function Contact() {
               reach the ESSENZA team directly through email.
             </p>
 
-            <a
-              href={`mailto:${email}`}
-              className="contact-email"
-            >
+            <a href={`mailto:${email}`} className="contact-email">
               {email}
             </a>
 
-            <a
-              href={`mailto:${email}`}
-              className="contact-button"
-            >
+            <a href={`mailto:${email}`} className="contact-button">
               MAIL US
             </a>
           </div>

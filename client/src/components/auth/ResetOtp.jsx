@@ -17,20 +17,20 @@ function ResetOtp() {
   const email = localStorage.getItem("resetEmail");
 
   // ========================================
-// Resend OTP Timer
-// ========================================
+  // Resend OTP Timer
+  // ========================================
 
-useEffect(() => {
-  if (resendTimer <= 0) {
-    return;
-  }
+  useEffect(() => {
+    if (resendTimer <= 0) {
+      return;
+    }
 
-  const timer = setInterval(() => {
-    setResendTimer((previousTimer) => previousTimer - 1);
-  }, 1000);
+    const timer = setInterval(() => {
+      setResendTimer((previousTimer) => previousTimer - 1);
+    }, 1000);
 
-  return () => clearInterval(timer);
-}, [resendTimer]);
+    return () => clearInterval(timer);
+  }, [resendTimer]);
 
   // ========================================
   // Verify OTP
@@ -58,12 +58,12 @@ useEffect(() => {
       setLoading(true);
 
       const response = await axios.post(
-  "http://localhost:5000/api/auth/verify-reset-otp",
-  {
-    email,
-    otp,
-  }
-);
+        "http://localhost:5000/api/auth/verify-reset-otp",
+        {
+          email,
+          otp,
+        },
+      );
 
       setMessage(response.data.message);
 
@@ -96,8 +96,8 @@ useEffect(() => {
     setError("");
 
     if (resendTimer > 0 || resending) {
-    return;
-  }
+      return;
+    }
 
     if (!email) {
       setError("Reset email not found");
@@ -109,18 +109,18 @@ useEffect(() => {
       setResending(true);
 
       const response = await axios.post(
-  "http://localhost:5000/api/auth/forgot-password",
-  {
-    email,
-  }
-);
+        "http://localhost:5000/api/auth/forgot-password",
+        {
+          email,
+        },
+      );
 
       setMessage(response.data.message);
 
-setOtp("");
+      setOtp("");
 
-// Restart resend timer
-setResendTimer(60);
+      // Restart resend timer
+      setResendTimer(60);
     } catch (error) {
       console.log("Resend OTP error:", error);
 
@@ -179,17 +179,16 @@ setResendTimer(60);
           <span>Didn't receive the code?</span>
 
           <button
-  type="button"
-  onClick={handleResend}
-  disabled={resending || resendTimer > 0}
->
-  {resending
-    ? "SENDING..."
-    : resendTimer > 0
-      ? `RESEND OTP IN ${resendTimer}s`
-      : "RESEND OTP"
-  }
-</button>
+            type="button"
+            onClick={handleResend}
+            disabled={resending || resendTimer > 0}
+          >
+            {resending
+              ? "SENDING..."
+              : resendTimer > 0
+                ? `RESEND OTP IN ${resendTimer}s`
+                : "RESEND OTP"}
+          </button>
         </div>
 
         <div className="back-login">

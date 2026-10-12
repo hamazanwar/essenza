@@ -16,20 +16,20 @@ function VerifyEmail() {
   const email = localStorage.getItem("verificationEmail");
 
   // ========================================
-// Resend OTP Timer
-// ========================================
+  // Resend OTP Timer
+  // ========================================
 
-useEffect(() => {
-  if (resendTimer <= 0) {
-    return;
-  }
+  useEffect(() => {
+    if (resendTimer <= 0) {
+      return;
+    }
 
-  const timer = setInterval(() => {
-    setResendTimer((previousTimer) => previousTimer - 1);
-  }, 1000);
+    const timer = setInterval(() => {
+      setResendTimer((previousTimer) => previousTimer - 1);
+    }, 1000);
 
-  return () => clearInterval(timer);
-}, [resendTimer]);
+    return () => clearInterval(timer);
+  }, [resendTimer]);
 
   //========================================
   // Verify OTP
@@ -56,12 +56,12 @@ useEffect(() => {
       setLoading(true);
 
       const response = await axios.post(
-  "http://localhost:5000/api/auth/verify-email-otp",
-  {
-    email,
-    otp,
-  }
-);
+        "http://localhost:5000/api/auth/verify-email-otp",
+        {
+          email,
+          otp,
+        },
+      );
 
       const data = response.data;
 
@@ -95,8 +95,8 @@ useEffect(() => {
     setError("");
 
     if (resendTimer > 0 || resending) {
-  return;
-}
+      return;
+    }
 
     if (!email) {
       setError("Verification email not found");
@@ -107,20 +107,20 @@ useEffect(() => {
       setResending(true);
 
       const response = await axios.post(
-  "http://localhost:5000/api/auth/resend-email-otp",
-  {
-    email,
-  }
-);
+        "http://localhost:5000/api/auth/resend-email-otp",
+        {
+          email,
+        },
+      );
       const data = response.data;
 
-     setMessage(data.message);
+      setMessage(data.message);
 
-// Clear OTP field
-setOtp("");
+      // Clear OTP field
+      setOtp("");
 
-// Restart resend timer
-setResendTimer(60);
+      // Restart resend timer
+      setResendTimer(60);
     } catch (error) {
       console.log("Resend OTP error:", error);
 
@@ -187,19 +187,18 @@ setResendTimer(60);
         <div className="resend-section">
           <span>Didn't receive the code?</span>
 
-          <button 
-  type="button" 
-  className="resend-button" 
-  onClick={handleResend} 
-  disabled={resending || resendTimer > 0} 
-> 
-  {resending
-    ? "SENDING..."
-    : resendTimer > 0
-      ? `Resend OTP in ${resendTimer}s`
-      : "Resend OTP"
-  } 
-</button>
+          <button
+            type="button"
+            className="resend-button"
+            onClick={handleResend}
+            disabled={resending || resendTimer > 0}
+          >
+            {resending
+              ? "SENDING..."
+              : resendTimer > 0
+                ? `Resend OTP in ${resendTimer}s`
+                : "Resend OTP"}
+          </button>
         </div>
 
         {/* Footer */}

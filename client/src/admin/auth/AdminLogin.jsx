@@ -19,14 +19,14 @@ function AdminLogin() {
 
     try {
       const response = await axios.post(
-    "http://localhost:5000/api/admin/auth/login",
-    {
-        email,
-        password,
-    }
-);
+        "http://localhost:5000/api/admin/auth/login",
+        {
+          email,
+          password,
+        },
+      );
 
-const data = response.data;
+      const data = response.data;
 
       console.log("Admin login successful:", data);
 

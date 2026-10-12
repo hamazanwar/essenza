@@ -44,9 +44,7 @@ function AdminNavbar() {
     <aside className="admin-sidebar">
       {/* LOGO */}
       <div className="admin-sidebar-logo">
-        <NavLink to="/admin/dashboard">
-          ESSENZA
-        </NavLink>
+        <NavLink to="/admin/dashboard">ESSENZA</NavLink>
 
         <span>ADMIN PANEL</span>
       </div>
@@ -78,9 +76,7 @@ function AdminNavbar() {
             }`
           }
         >
-          <span className="admin-sidebar-profile-icon">
-            👤
-          </span>
+          <span className="admin-sidebar-profile-icon">👤</span>
 
           <span>Admin Profile</span>
         </NavLink>

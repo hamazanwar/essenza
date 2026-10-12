@@ -46,8 +46,8 @@ function SearchOverlay({ onClose }) {
 
         const response = await axios.get(
           `http://localhost:5000/api/products?search=${encodeURIComponent(
-            trimmedSearch
-          )}`
+            trimmedSearch,
+          )}`,
         );
 
         setProducts(response.data.products || []);
@@ -72,10 +72,7 @@ function SearchOverlay({ onClose }) {
   };
 
   return (
-    <div
-      className="search-overlay"
-      onClick={onClose}
-    >
+    <div className="search-overlay" onClick={onClose}>
       <div
         className="search-window"
         onClick={(event) => event.stopPropagation()}
@@ -83,9 +80,7 @@ function SearchOverlay({ onClose }) {
         {/* SEARCH HEADER */}
 
         <div className="search-window-header">
-
           <div className="search-input-wrapper">
-
             <svg
               className="search-input-icon"
               viewBox="0 0 24 24"
@@ -97,11 +92,7 @@ function SearchOverlay({ onClose }) {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <circle
-                cx="11"
-                cy="11"
-                r="7"
-              />
+              <circle cx="11" cy="11" r="7" />
 
               <path d="M20 20l-4-4" />
             </svg>
@@ -110,12 +101,9 @@ function SearchOverlay({ onClose }) {
               ref={inputRef}
               type="text"
               value={searchTerm}
-              onChange={(event) =>
-                setSearchTerm(event.target.value)
-              }
+              onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Search fragrances..."
             />
-
           </div>
 
           <button
@@ -126,84 +114,58 @@ function SearchOverlay({ onClose }) {
           >
             ×
           </button>
-
         </div>
 
         {/* SEARCH CONTENT */}
 
         <div className="search-results">
-
           {!searchTerm.trim() && (
             <div className="search-empty-state">
               <h3>SEARCH ESSENZA</h3>
-              <p>
-                Find your signature fragrance.
-              </p>
+              <p>Find your signature fragrance.</p>
             </div>
           )}
 
-          {loading && (
-            <div className="search-message">
-              Searching...
+          {loading && <div className="search-message">Searching...</div>}
+
+          {!loading && searchTerm.trim() && products.length === 0 && (
+            <div className="search-empty-state">
+              <h3>NO PRODUCTS FOUND</h3>
+              <p>Try searching for another fragrance.</p>
             </div>
           )}
-
-          {!loading &&
-            searchTerm.trim() &&
-            products.length === 0 && (
-              <div className="search-empty-state">
-                <h3>NO PRODUCTS FOUND</h3>
-                <p>
-                  Try searching for another fragrance.
-                </p>
-              </div>
-            )}
 
           {!loading && products.length > 0 && (
             <div className="search-product-list">
-
               {products.slice(0, 8).map((product) => {
+                const image = product.productImage?.[0];
 
-                const image =
-                  product.productImage?.[0];
-
-                const startingPrice =
-                  product.variants?.[0]?.price;
+                const startingPrice = product.variants?.[0]?.price;
 
                 return (
                   <button
                     type="button"
                     className="search-product-item"
                     key={product._id}
-                    onClick={() =>
-                      handleProductClick(product._id)
-                    }
+                    onClick={() => handleProductClick(product._id)}
                   >
-
                     <div className="search-product-image">
-
                       {image ? (
                         <img
                           src={`http://localhost:5000${image}`}
                           alt={product.name}
                         />
                       ) : (
-                        <span>
-                          No Image
-                        </span>
+                        <span>No Image</span>
                       )}
-
                     </div>
 
                     <div className="search-product-info">
-
                       <p className="search-product-category">
                         {product.categoryId?.name}
                       </p>
 
-                      <h3>
-                        {product.name}
-                      </h3>
+                      <h3>{product.name}</h3>
 
                       {startingPrice ? (
                         <p className="search-product-price">
@@ -214,16 +176,12 @@ function SearchOverlay({ onClose }) {
                           Price unavailable
                         </p>
                       )}
-
                     </div>
-
                   </button>
                 );
               })}
-
             </div>
           )}
-
         </div>
       </div>
     </div>

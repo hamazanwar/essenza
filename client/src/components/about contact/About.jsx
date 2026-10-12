@@ -33,9 +33,9 @@ function About() {
 
           <div className="about-section-content">
             <p>
-              ESSENZA was created with a simple idea: to make refined
-              fragrances accessible to everyone. Our collection is designed
-              around timeless scents, modern elegance, and everyday luxury.
+              ESSENZA was created with a simple idea: to make refined fragrances
+              accessible to everyone. Our collection is designed around timeless
+              scents, modern elegance, and everyday luxury.
             </p>
 
             <p>
@@ -66,17 +66,16 @@ function About() {
             <div className="philosophy-card">
               <h3>IDENTITY</h3>
               <p>
-                Every fragrance tells a story. Our collection is created to
-                help you express your individuality through scent.
+                Every fragrance tells a story. Our collection is created to help
+                you express your individuality through scent.
               </p>
             </div>
 
             <div className="philosophy-card">
               <h3>ELEGANCE</h3>
               <p>
-                From the fragrance itself to the experience of discovering
-                it, ESSENZA is inspired by modern luxury and understated
-                elegance.
+                From the fragrance itself to the experience of discovering it,
+                ESSENZA is inspired by modern luxury and understated elegance.
               </p>
             </div>
           </div>

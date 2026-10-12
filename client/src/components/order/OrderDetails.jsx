@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -32,7 +31,7 @@ function OrderDetails() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         setOrder(response.data.order);
@@ -40,8 +39,7 @@ function OrderDetails() {
         console.error("Fetch order details error:", err);
 
         setError(
-          err.response?.data?.message ||
-            "Unable to load order details."
+          err.response?.data?.message || "Unable to load order details.",
         );
       } finally {
         setLoading(false);
@@ -137,9 +135,7 @@ function OrderDetails() {
     const addressLines = [
       address.fullName,
       address.address,
-      [address.city, address.state, address.pincode]
-        .filter(Boolean)
-        .join(", "),
+      [address.city, address.state, address.pincode].filter(Boolean).join(", "),
     ].filter(Boolean);
 
     if (addressLines.length === 0) {
@@ -179,13 +175,9 @@ function OrderDetails() {
         y = 20;
       }
 
-      const productDescription =
-        `${item.productName || "Product"} (${item.size || "N/A"})`;
+      const productDescription = `${item.productName || "Product"} (${item.size || "N/A"})`;
 
-      const productLines = pdf.splitTextToSize(
-        productDescription,
-        95
-      );
+      const productLines = pdf.splitTextToSize(productDescription, 95);
 
       pdf.text(productLines, descriptionX, y);
       pdf.text(String(item.quantity || 0), quantityX, y, {
@@ -209,10 +201,7 @@ function OrderDetails() {
     pdf.setFontSize(10);
 
     addLabelValue("Subtotal", formatAmount(order.subtotal));
-    addLabelValue(
-      "Delivery Charge",
-      formatAmount(order.deliveryCharge)
-    );
+    addLabelValue("Delivery Charge", formatAmount(order.deliveryCharge));
 
     y += 2;
     pdf.setFontSize(13);
@@ -221,12 +210,9 @@ function OrderDetails() {
     y += 10;
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
-    pdf.text(
-      "Thank you for shopping with ESSENZA.",
-      pageWidth / 2,
-      y,
-      { align: "center" }
-    );
+    pdf.text("Thank you for shopping with ESSENZA.", pageWidth / 2, y, {
+      align: "center",
+    });
 
     pdf.save(`ESSENZA-Invoice-${getShortOrderId()}.pdf`);
   };
@@ -236,9 +222,7 @@ function OrderDetails() {
       <>
         <Navbar />
         <main className="order-details-page">
-          <p className="order-details-message">
-            Loading order details...
-          </p>
+          <p className="order-details-message">Loading order details...</p>
         </main>
         <Footer />
       </>
@@ -253,10 +237,7 @@ function OrderDetails() {
           <div className="order-details-error">
             <h2>ORDER NOT FOUND</h2>
             <p>{error || "We couldn't find this order."}</p>
-            <button
-              type="button"
-              onClick={() => navigate("/my-orders")}
-            >
+            <button type="button" onClick={() => navigate("/my-orders")}>
               BACK TO MY ORDERS
             </button>
           </div>
@@ -291,7 +272,7 @@ function OrderDetails() {
 
             <span
               className={`order-details-status ${String(
-                order.orderStatus
+                order.orderStatus,
               ).toLowerCase()}`}
             >
               {order.orderStatus}
@@ -354,9 +335,7 @@ function OrderDetails() {
                     <p>Quantity: {item.quantity}</p>
                   </div>
 
-                  <strong>
-                    {formatAmount(item.totalPrice)}
-                  </strong>
+                  <strong>{formatAmount(item.totalPrice)}</strong>
                 </div>
               ))}
             </div>
@@ -400,9 +379,7 @@ function OrderDetails() {
           <section className="order-details-invoice">
             <div>
               <h2>YOUR INVOICE</h2>
-              <p>
-                View the invoice or download a PDF copy for your records.
-              </p>
+              <p>View the invoice or download a PDF copy for your records.</p>
             </div>
 
             <div className="order-invoice-actions">

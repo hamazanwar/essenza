@@ -24,23 +24,17 @@ function Cart() {
           return;
         }
 
-        const response = await axios.get(
-          "http://localhost:5000/api/cart",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await axios.get("http://localhost:5000/api/cart", {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         setCart(response.data.cart);
       } catch (error) {
         console.error("Get cart error:", error);
 
-        setError(
-          error.response?.data?.message ||
-            "Failed to load cart",
-        );
+        setError(error.response?.data?.message || "Failed to load cart");
       } finally {
         setLoading(false);
       }
@@ -76,15 +70,9 @@ function Cart() {
 
       setCart(response.data.cart);
     } catch (error) {
-      console.error(
-        "Update cart quantity error:",
-        error,
-      );
+      console.error("Update cart quantity error:", error);
 
-      setError(
-        error.response?.data?.message ||
-          "Failed to update quantity",
-      );
+      setError(error.response?.data?.message || "Failed to update quantity");
     }
   };
 
@@ -113,38 +101,27 @@ function Cart() {
       setCart(response.data.cart);
       setCartMessage("Product removed from cart.");
     } catch (error) {
-      console.error(
-        "Remove cart item error:",
-        error,
-      );
+      console.error("Remove cart item error:", error);
 
-      setError(
-        error.response?.data?.message ||
-          "Failed to remove product",
-      );
+      setError(error.response?.data?.message || "Failed to remove product");
     }
   };
 
-  
   // CALCULATE SUBTOTAL USING DISCOUNTED PRICES
   const subtotal =
     cart?.items?.reduce(
       (total, item) =>
-        total +
-        (item.discountedPrice ?? item.variantId.price) *
-          item.quantity,
+        total + (item.discountedPrice ?? item.variantId.price) * item.quantity,
       0,
     ) || 0;
 
   const originalSubtotal =
     cart?.items?.reduce(
-      (total, item) =>
-        total + item.variantId.price * item.quantity,
+      (total, item) => total + item.variantId.price * item.quantity,
       0,
     ) || 0;
 
   const totalDiscount = originalSubtotal - subtotal;
-
 
   if (loading) {
     return (
@@ -152,9 +129,7 @@ function Cart() {
         <Navbar />
 
         <main className="cart-page">
-          <div className="cart-message">
-            Loading cart...
-          </div>
+          <div className="cart-message">Loading cart...</div>
         </main>
 
         <Footer />
@@ -168,9 +143,7 @@ function Cart() {
         <Navbar />
 
         <main className="cart-page">
-          <div className="cart-message error">
-            {error}
-          </div>
+          <div className="cart-message error">{error}</div>
         </main>
 
         <Footer />
@@ -184,194 +157,138 @@ function Cart() {
 
       <main className="cart-page">
         <div className="cart-container">
-
           <h1>YOUR CART</h1>
 
-          {cartMessage && (
-            <p className="cart-success-message">
-              {cartMessage}
-            </p>
-          )}
+          {cartMessage && <p className="cart-success-message">{cartMessage}</p>}
 
-          {error && (
-            <p className="cart-error-message">
-              {error}
-            </p>
-          )}
+          {error && <p className="cart-error-message">{error}</p>}
 
           {cart?.items?.length === 0 ? (
             <p>Your cart is empty.</p>
           ) : (
             <>
               <div className="cart-items">
-
                 {cart.items.map((item) => (
-                  <div
-                    key={item._id}
-                    className="cart-item"
-                  >
-
+                  <div key={item._id} className="cart-item">
                     {/* PRODUCT IMAGE */}
                     <div className="cart-item-image">
-                      {item.productId?.productImage
-                        ?.length > 0 ? (
+                      {item.productId?.productImage?.length > 0 ? (
                         <img
                           src={`http://localhost:5000${item.productId.productImage[0]}`}
                           alt={item.productId.name}
                         />
                       ) : (
-                        <div>
-                          No Image
-                        </div>
+                        <div>No Image</div>
                       )}
                     </div>
 
                     {/* PRODUCT DETAILS */}
                     <div className="cart-item-details">
+                      <h2>{item.productId?.name}</h2>
 
-                      <h2>
-                        {item.productId?.name}
-                      </h2>
+                      <p>Size: {item.variantId?.size}</p>
 
-                      <p>
-                        Size: {item.variantId?.size}
-                      </p>
+                      {item.discountAmount > 0 ? (
+                        <>
+                          <p className="cart-original-price">
+                            ₹{item.originalPrice}
+                          </p>
 
-                      
-{item.discountAmount > 0 ? (
-  <>
-    <p className="cart-original-price">
-      ₹{item.originalPrice}
-    </p>
+                          <p className="cart-discounted-price">
+                            ₹{item.discountedPrice}
+                          </p>
 
-    <p className="cart-discounted-price">
-      ₹{item.discountedPrice}
-    </p>
-
-    <p className="cart-offer-badge">
-      {item.discountType === "PERCENTAGE"
-        ? `${item.discountValue}% OFF`
-        : `₹${item.discountValue} OFF`}
-    </p>
-  </>
-) : (
-  <p>
-    ₹{item.variantId?.price}
-  </p>
-)}
-
-
+                          <p className="cart-offer-badge">
+                            {item.discountType === "PERCENTAGE"
+                              ? `${item.discountValue}% OFF`
+                              : `₹${item.discountValue} OFF`}
+                          </p>
+                        </>
+                      ) : (
+                        <p>₹{item.variantId?.price}</p>
+                      )}
                     </div>
 
                     {/* QUANTITY */}
                     <div className="cart-item-quantity">
-
                       <button
                         type="button"
                         onClick={() =>
-                          updateQuantity(
-                            item._id,
-                            item.quantity - 1,
-                          )
+                          updateQuantity(item._id, item.quantity - 1)
                         }
-                        disabled={
-                          item.quantity <= 1
-                        }
+                        disabled={item.quantity <= 1}
                       >
                         −
                       </button>
 
-                      <span>
-                        {item.quantity}
-                      </span>
+                      <span>{item.quantity}</span>
 
                       <button
                         type="button"
                         onClick={() =>
-                          updateQuantity(
-                            item._id,
-                            item.quantity + 1,
-                          )
+                          updateQuantity(item._id, item.quantity + 1)
                         }
-                        disabled={
-                          item.quantity >=
-                          item.variantId.stock
-                        }
+                        disabled={item.quantity >= item.variantId.stock}
                       >
                         +
                       </button>
-
                     </div>
 
                     {/* ITEM SUBTOTAL */}
-                    
-<div className="cart-item-subtotal">
-  ₹
-  {(
-    (item.discountedPrice ?? item.variantId.price) *
-    item.quantity
-  ).toFixed(2)}
-</div>
 
+                    <div className="cart-item-subtotal">
+                      ₹
+                      {(
+                        (item.discountedPrice ?? item.variantId.price) *
+                        item.quantity
+                      ).toFixed(2)}
+                    </div>
 
                     {/* REMOVE */}
                     <button
                       type="button"
                       className="cart-remove-button"
-                      onClick={() =>
-                        removeItem(item._id)
-                      }
+                      onClick={() => removeItem(item._id)}
                     >
                       REMOVE
                     </button>
-
                   </div>
                 ))}
-
               </div>
 
               {/* CART SUMMARY */}
               <div className="cart-summary">
-
                 <h2>CART SUMMARY</h2>
 
                 <div className="cart-summary-row">
                   <span>Subtotal</span>
 
-                  <span>
-                    ₹{subtotal}
-                  </span>
+                  <span>₹{subtotal}</span>
 
-{totalDiscount > 0 && (
-  <div className="cart-summary-row cart-discount-row">
-    <span>Offer Discount</span>
-    <span>-₹{totalDiscount.toFixed(2)}</span>
-  </div>
-)}
-
-
+                  {totalDiscount > 0 && (
+                    <div className="cart-summary-row cart-discount-row">
+                      <span>Offer Discount</span>
+                      <span>-₹{totalDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="cart-summary-row">
                   <span>Total</span>
 
-                  <span>
-                    ₹{subtotal}
-                  </span>
+                  <span>₹{subtotal}</span>
                 </div>
 
                 <button
-  type="button"
-  className="checkout-button"
-  onClick={() => navigate("/checkout")}
->
-  PROCEED TO CHECKOUT
-</button>
-
+                  type="button"
+                  className="checkout-button"
+                  onClick={() => navigate("/checkout")}
+                >
+                  PROCEED TO CHECKOUT
+                </button>
               </div>
             </>
           )}
-
         </div>
       </main>
 

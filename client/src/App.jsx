@@ -72,10 +72,7 @@ function App() {
       <Route path="/wallet" element={<Wallet />} />
       <Route path="/admin/offers" element={<OfferManagement />} />
       <Route path="/admin/reviews" element={<AdminReviews />} />
-      <Route
-  path="/admin/sales-report"
-  element={<AdminSalesReport />}
-/>
+      <Route path="/admin/sales-report" element={<AdminSalesReport />} />
     </Routes>
   );
 }

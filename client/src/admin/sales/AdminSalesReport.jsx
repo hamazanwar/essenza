@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -29,7 +28,7 @@ function AdminSalesReport() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       setReport(response.data.report);
@@ -37,8 +36,7 @@ function AdminSalesReport() {
       console.error("Fetch sales report error:", err);
 
       setError(
-        err.response?.data?.message ||
-          "Failed to load the sales report."
+        err.response?.data?.message || "Failed to load the sales report.",
       );
     } finally {
       setLoading(false);
@@ -72,8 +70,7 @@ function AdminSalesReport() {
       return;
     }
 
-    const escapeCSV = (value) =>
-      `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const escapeCSV = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
 
     const rows = [
       [
@@ -138,10 +135,7 @@ function AdminSalesReport() {
           </button>
         </header>
 
-        <form
-          className="admin-sales-filters"
-          onSubmit={handleFilter}
-        >
+        <form className="admin-sales-filters" onSubmit={handleFilter}>
           <div className="admin-sales-date-field">
             <label htmlFor="sales-from">FROM DATE</label>
             <input
@@ -182,22 +176,16 @@ function AdminSalesReport() {
           </button>
         </form>
 
-        {error && (
-          <p className="admin-sales-error">{error}</p>
-        )}
+        {error && <p className="admin-sales-error">{error}</p>}
 
         {loading ? (
-          <p className="admin-sales-message">
-            Loading sales report...
-          </p>
+          <p className="admin-sales-message">Loading sales report...</p>
         ) : report ? (
           <>
             <section className="admin-sales-summary">
               <article className="admin-sales-summary-card">
                 <span>TOTAL SALES</span>
-                <strong>
-                  {formatCurrency(report.summary.totalSales)}
-                </strong>
+                <strong>{formatCurrency(report.summary.totalSales)}</strong>
                 <small>Delivered orders only</small>
               </article>
 
@@ -249,7 +237,7 @@ function AdminSalesReport() {
                         <tr key={day.date}>
                           <td>
                             {new Date(
-                              `${day.date}T00:00:00`
+                              `${day.date}T00:00:00`,
                             ).toLocaleDateString("en-IN")}
                           </td>
                           <td>{day.orders}</td>
@@ -292,21 +280,15 @@ function AdminSalesReport() {
                     <tbody>
                       {report.orders.map((order) => (
                         <tr key={order._id}>
+                          <td>#{order._id.slice(-6).toUpperCase()}</td>
                           <td>
-                            #{order._id.slice(-6).toUpperCase()}
+                            <strong>{order.userId?.name || "Unknown"}</strong>
+                            <small>{order.userId?.email || ""}</small>
                           </td>
                           <td>
-                            <strong>
-                              {order.userId?.name || "Unknown"}
-                            </strong>
-                            <small>
-                              {order.userId?.email || ""}
-                            </small>
-                          </td>
-                          <td>
-                            {new Date(
-                              order.createdAt
-                            ).toLocaleDateString("en-IN")}
+                            {new Date(order.createdAt).toLocaleDateString(
+                              "en-IN",
+                            )}
                           </td>
                           <td>
                             {order.paymentMethod}
@@ -315,16 +297,13 @@ function AdminSalesReport() {
                           <td>
                             <span
                               className={`admin-sales-status admin-sales-status-${String(
-                                order.orderStatus
+                                order.orderStatus,
                               ).toLowerCase()}`}
                             >
-                              {String(order.orderStatus)
-                                .replaceAll("_", " ")}
+                              {String(order.orderStatus).replaceAll("_", " ")}
                             </span>
                           </td>
-                          <td>
-                            {formatCurrency(order.totalAmount)}
-                          </td>
+                          <td>{formatCurrency(order.totalAmount)}</td>
                         </tr>
                       ))}
                     </tbody>

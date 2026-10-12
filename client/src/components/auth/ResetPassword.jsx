@@ -19,7 +19,7 @@ function ResetPassword() {
     event.preventDefault();
 
     setError("");
-setSuccess("");
+    setSuccess("");
 
     const email = localStorage.getItem("resetEmail");
     const otp = localStorage.getItem("resetOtp");
@@ -38,13 +38,13 @@ setSuccess("");
       setLoading(true);
 
       const response = await axios.post(
-  "http://localhost:5000/api/auth/reset-password",
-  {
-    email,
-    otp,
-    newPassword,
-  }
-);
+        "http://localhost:5000/api/auth/reset-password",
+        {
+          email,
+          otp,
+          newPassword,
+        },
+      );
 
       console.log("Reset password response:", response.data);
 
@@ -54,9 +54,9 @@ setSuccess("");
 
       setSuccess("Password reset successfully");
 
-setTimeout(() => {
-  navigate("/login");
-}, 2000);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error) {
       console.log("Reset password error:", error);
 
@@ -134,13 +134,11 @@ setTimeout(() => {
 
           {/* Error */}
 
-{error && <p className="reset-error">{error}</p>}
+          {error && <p className="reset-error">{error}</p>}
 
-{/* Success */}
+          {/* Success */}
 
-{success && (
-  <p className="reset-success">{success}</p>
-)}
+          {success && <p className="reset-success">{success}</p>}
 
           {/* Reset button */}
 

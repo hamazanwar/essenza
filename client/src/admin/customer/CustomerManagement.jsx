@@ -11,23 +11,23 @@ function CustomerManagement() {
   const [error, setError] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-const customersPerPage = 10;
+  const customersPerPage = 10;
 
   const handleCustomerStatus = async (customerId) => {
     try {
       const token = localStorage.getItem("adminToken");
 
       const response = await axios.patch(
-    `http://localhost:5000/api/admin/customers/${customerId}/status`,
-    {},
-    {
-        headers: {
+        `http://localhost:5000/api/admin/customers/${customerId}/status`,
+        {},
+        {
+          headers: {
             Authorization: `Bearer ${token}`,
+          },
         },
-    }
-);
+      );
 
-const data = response.data;
+      const data = response.data;
 
       // Update the customer in the table
       setCustomers((previousCustomers) =>
@@ -49,12 +49,12 @@ const data = response.data;
 
   const totalPages = Math.ceil(customers.length / customersPerPage);
 
-const startIndex = (currentPage - 1) * customersPerPage;
+  const startIndex = (currentPage - 1) * customersPerPage;
 
-const currentCustomers = customers.slice(
-  startIndex,
-  startIndex + customersPerPage
-);
+  const currentCustomers = customers.slice(
+    startIndex,
+    startIndex + customersPerPage,
+  );
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -62,15 +62,15 @@ const currentCustomers = customers.slice(
         const token = localStorage.getItem("adminToken");
 
         const response = await axios.get(
-    "http://localhost:5000/api/admin/customers",
-    {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    }
-);
+          "http://localhost:5000/api/admin/customers",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
-const data = response.data;
+        const data = response.data;
 
         setCustomers(data.customers);
       } catch (error) {
@@ -139,32 +139,32 @@ const data = response.data;
                       </td>
 
                       <td>
-  <button
-    className="customer-view-button"
-    onClick={() =>
-      navigate(`/admin/customers/${customer._id}`)
-    }
-  >
-    VIEW
-  </button>
+                        <button
+                          className="customer-view-button"
+                          onClick={() =>
+                            navigate(`/admin/customers/${customer._id}`)
+                          }
+                        >
+                          VIEW
+                        </button>
 
-  <button
-    className={
-      customer.isActive
-        ? "customer-block-button"
-        : "customer-unblock-button"
-    }
-    onClick={() => handleCustomerStatus(customer._id)}
-  >
-    {customer.isActive ? "BLOCK" : "UNBLOCK"}
-  </button>
-</td>
+                        <button
+                          className={
+                            customer.isActive
+                              ? "customer-block-button"
+                              : "customer-unblock-button"
+                          }
+                          onClick={() => handleCustomerStatus(customer._id)}
+                        >
+                          {customer.isActive ? "BLOCK" : "UNBLOCK"}
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
-          <div className="customer-pagination">
+            <div className="customer-pagination">
               <button
                 onClick={() => setCurrentPage((page) => page - 1)}
                 disabled={currentPage === 1}
@@ -183,7 +183,6 @@ const data = response.data;
                 NEXT →
               </button>
             </div>
-
           </div>
         )}
       </main>

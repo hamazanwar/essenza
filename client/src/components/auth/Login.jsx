@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 
-
-
 function Login() {
   const navigate = useNavigate();
 
@@ -25,12 +23,12 @@ function Login() {
       setLoading(true);
 
       const response = await axios.post(
-  "http://localhost:5000/api/auth/login",
-  {
-    email,
-    password,
-  }
-);
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        },
+      );
       const data = response.data;
 
       console.log("Login response:", data);
@@ -164,13 +162,13 @@ function Login() {
           onSuccess={async (credentialResponse) => {
             try {
               const response = await axios.post(
-    "http://localhost:5000/api/auth/google-login",
-    {
-        credential: credentialResponse.credential,
-    }
-);
+                "http://localhost:5000/api/auth/google-login",
+                {
+                  credential: credentialResponse.credential,
+                },
+              );
 
-const data = response.data;
+              const data = response.data;
 
               localStorage.setItem("token", data.token);
 

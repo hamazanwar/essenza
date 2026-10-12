@@ -18,12 +18,12 @@ function MyOrders() {
   const [cancelOrderId, setCancelOrderId] = useState(null);
   const [cancelling, setCancelling] = useState(false);
   const [myReviews, setMyReviews] = useState([]);
-const [reviewTarget, setReviewTarget] = useState(null);
-const [rating, setRating] = useState(5);
-const [comment, setComment] = useState("");
-const [reviewSubmitting, setReviewSubmitting] = useState(false);
-const [reviewMessage, setReviewMessage] = useState("");
-const [reviewError, setReviewError] = useState("");
+  const [reviewTarget, setReviewTarget] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState("");
+  const [reviewError, setReviewError] = useState("");
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -45,22 +45,19 @@ const [reviewError, setReviewError] = useState("");
         );
         setOrders(response.data.orders || []);
         try {
-  const reviewsResponse = await axios.get(
-    "http://localhost:5000/api/reviews/my-reviews",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+          const reviewsResponse = await axios.get(
+            "http://localhost:5000/api/reviews/my-reviews",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
 
-  setMyReviews(reviewsResponse.data.reviews || []);
-} catch (reviewError) {
-  console.error("Fetch reviews error:", reviewError);
-}
-
-        
-
+          setMyReviews(reviewsResponse.data.reviews || []);
+        } catch (reviewError) {
+          console.error("Fetch reviews error:", reviewError);
+        }
       } catch (error) {
         console.error("Fetch orders error:", error);
 
@@ -115,97 +112,94 @@ const [reviewError, setReviewError] = useState("");
   };
 
   const getProductId = (item) => {
-  const product = item.productId;
+    const product = item.productId;
 
-  if (!product) return "";
+    if (!product) return "";
 
-  return typeof product === "object"
-    ? String(product._id || "")
-    : String(product);
-};
+    return typeof product === "object"
+      ? String(product._id || "")
+      : String(product);
+  };
 
-const hasReviewed = (orderId, productId) => {
-  return myReviews.some((review) => {
-    const reviewOrderId =
-      typeof review.orderId === "object"
-        ? review.orderId?._id
-        : review.orderId;
+  const hasReviewed = (orderId, productId) => {
+    return myReviews.some((review) => {
+      const reviewOrderId =
+        typeof review.orderId === "object"
+          ? review.orderId?._id
+          : review.orderId;
 
-    const reviewProductId =
-      typeof review.productId === "object"
-        ? review.productId?._id
-        : review.productId;
+      const reviewProductId =
+        typeof review.productId === "object"
+          ? review.productId?._id
+          : review.productId;
 
-    return (
-      String(reviewOrderId) === String(orderId) &&
-      String(reviewProductId) === String(productId)
-    );
-  });
-};
+      return (
+        String(reviewOrderId) === String(orderId) &&
+        String(reviewProductId) === String(productId)
+      );
+    });
+  };
 
-const openReviewForm = (order, item) => {
-  setReviewTarget({
-    orderId: order._id,
-    productId: getProductId(item),
-    productName: item.productName,
-  });
+  const openReviewForm = (order, item) => {
+    setReviewTarget({
+      orderId: order._id,
+      productId: getProductId(item),
+      productName: item.productName,
+    });
 
-  setRating(5);
-  setComment("");
-  setReviewMessage("");
-  setReviewError("");
-};
-
-const handleSubmitReview = async (event) => {
-  event.preventDefault();
-
-  if (!reviewTarget) return;
-
-  try {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    setReviewSubmitting(true);
-    setReviewError("");
-    setReviewMessage("");
-
-    const response = await axios.post(
-      "http://localhost:5000/api/reviews",
-      {
-        productId: reviewTarget.productId,
-        orderId: reviewTarget.orderId,
-        rating,
-        comment,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setMyReviews((previous) => [
-      response.data.review,
-      ...previous,
-    ]);
-
-    setReviewMessage("Your review has been submitted successfully.");
-    setReviewTarget(null);
     setRating(5);
     setComment("");
-  } catch (error) {
-    setReviewError(
-      error.response?.data?.message ||
-        "Unable to submit your review. Please try again."
-    );
-  } finally {
-    setReviewSubmitting(false);
-  }
-};
+    setReviewMessage("");
+    setReviewError("");
+  };
+
+  const handleSubmitReview = async (event) => {
+    event.preventDefault();
+
+    if (!reviewTarget) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      setReviewSubmitting(true);
+      setReviewError("");
+      setReviewMessage("");
+
+      const response = await axios.post(
+        "http://localhost:5000/api/reviews",
+        {
+          productId: reviewTarget.productId,
+          orderId: reviewTarget.orderId,
+          rating,
+          comment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setMyReviews((previous) => [response.data.review, ...previous]);
+
+      setReviewMessage("Your review has been submitted successfully.");
+      setReviewTarget(null);
+      setRating(5);
+      setComment("");
+    } catch (error) {
+      setReviewError(
+        error.response?.data?.message ||
+          "Unable to submit your review. Please try again.",
+      );
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-IN", {
@@ -260,10 +254,7 @@ const handleSubmitReview = async (event) => {
           {orders.length > 0 && (
             <div className="my-orders-list">
               {orders.map((order) => (
-                <article
-  key={order._id}
-  className="my-order-card"
->
+                <article key={order._id} className="my-order-card">
                   <div className="my-order-header">
                     <div>
                       <span>ORDER ID</span>
@@ -316,21 +307,22 @@ const handleSubmitReview = async (event) => {
                           >
                             VIEW DETAILS →
                           </button>
-                          {String(order.orderStatus).toUpperCase() === "DELIVERED" &&
-  getProductId(item) &&
-  (hasReviewed(order._id, getProductId(item)) ? (
-    <p className="my-order-review-submitted">
-      ✓ REVIEW SUBMITTED
-    </p>
-  ) : (
-    <button
-      type="button"
-      className="my-order-write-review-button"
-      onClick={() => openReviewForm(order, item)}
-    >
-      WRITE REVIEW
-    </button>
-  ))}
+                          {String(order.orderStatus).toUpperCase() ===
+                            "DELIVERED" &&
+                            getProductId(item) &&
+                            (hasReviewed(order._id, getProductId(item)) ? (
+                              <p className="my-order-review-submitted">
+                                ✓ REVIEW SUBMITTED
+                              </p>
+                            ) : (
+                              <button
+                                type="button"
+                                className="my-order-write-review-button"
+                                onClick={() => openReviewForm(order, item)}
+                              >
+                                WRITE REVIEW
+                              </button>
+                            ))}
                         </div>
 
                         <div className="my-order-item-price">
@@ -410,19 +402,14 @@ const handleSubmitReview = async (event) => {
               ))}
             </div>
           )}
-          
+
           {reviewMessage && (
-            <p className="my-order-review-success">
-              {reviewMessage}
-            </p>
+            <p className="my-order-review-success">{reviewMessage}</p>
           )}
 
           {reviewTarget && (
             <div className="my-review-overlay">
-              <form
-                className="my-review-form"
-                onSubmit={handleSubmitReview}
-              >
+              <form className="my-review-form" onSubmit={handleSubmitReview}>
                 <button
                   type="button"
                   className="my-review-close"
@@ -438,9 +425,7 @@ const handleSubmitReview = async (event) => {
                   ×
                 </button>
 
-                <p className="my-review-eyebrow">
-                  ESSENZA REVIEWS
-                </p>
+                <p className="my-review-eyebrow">ESSENZA REVIEWS</p>
 
                 <h2>WRITE A REVIEW</h2>
 
@@ -465,16 +450,12 @@ const handleSubmitReview = async (event) => {
                   ))}
                 </div>
 
-                <label htmlFor="my-review-comment">
-                  YOUR EXPERIENCE
-                </label>
+                <label htmlFor="my-review-comment">YOUR EXPERIENCE</label>
 
                 <textarea
                   id="my-review-comment"
                   value={comment}
-                  onChange={(event) =>
-                    setComment(event.target.value)
-                  }
+                  onChange={(event) => setComment(event.target.value)}
                   placeholder="Share your experience with this fragrance..."
                   minLength={3}
                   maxLength={1000}
@@ -484,9 +465,7 @@ const handleSubmitReview = async (event) => {
                 />
 
                 {reviewError && (
-                  <p className="my-order-review-error">
-                    {reviewError}
-                  </p>
+                  <p className="my-order-review-error">{reviewError}</p>
                 )}
 
                 <button
@@ -494,14 +473,11 @@ const handleSubmitReview = async (event) => {
                   className="my-review-submit-button"
                   disabled={reviewSubmitting}
                 >
-                  {reviewSubmitting
-                    ? "SUBMITTING..."
-                    : "SUBMIT REVIEW"}
+                  {reviewSubmitting ? "SUBMITTING..." : "SUBMIT REVIEW"}
                 </button>
               </form>
             </div>
           )}
-
         </div>
       </main>
 

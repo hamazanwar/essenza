@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "../bars/AdminNavbar";
@@ -34,8 +33,7 @@ function OfferManagement() {
   const getToken = () => localStorage.getItem("adminToken");
 
   const getErrorMessage = (err) =>
-    err.response?.data?.message ||
-    "Something went wrong. Please try again.";
+    err.response?.data?.message || "Something went wrong. Please try again.";
 
   const config = {
     headers: {
@@ -75,8 +73,7 @@ function OfferManagement() {
         axios.get(CATEGORY_API, tokenConfig),
       ]);
 
-      const productData =
-        productResponse.data.products || productResponse.data;
+      const productData = productResponse.data.products || productResponse.data;
 
       const categoryData =
         categoryResponse.data.categories || categoryResponse.data;
@@ -86,7 +83,7 @@ function OfferManagement() {
     } catch (err) {
       console.error("Product/category loading error:", err);
       setError(
-        "Unable to load products or categories. Check your existing admin API routes."
+        "Unable to load products or categories. Check your existing admin API routes.",
       );
     }
   }, []);
@@ -174,11 +171,7 @@ function OfferManagement() {
       };
 
       if (editingId) {
-        await axios.patch(
-          `${OFFER_API}/${editingId}`,
-          payload,
-          tokenConfig
-        );
+        await axios.patch(`${OFFER_API}/${editingId}`, payload, tokenConfig);
         setMessage("Offer updated successfully.");
       } else {
         await axios.post(OFFER_API, payload, tokenConfig);
@@ -198,9 +191,7 @@ function OfferManagement() {
     const toDateTimeLocal = (date) => {
       const parsed = new Date(date);
       const offset = parsed.getTimezoneOffset() * 60000;
-      return new Date(parsed.getTime() - offset)
-        .toISOString()
-        .slice(0, 16);
+      return new Date(parsed.getTime() - offset).toISOString().slice(0, 16);
     };
 
     setForm({
@@ -209,10 +200,10 @@ function OfferManagement() {
       discountType: offer.discountType || "PERCENTAGE",
       discountValue: String(offer.discountValue ?? ""),
       applicableProducts: (offer.applicableProducts || []).map((item) =>
-        typeof item === "string" ? item : item._id
+        typeof item === "string" ? item : item._id,
       ),
       applicableCategories: (offer.applicableCategories || []).map((item) =>
-        typeof item === "string" ? item : item._id
+        typeof item === "string" ? item : item._id,
       ),
       startDate: toDateTimeLocal(offer.startDate),
       endDate: toDateTimeLocal(offer.endDate),
@@ -252,11 +243,11 @@ function OfferManagement() {
         await axios.patch(
           `${OFFER_API}/${offer._id}`,
           { isActive: !offer.isActive },
-          tokenConfig
+          tokenConfig,
         );
 
         setMessage(
-          `Offer ${offer.isActive ? "deactivated" : "activated"} successfully.`
+          `Offer ${offer.isActive ? "deactivated" : "activated"} successfully.`,
         );
       }
 
@@ -292,22 +283,24 @@ function OfferManagement() {
             <h1>Offer Management</h1>
             <p>Create product and category discounts for your store.</p>
           </div>
-          <span className="coupon-total-count">
-            {offers.length} OFFERS
-          </span>
+          <span className="coupon-total-count">{offers.length} OFFERS</span>
         </div>
 
         {message && (
           <div className="coupon-feedback coupon-feedback-success">
             {message}
-            <button type="button" onClick={() => setMessage("")}>×</button>
+            <button type="button" onClick={() => setMessage("")}>
+              ×
+            </button>
           </div>
         )}
 
         {error && (
           <div className="coupon-feedback coupon-feedback-error">
             {error}
-            <button type="button" onClick={() => setError("")}>×</button>
+            <button type="button" onClick={() => setError("")}>
+              ×
+            </button>
           </div>
         )}
 
@@ -461,7 +454,11 @@ function OfferManagement() {
                 className="coupon-primary-button"
                 disabled={saving}
               >
-                {saving ? "SAVING..." : editingId ? "SAVE CHANGES" : "CREATE OFFER"}
+                {saving
+                  ? "SAVING..."
+                  : editingId
+                    ? "SAVE CHANGES"
+                    : "CREATE OFFER"}
               </button>
 
               {!editingId && (
@@ -510,10 +507,14 @@ function OfferManagement() {
                   {offers.map((offer) => {
                     const status = getOfferStatus(offer);
                     const productNames = (offer.applicableProducts || [])
-                      .map((item) => typeof item === "string" ? item : item.name)
+                      .map((item) =>
+                        typeof item === "string" ? item : item.name,
+                      )
                       .filter(Boolean);
                     const categoryNames = (offer.applicableCategories || [])
-                      .map((item) => typeof item === "string" ? item : item.name)
+                      .map((item) =>
+                        typeof item === "string" ? item : item.name,
+                      )
                       .filter(Boolean);
 
                     return (
@@ -524,14 +525,24 @@ function OfferManagement() {
                             {offer.description || "No description"}
                           </span>
                         </td>
-                        <td><strong>{formatDiscount(offer)}</strong></td>
                         <td>
-                          {[...productNames, ...categoryNames].join(", ") || "Selected items"}
+                          <strong>{formatDiscount(offer)}</strong>
                         </td>
                         <td>
-                          <span>{new Date(offer.startDate).toLocaleDateString("en-IN")}</span>
+                          {[...productNames, ...categoryNames].join(", ") ||
+                            "Selected items"}
+                        </td>
+                        <td>
+                          <span>
+                            {new Date(offer.startDate).toLocaleDateString(
+                              "en-IN",
+                            )}
+                          </span>
                           <span className="coupon-description-text">
-                            to {new Date(offer.endDate).toLocaleDateString("en-IN")}
+                            to{" "}
+                            {new Date(offer.endDate).toLocaleDateString(
+                              "en-IN",
+                            )}
                           </span>
                         </td>
                         <td>
@@ -543,19 +554,26 @@ function OfferManagement() {
                         </td>
                         <td>
                           <div className="coupon-row-actions">
-                            <button type="button" onClick={() => handleEdit(offer)}>
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(offer)}
+                            >
                               EDIT
                             </button>
                             <button
                               type="button"
-                              onClick={() => setConfirmAction({ type: "status", offer })}
+                              onClick={() =>
+                                setConfirmAction({ type: "status", offer })
+                              }
                             >
                               {offer.isActive ? "DEACTIVATE" : "ACTIVATE"}
                             </button>
                             <button
                               type="button"
                               className="coupon-delete-action"
-                              onClick={() => setConfirmAction({ type: "delete", offer })}
+                              onClick={() =>
+                                setConfirmAction({ type: "delete", offer })
+                              }
                             >
                               DELETE
                             </button>

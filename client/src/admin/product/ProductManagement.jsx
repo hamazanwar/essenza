@@ -29,17 +29,14 @@ function ProductManagement() {
   const [editProductImages, setEditProductImages] = useState([]);
   const [newProductImages, setNewProductImages] = useState([]);
 
-  const totalPages = Math.ceil(
-  products.length / PRODUCTS_PER_PAGE
-);
+  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
 
-const startIndex =
-  (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
 
-const currentProducts = products.slice(
-  startIndex,
-  startIndex + PRODUCTS_PER_PAGE
-);
+  const currentProducts = products.slice(
+    startIndex,
+    startIndex + PRODUCTS_PER_PAGE,
+  );
 
   const fetchProducts = async () => {
     try {
@@ -288,30 +285,27 @@ const currentProducts = products.slice(
   }, []);
 
   useEffect(() => {
-  if (totalPages > 0 && currentPage > totalPages) {
-    setCurrentPage(totalPages);
-  }
-}, [currentPage, totalPages]);
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   return (
     <div className="admin-product-page">
       <AdminNavbar />
 
       <main className="admin-product-content">
+        <div className="product-management-header">
+          <h1>PRODUCT MANAGEMENT</h1>
 
-  <div className="product-management-header">
-    <h1>PRODUCT MANAGEMENT</h1>
-
-    <button
-      type="button"
-      className="add-product-button"
-      onClick={() => navigate("/admin/products/add")}
-    >
-      ADD PRODUCT
-    </button>
-  </div>
-
-        
+          <button
+            type="button"
+            className="add-product-button"
+            onClick={() => navigate("/admin/products/add")}
+          >
+            ADD PRODUCT
+          </button>
+        </div>
 
         {loading && <p>Loading products...</p>}
 
@@ -323,212 +317,194 @@ const currentProducts = products.slice(
 
         {!loading && !error && products.length > 0 && (
           <>
-          <div className="product-list">
-            {currentProducts.map((product) => (
-              <div
-                key={product._id}
-                className={`product-item ${
-                  editProductId === product._id ? "product-item-editing" : ""
-                }`}
-              >
-                {editProductId === product._id ? (
-                  <>
-                    <input
-                      type="text"
-                      value={editProductName}
-                      onChange={(event) =>
-                        setEditProductName(event.target.value)
-                      }
-                      placeholder="Product name"
-                      autoFocus
-                    />
+            <div className="product-list">
+              {currentProducts.map((product) => (
+                <div
+                  key={product._id}
+                  className={`product-item ${
+                    editProductId === product._id ? "product-item-editing" : ""
+                  }`}
+                >
+                  {editProductId === product._id ? (
+                    <>
+                      <input
+                        type="text"
+                        value={editProductName}
+                        onChange={(event) =>
+                          setEditProductName(event.target.value)
+                        }
+                        placeholder="Product name"
+                        autoFocus
+                      />
 
-                    <select
-                      value={editCategoryId}
-                      onChange={(event) =>
-                        setEditCategoryId(event.target.value)
-                      }
-                    >
-                      <option value="">Select category</option>
+                      <select
+                        value={editCategoryId}
+                        onChange={(event) =>
+                          setEditCategoryId(event.target.value)
+                        }
+                      >
+                        <option value="">Select category</option>
 
-                      {categories
-                        .filter((category) => category.isActive)
-                        .map((category) => (
-                          <option key={category._id} value={category._id}>
-                            {category.name}
-                          </option>
-                        ))}
-                    </select>
+                        {categories
+                          .filter((category) => category.isActive)
+                          .map((category) => (
+                            <option key={category._id} value={category._id}>
+                              {category.name}
+                            </option>
+                          ))}
+                      </select>
 
-                    <textarea
-                      value={editDescription}
-                      onChange={(event) =>
-                        setEditDescription(event.target.value)
-                      }
-                      placeholder="Product description"
-                    />
-                    <textarea
-                      value={editFragranceNotes}
-                      onChange={(event) =>
-                        setEditFragranceNotes(event.target.value)
-                      }
-                      placeholder="Fragrance notes"
-                    />
+                      <textarea
+                        value={editDescription}
+                        onChange={(event) =>
+                          setEditDescription(event.target.value)
+                        }
+                        placeholder="Product description"
+                      />
+                      <textarea
+                        value={editFragranceNotes}
+                        onChange={(event) =>
+                          setEditFragranceNotes(event.target.value)
+                        }
+                        placeholder="Fragrance notes"
+                      />
 
-                    <textarea
-                      value={editIngredients}
-                      onChange={(event) =>
-                        setEditIngredients(event.target.value)
-                      }
-                      placeholder="Ingredients"
-                    />
+                      <textarea
+                        value={editIngredients}
+                        onChange={(event) =>
+                          setEditIngredients(event.target.value)
+                        }
+                        placeholder="Ingredients"
+                      />
 
-                    <textarea
-                      value={editHowToUse}
-                      onChange={(event) => setEditHowToUse(event.target.value)}
-                      placeholder="How to use"
-                    />
+                      <textarea
+                        value={editHowToUse}
+                        onChange={(event) =>
+                          setEditHowToUse(event.target.value)
+                        }
+                        placeholder="How to use"
+                      />
 
-                    <textarea
-                      value={editShippingAndReturns}
-                      onChange={(event) =>
-                        setEditShippingAndReturns(event.target.value)
-                      }
-                      placeholder="Shipping & returns"
-                    />
-                    <div className="product-variants">
-                      <div className="product-variants-header">
-                        <h3>PRODUCT VARIANTS</h3>
-
-                        <button
-                          type="button"
-                          className="product-variant-add"
-                          onClick={() => {
-                            setEditVariants((previousVariants) => [
-                              ...previousVariants,
-                              {
-                                size: "",
-                                price: "",
-                                stock: "",
-                              },
-                            ]);
-                          }}
-                        >
-                          + ADD VARIANT
-                        </button>
-                      </div>
-
-                      {editVariants.map((variant, index) => (
-                        <div
-                          key={variant.id || index}
-                          className="product-variant-row"
-                        >
-                          <input
-                            type="text"
-                            placeholder="Size (e.g. 50ml)"
-                            value={variant.size}
-                            onChange={(event) => {
-                              const updatedVariants = [...editVariants];
-
-                              updatedVariants[index].size = event.target.value;
-
-                              setEditVariants(updatedVariants);
-                            }}
-                          />
-
-                          <input
-                            type="number"
-                            placeholder="Price"
-                            min="0"
-                            value={variant.price}
-                            onChange={(event) => {
-                              const updatedVariants = [...editVariants];
-
-                              updatedVariants[index].price = event.target.value;
-
-                              setEditVariants(updatedVariants);
-                            }}
-                          />
-
-                          <input
-                            type="number"
-                            placeholder="Stock"
-                            min="0"
-                            value={variant.stock}
-                            onChange={(event) => {
-                              const updatedVariants = [...editVariants];
-
-                              updatedVariants[index].stock = event.target.value;
-
-                              setEditVariants(updatedVariants);
-                            }}
-                          />
+                      <textarea
+                        value={editShippingAndReturns}
+                        onChange={(event) =>
+                          setEditShippingAndReturns(event.target.value)
+                        }
+                        placeholder="Shipping & returns"
+                      />
+                      <div className="product-variants">
+                        <div className="product-variants-header">
+                          <h3>PRODUCT VARIANTS</h3>
 
                           <button
                             type="button"
-                            className="product-variant-remove"
-                            onClick={async () => {
-                              const variant = editVariants[index];
-
-                              try {
-                                setError("");
-                                setSuccess("");
-
-                                // Existing variant → delete from database
-                                if (variant.id) {
-                                  const token =
-                                    localStorage.getItem("adminToken");
-
-                                  await axios.delete(
-                                    `http://localhost:5000/api/admin/variants/${variant.id}`,
-                                    {
-                                      headers: {
-                                        Authorization: `Bearer ${token}`,
-                                      },
-                                    },
-                                  );
-                                }
-
-                                // Remove from React state
-                                setEditVariants((previousVariants) =>
-                                  previousVariants.filter(
-                                    (_, variantIndex) => variantIndex !== index,
-                                  ),
-                                );
-
-                                setSuccess("Variant removed successfully.");
-                              } catch (error) {
-                                console.error("Delete variant error:", error);
-
-                                setError(
-                                  error.response?.data?.message ||
-                                    "Unable to remove variant.",
-                                );
-                              }
+                            className="product-variant-add"
+                            onClick={() => {
+                              setEditVariants((previousVariants) => [
+                                ...previousVariants,
+                                {
+                                  size: "",
+                                  price: "",
+                                  stock: "",
+                                },
+                              ]);
                             }}
                           >
-                            REMOVE
+                            + ADD VARIANT
                           </button>
                         </div>
-                      ))}
-                    </div>
-                    {editProductImages.length > 0 && (
-                      <div className="edit-product-images">
-                        {editProductImages.map((image, index) => (
-                          <div key={index} className="edit-product-image-item">
-                            <img
-                              src={`http://localhost:5000${image}`}
-                              alt={`${editProductName} ${index + 1}`}
+
+                        {editVariants.map((variant, index) => (
+                          <div
+                            key={variant.id || index}
+                            className="product-variant-row"
+                          >
+                            <input
+                              type="text"
+                              placeholder="Size (e.g. 50ml)"
+                              value={variant.size}
+                              onChange={(event) => {
+                                const updatedVariants = [...editVariants];
+
+                                updatedVariants[index].size =
+                                  event.target.value;
+
+                                setEditVariants(updatedVariants);
+                              }}
+                            />
+
+                            <input
+                              type="number"
+                              placeholder="Price"
+                              min="0"
+                              value={variant.price}
+                              onChange={(event) => {
+                                const updatedVariants = [...editVariants];
+
+                                updatedVariants[index].price =
+                                  event.target.value;
+
+                                setEditVariants(updatedVariants);
+                              }}
+                            />
+
+                            <input
+                              type="number"
+                              placeholder="Stock"
+                              min="0"
+                              value={variant.stock}
+                              onChange={(event) => {
+                                const updatedVariants = [...editVariants];
+
+                                updatedVariants[index].stock =
+                                  event.target.value;
+
+                                setEditVariants(updatedVariants);
+                              }}
                             />
 
                             <button
                               type="button"
-                              onClick={() => {
-                                setEditProductImages((previousImages) =>
-                                  previousImages.filter(
-                                    (_, imageIndex) => imageIndex !== index,
-                                  ),
-                                );
+                              className="product-variant-remove"
+                              onClick={async () => {
+                                const variant = editVariants[index];
+
+                                try {
+                                  setError("");
+                                  setSuccess("");
+
+                                  // Existing variant → delete from database
+                                  if (variant.id) {
+                                    const token =
+                                      localStorage.getItem("adminToken");
+
+                                    await axios.delete(
+                                      `http://localhost:5000/api/admin/variants/${variant.id}`,
+                                      {
+                                        headers: {
+                                          Authorization: `Bearer ${token}`,
+                                        },
+                                      },
+                                    );
+                                  }
+
+                                  // Remove from React state
+                                  setEditVariants((previousVariants) =>
+                                    previousVariants.filter(
+                                      (_, variantIndex) =>
+                                        variantIndex !== index,
+                                    ),
+                                  );
+
+                                  setSuccess("Variant removed successfully.");
+                                } catch (error) {
+                                  console.error("Delete variant error:", error);
+
+                                  setError(
+                                    error.response?.data?.message ||
+                                      "Unable to remove variant.",
+                                  );
+                                }
                               }}
                             >
                               REMOVE
@@ -536,242 +512,266 @@ const currentProducts = products.slice(
                           </div>
                         ))}
                       </div>
-                    )}
-                    {newProductImages.length > 0 && (
-                      <div className="new-product-images">
-                        {newProductImages.map((image, index) => (
-                          <div key={index} className="new-product-image-item">
-                            <img
-                              src={URL.createObjectURL(image)}
-                              alt={image.name}
-                            />
-
-                            <span>{image.name}</span>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setNewProductImages((previousImages) =>
-                                  previousImages.filter(
-                                    (_, imageIndex) => imageIndex !== index,
-                                  ),
-                                );
-                              }}
+                      {editProductImages.length > 0 && (
+                        <div className="edit-product-images">
+                          {editProductImages.map((image, index) => (
+                            <div
+                              key={index}
+                              className="edit-product-image-item"
                             >
-                              REMOVE
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                              <img
+                                src={`http://localhost:5000${image}`}
+                                alt={`${editProductName} ${index + 1}`}
+                              />
 
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      multiple
-                      onChange={(event) => {
-                        const selectedImages = Array.from(event.target.files);
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditProductImages((previousImages) =>
+                                    previousImages.filter(
+                                      (_, imageIndex) => imageIndex !== index,
+                                    ),
+                                  );
+                                }}
+                              >
+                                REMOVE
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {newProductImages.length > 0 && (
+                        <div className="new-product-images">
+                          {newProductImages.map((image, index) => (
+                            <div key={index} className="new-product-image-item">
+                              <img
+                                src={URL.createObjectURL(image)}
+                                alt={image.name}
+                              />
 
-                        setNewProductImages((previousImages) => [
-                          ...previousImages,
-                          ...selectedImages,
-                        ]);
-                      }}
-                    />
-                  </>
-                ) : (
-                  <h3>{product.name}</h3>
-                )}
+                              <span>{image.name}</span>
 
-                {editProductId !== product._id &&
-                  product.productImage?.length > 0 && (
-                    <div className="product-images">
-                      {product.productImage.map((image, index) => (
-                        <img
-                          key={index}
-                          src={`http://localhost:5000${image}`}
-                          alt={`${product.name} ${index + 1}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                <p>Category: {product.categoryId?.name}</p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setNewProductImages((previousImages) =>
+                                    previousImages.filter(
+                                      (_, imageIndex) => imageIndex !== index,
+                                    ),
+                                  );
+                                }}
+                              >
+                                REMOVE
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
-                <p>{product.description}</p>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        multiple
+                        onChange={(event) => {
+                          const selectedImages = Array.from(event.target.files);
 
-                <p>Status: {product.isActive ? "Active" : "Inactive"}</p>
-                <div className="product-item-actions">
-                  {editProductId === product._id ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => handleEditProduct(product._id)}
-                      >
-                        SAVE
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditProductId(null);
-                          setEditProductName("");
-                          setEditCategoryId("");
-                          setEditDescription("");
-                          setEditFragranceNotes("");
-                          setEditIngredients("");
-                          setEditHowToUse("");
-                          setEditShippingAndReturns("");
-                          setEditProductImages([]);
-                          setNewProductImages([]);
-                          setEditVariants([]);
+                          setNewProductImages((previousImages) => [
+                            ...previousImages,
+                            ...selectedImages,
+                          ]);
                         }}
-                      >
-                        CANCEL
-                      </button>
+                      />
                     </>
                   ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          setEditProductId(product._id);
-
-                          setEditProductName(product.name);
-
-                          setEditCategoryId(
-                            typeof product.categoryId === "object"
-                              ? product.categoryId._id
-                              : product.categoryId,
-                          );
-
-                          setEditDescription(product.description);
-
-                          setEditFragranceNotes(product.fragranceNotes || "");
-
-                          setEditIngredients(product.ingredients || "");
-
-                          setEditHowToUse(product.howToUse || "");
-
-                          setEditShippingAndReturns(
-                            product.shippingAndReturns || "",
-                          );
-
-                          setEditProductImages(product.productImage || []);
-                          setNewProductImages([]);
-                          setEditVariants([]);
-
-                          setError("");
-                          setSuccess("");
-
-                          const token = localStorage.getItem("adminToken");
-
-                          try {
-                            const response = await axios.get(
-                              `http://localhost:5000/api/admin/variants/product/${product._id}`,
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${token}`,
-                                },
-                              },
-                            );
-
-                            setEditVariants(
-                              response.data.variants.map((variant) => ({
-                                id: variant._id,
-                                size: variant.size,
-                                price: variant.price,
-                                stock: variant.stock,
-                              })),
-                            );
-                          } catch (error) {
-                            console.error("Get product variants error:", error);
-
-                            setError(
-                              error.response?.data?.message ||
-                                "Unable to load product variants.",
-                            );
-                          }
-                        }}
-                      >
-                        EDIT
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleToggleProductStatus(product._id)}
-                      >
-                        {product.isActive ? "DEACTIVATE" : "ACTIVATE"}
-                      </button>
-                    </>
+                    <h3>{product.name}</h3>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => setDeleteProductId(product._id)}
-                  >
-                    DELETE
-                  </button>
-                </div>
-                {deleteProductId === product._id && (
-                  <div className="product-delete-modal">
-                    <div className="product-delete-modal-content">
-                      <h2>DELETE PRODUCT</h2>
 
-                      <p>Are you sure you want to delete this product?</p>
+                  {editProductId !== product._id &&
+                    product.productImage?.length > 0 && (
+                      <div className="product-images">
+                        {product.productImage.map((image, index) => (
+                          <img
+                            key={index}
+                            src={`http://localhost:5000${image}`}
+                            alt={`${product.name} ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  <p>Category: {product.categoryId?.name}</p>
 
-                      <div className="product-delete-modal-actions">
+                  <p>{product.description}</p>
+
+                  <p>Status: {product.isActive ? "Active" : "Inactive"}</p>
+                  <div className="product-item-actions">
+                    {editProductId === product._id ? (
+                      <>
                         <button
                           type="button"
-                          onClick={() => setDeleteProductId(null)}
+                          onClick={() => handleEditProduct(product._id)}
+                        >
+                          SAVE
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditProductId(null);
+                            setEditProductName("");
+                            setEditCategoryId("");
+                            setEditDescription("");
+                            setEditFragranceNotes("");
+                            setEditIngredients("");
+                            setEditHowToUse("");
+                            setEditShippingAndReturns("");
+                            setEditProductImages([]);
+                            setNewProductImages([]);
+                            setEditVariants([]);
+                          }}
                         >
                           CANCEL
                         </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            setEditProductId(product._id);
+
+                            setEditProductName(product.name);
+
+                            setEditCategoryId(
+                              typeof product.categoryId === "object"
+                                ? product.categoryId._id
+                                : product.categoryId,
+                            );
+
+                            setEditDescription(product.description);
+
+                            setEditFragranceNotes(product.fragranceNotes || "");
+
+                            setEditIngredients(product.ingredients || "");
+
+                            setEditHowToUse(product.howToUse || "");
+
+                            setEditShippingAndReturns(
+                              product.shippingAndReturns || "",
+                            );
+
+                            setEditProductImages(product.productImage || []);
+                            setNewProductImages([]);
+                            setEditVariants([]);
+
+                            setError("");
+                            setSuccess("");
+
+                            const token = localStorage.getItem("adminToken");
+
+                            try {
+                              const response = await axios.get(
+                                `http://localhost:5000/api/admin/variants/product/${product._id}`,
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${token}`,
+                                  },
+                                },
+                              );
+
+                              setEditVariants(
+                                response.data.variants.map((variant) => ({
+                                  id: variant._id,
+                                  size: variant.size,
+                                  price: variant.price,
+                                  stock: variant.stock,
+                                })),
+                              );
+                            } catch (error) {
+                              console.error(
+                                "Get product variants error:",
+                                error,
+                              );
+
+                              setError(
+                                error.response?.data?.message ||
+                                  "Unable to load product variants.",
+                              );
+                            }
+                          }}
+                        >
+                          EDIT
+                        </button>
 
                         <button
                           type="button"
-                          onClick={() => handleDeleteProduct(deleteProductId)}
+                          onClick={() => handleToggleProductStatus(product._id)}
                         >
-                          DELETE
+                          {product.isActive ? "DEACTIVATE" : "ACTIVATE"}
                         </button>
+                      </>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setDeleteProductId(product._id)}
+                    >
+                      DELETE
+                    </button>
+                  </div>
+                  {deleteProductId === product._id && (
+                    <div className="product-delete-modal">
+                      <div className="product-delete-modal-content">
+                        <h2>DELETE PRODUCT</h2>
+
+                        <p>Are you sure you want to delete this product?</p>
+
+                        <div className="product-delete-modal-actions">
+                          <button
+                            type="button"
+                            onClick={() => setDeleteProductId(null)}
+                          >
+                            CANCEL
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProduct(deleteProductId)}
+                          >
+                            DELETE
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                            </div>
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <div className="product-pagination">
-
-              <button
-                type="button"
-                disabled={currentPage === 1}
-                onClick={() =>
-                  setCurrentPage(
-                    (previousPage) => previousPage - 1
-                  )
-                }
-              >
-                PREVIOUS
-              </button>
-
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                type="button"
-                disabled={currentPage === totalPages}
-                onClick={() =>
-                  setCurrentPage(
-                    (previousPage) => previousPage + 1
-                  )
-                }
-              >
-                NEXT
-              </button>
-
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+            {totalPages > 1 && (
+              <div className="product-pagination">
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() =>
+                    setCurrentPage((previousPage) => previousPage - 1)
+                  }
+                >
+                  PREVIOUS
+                </button>
+
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((previousPage) => previousPage + 1)
+                  }
+                >
+                  NEXT
+                </button>
+              </div>
+            )}
           </>
         )}
       </main>

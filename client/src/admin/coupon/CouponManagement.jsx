@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "../bars/AdminNavbar";
@@ -68,7 +67,7 @@ function CouponManagement() {
           page: 1,
           limit: 10,
           totalPages: 0,
-        }
+        },
       );
     } catch (err) {
       setError(getErrorMessage(err));
@@ -130,8 +129,7 @@ function CouponManagement() {
           : null,
       startDate: new Date(form.startDate).toISOString(),
       expiryDate: new Date(form.expiryDate).toISOString(),
-      usageLimit:
-        form.usageLimit !== "" ? Number(form.usageLimit) : null,
+      usageLimit: form.usageLimit !== "" ? Number(form.usageLimit) : null,
       isActive: form.isActive,
     };
 
@@ -168,9 +166,7 @@ function CouponManagement() {
       const parsed = new Date(date);
       const offset = parsed.getTimezoneOffset() * 60000;
 
-      return new Date(parsed.getTime() - offset)
-        .toISOString()
-        .slice(0, 16);
+      return new Date(parsed.getTime() - offset).toISOString().slice(0, 16);
     };
 
     setForm({
@@ -179,12 +175,10 @@ function CouponManagement() {
       discountType: coupon.discountType || "PERCENTAGE",
       discountValue: String(coupon.discountValue ?? ""),
       minOrderAmount: String(coupon.minOrderAmount ?? 0),
-      maxDiscount:
-        coupon.maxDiscount == null ? "" : String(coupon.maxDiscount),
+      maxDiscount: coupon.maxDiscount == null ? "" : String(coupon.maxDiscount),
       startDate: toDateTimeLocal(coupon.startDate),
       expiryDate: toDateTimeLocal(coupon.expiryDate),
-      usageLimit:
-        coupon.usageLimit == null ? "" : String(coupon.usageLimit),
+      usageLimit: coupon.usageLimit == null ? "" : String(coupon.usageLimit),
       isActive: coupon.isActive,
     });
 
@@ -197,72 +191,62 @@ function CouponManagement() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  
-const handleToggleStatus = async (coupon) => {
-  setConfirmAction({
-    type: "status",
-    coupon,
-  });
-};
+  const handleToggleStatus = async (coupon) => {
+    setConfirmAction({
+      type: "status",
+      coupon,
+    });
+  };
 
+  const handleDelete = async (coupon) => {
+    setConfirmAction({
+      type: "delete",
+      coupon,
+    });
+  };
 
-  
-const handleDelete = async (coupon) => {
-  setConfirmAction({
-    type: "delete",
-    coupon,
-  });
-};
+  const handleConfirmAction = async () => {
+    if (!confirmAction) return;
 
+    const { type, coupon } = confirmAction;
 
+    setConfirmAction(null);
+    setError("");
+    setMessage("");
 
-const handleConfirmAction = async () => {
-  if (!confirmAction) return;
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      };
 
-  const { type, coupon } = confirmAction;
+      if (type === "delete") {
+        await axios.delete(`${API_URL}/${coupon._id}`, config);
 
-  setConfirmAction(null);
-  setError("");
-  setMessage("");
+        setMessage("Coupon deleted successfully.");
 
-  try {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    };
+        if (coupons.length === 1 && page > 1) {
+          setPage((previous) => previous - 1);
+        } else {
+          await fetchCoupons();
+        }
 
-    if (type === "delete") {
-      await axios.delete(`${API_URL}/${coupon._id}`, config);
+        if (editingId === coupon._id) {
+          resetForm();
+        }
+      } else if (type === "status") {
+        const action = coupon.isActive ? "deactivate" : "activate";
 
-      setMessage("Coupon deleted successfully.");
+        await axios.patch(`${API_URL}/${coupon._id}/status`, {}, config);
 
-      if (coupons.length === 1 && page > 1) {
-        setPage((previous) => previous - 1);
-      } else {
+        setMessage(`Coupon ${action}d successfully.`);
         await fetchCoupons();
       }
-
-      if (editingId === coupon._id) {
-        resetForm();
-      }
-    } else if (type === "status") {
-      const action = coupon.isActive ? "deactivate" : "activate";
-
-      await axios.patch(
-        `${API_URL}/${coupon._id}/status`,
-        {},
-        config
-      );
-
-      setMessage(`Coupon ${action}d successfully.`);
-      await fetchCoupons();
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
-  } catch (err) {
-    setError(getErrorMessage(err));
-  }
-};
-
+  };
 
   const formatDate = (date) =>
     date
@@ -285,10 +269,7 @@ const handleConfirmAction = async () => {
     if (now < new Date(coupon.startDate)) return "Scheduled";
     if (now > new Date(coupon.expiryDate)) return "Expired";
 
-    if (
-      coupon.usageLimit != null &&
-      coupon.usedCount >= coupon.usageLimit
-    ) {
+    if (coupon.usageLimit != null && coupon.usedCount >= coupon.usageLimit) {
       return "Limit reached";
     }
 
@@ -307,9 +288,7 @@ const handleConfirmAction = async () => {
             <p>Create and manage discount coupons for your store.</p>
           </div>
 
-          <span className="coupon-total-count">
-            {pagination.total} COUPONS
-          </span>
+          <span className="coupon-total-count">{pagination.total} COUPONS</span>
         </div>
 
         {message && (
@@ -387,9 +366,7 @@ const handleConfirmAction = async () => {
               </div>
 
               <div className="coupon-field">
-                <label htmlFor="coupon-discount-type">
-                  Discount Type *
-                </label>
+                <label htmlFor="coupon-discount-type">Discount Type *</label>
                 <select
                   id="coupon-discount-type"
                   name="discountType"
@@ -403,9 +380,7 @@ const handleConfirmAction = async () => {
               </div>
 
               <div className="coupon-field">
-                <label htmlFor="coupon-discount-value">
-                  Discount Value *
-                </label>
+                <label htmlFor="coupon-discount-value">Discount Value *</label>
                 <input
                   id="coupon-discount-value"
                   name="discountValue"
@@ -423,9 +398,7 @@ const handleConfirmAction = async () => {
               </div>
 
               <div className="coupon-field">
-                <label htmlFor="coupon-minimum">
-                  Minimum Order Amount (₹)
-                </label>
+                <label htmlFor="coupon-minimum">Minimum Order Amount (₹)</label>
                 <input
                   id="coupon-minimum"
                   name="minOrderAmount"
@@ -468,9 +441,7 @@ const handleConfirmAction = async () => {
               </div>
 
               <div className="coupon-field">
-                <label htmlFor="coupon-expiry-date">
-                  Expiry Date & Time *
-                </label>
+                <label htmlFor="coupon-expiry-date">Expiry Date & Time *</label>
                 <input
                   id="coupon-expiry-date"
                   name="expiryDate"
@@ -482,9 +453,7 @@ const handleConfirmAction = async () => {
               </div>
 
               <div className="coupon-field">
-                <label htmlFor="coupon-usage-limit">
-                  Usage Limit
-                </label>
+                <label htmlFor="coupon-usage-limit">Usage Limit</label>
                 <input
                   id="coupon-usage-limit"
                   name="usageLimit"
@@ -604,9 +573,9 @@ const handleConfirmAction = async () => {
 
                           <td>
                             ₹
-                            {Number(
-                              coupon.minOrderAmount || 0
-                            ).toLocaleString("en-IN")}
+                            {Number(coupon.minOrderAmount || 0).toLocaleString(
+                              "en-IN",
+                            )}
                           </td>
 
                           <td>
@@ -617,8 +586,7 @@ const handleConfirmAction = async () => {
                           </td>
 
                           <td>
-                            {coupon.usedCount || 0} /{" "}
-                            {coupon.usageLimit ?? "∞"}
+                            {coupon.usedCount || 0} / {coupon.usageLimit ?? "∞"}
                           </td>
 
                           <td>
@@ -685,9 +653,7 @@ const handleConfirmAction = async () => {
                   <button
                     type="button"
                     onClick={() => setPage((previous) => previous + 1)}
-                    disabled={
-                      page >= Math.max(1, pagination.totalPages)
-                    }
+                    disabled={page >= Math.max(1, pagination.totalPages)}
                   >
                     NEXT
                   </button>
@@ -696,7 +662,6 @@ const handleConfirmAction = async () => {
             </>
           )}
         </section>
-      
       </main>
 
       {confirmAction && (
@@ -727,9 +692,7 @@ const handleConfirmAction = async () => {
               {confirmAction.type === "delete"
                 ? `Are you sure you want to delete "${confirmAction.coupon.code}"? This action cannot be undone.`
                 : `Are you sure you want to ${
-                    confirmAction.coupon.isActive
-                      ? "deactivate"
-                      : "activate"
+                    confirmAction.coupon.isActive ? "deactivate" : "activate"
                   } "${confirmAction.coupon.code}"?`}
             </p>
 
@@ -760,6 +723,5 @@ const handleConfirmAction = async () => {
     </div>
   );
 }
-
 
 export default CouponManagement;

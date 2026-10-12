@@ -1843,7 +1843,6 @@
   color: #111;
 }
 
-
 /* ==========================================
    PRODUCT MANAGEMENT HEADER
 ========================================== */
@@ -1857,7 +1856,6 @@
 
   margin-bottom: 35px;
 }
-
 
 /* ==========================================
    ADD PRODUCT BUTTON
@@ -2679,7 +2677,6 @@
   color: #111;
 }
 
-
 /* ==========================================
    PRODUCT RESPONSIVE
 ========================================== */
@@ -2910,25 +2907,26 @@
   opacity: 0.8;
 }
 
-
 .buy-now-button {
-    width: 100%;
-    height: 42px;
-    margin-top: 14px;
-    border: 1px solid #111111;
-    background: #111111;
-    color: #ffffff;
-    font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease;
+  width: 100%;
+  height: 42px;
+  margin-top: 14px;
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 .buy-now-button:hover {
-    background: #ffffff;
-    color: #111111;
+  background: #ffffff;
+  color: #111111;
 }
 
 /* ========================================
@@ -2936,168 +2934,167 @@
 ======================================== */
 
 .product-details-page {
-    width: 100%;
-    min-height: 100vh;
-    padding: 60px 7% 120px;
-    background: #ffffff;
+  width: 100%;
+  min-height: 100vh;
+  padding: 60px 7% 120px;
+  background: #ffffff;
 }
 
 .product-details-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 70px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 70px;
 }
 
 /* PRODUCT GALLERY */
 
 .product-gallery {
-    width: 100%;
+  width: 100%;
 }
 
 .product-main-image {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background: #f6f6f6;
-    overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f6f6f6;
+  overflow: hidden;
 }
 
 .product-main-image img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .product-main-image-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #999999;
-    font-size: 12px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999999;
+  font-size: 12px;
 }
 
 /* THUMBNAILS */
 
 .product-thumbnails {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .product-thumbnail {
-    width: 70px;
-    height: 70px;
-    padding: 0;
-    border: 1px solid #dddddd;
-    background: #f6f6f6;
-    cursor: pointer;
-    overflow: hidden;
+  width: 70px;
+  height: 70px;
+  padding: 0;
+  border: 1px solid #dddddd;
+  background: #f6f6f6;
+  cursor: pointer;
+  overflow: hidden;
 }
 
 .product-thumbnail.active {
-    border: 1px solid #111111;
+  border: 1px solid #111111;
 }
 
 .product-thumbnail img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 /* PRODUCT INFORMATION */
 
 .product-details-info {
-    padding-top: 15px;
+  padding-top: 15px;
 }
 
 .product-details-category {
-    margin: 0 0 12px;
-    font-size: 10px;
-    font-weight: 500;
-    color: #888888;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
+  margin: 0 0 12px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
 .product-details-info h1 {
-    margin: 0;
-    font-family: "Playfair Display", serif;
-    font-size: 40px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    color: #111111;
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: #111111;
 }
 
 .product-details-description {
-    margin-top: 25px;
-    font-size: 13px;
-    line-height: 1.8;
-    color: #666666;
+  margin-top: 25px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #666666;
 }
 
 .product-variants {
-    margin-top: 35px;
+  margin-top: 35px;
 }
 
 .product-variants h3 {
-    margin: 0 0 15px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
+  margin: 0 0 15px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
 }
 
 .variant-list {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .variant-list button {
-    min-width: 80px;
-    height: 40px;
-    padding: 0 15px;
-    border: 1px solid #cccccc;
-    background: #ffffff;
-    color: #111111;
-    font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 11px;
-    cursor: pointer;
+  min-width: 80px;
+  height: 40px;
+  padding: 0 15px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11px;
+  cursor: pointer;
 }
 
 .variant-list button:hover {
-    border-color: #111111;
+  border-color: #111111;
 }
 
 @media (max-width: 750px) {
+  .product-details-page {
+    padding: 45px 5% 90px;
+  }
 
-    .product-details-page {
-        padding: 45px 5% 90px;
-    }
+  .product-details-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
 
-    .product-details-container {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
+  .product-details-info {
+    padding-top: 0;
+  }
 
-    .product-details-info {
-        padding-top: 0;
-    }
+  .product-details-info h1 {
+    font-size: 32px;
+  }
 
-    .product-details-info h1 {
-        font-size: 32px;
-    }
-
-    .product-thumbnail {
-        width: 60px;
-        height: 60px;
-    }
+  .product-thumbnail {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 /* =========================================================
@@ -3122,7 +3119,6 @@
 
   z-index: 2000;
 }
-
 
 /* =========================================================
    SIDEBAR LOGO
@@ -3164,7 +3160,6 @@
   letter-spacing: 2px;
 }
 
-
 /* =========================================================
    SIDEBAR NAVIGATION
 ========================================================= */
@@ -3187,7 +3182,6 @@
 .admin-sidebar-navigation::-webkit-scrollbar-thumb {
   background: #dddddd;
 }
-
 
 /* =========================================================
    SIDEBAR LINKS
@@ -3232,7 +3226,6 @@
   padding-left: 19px;
 }
 
-
 /* =========================================================
    ACTIVE SIDEBAR LINK
 ========================================================= */
@@ -3250,7 +3243,6 @@
 
   padding-left: 19px;
 }
-
 
 /* =========================================================
    SIDEBAR PROFILE
@@ -3333,7 +3325,6 @@
   border-color: #fff;
 }
 
-
 /* =========================================================
    ADMIN PAGE CONTENT OFFSET
 ========================================================= */
@@ -3344,7 +3335,6 @@
    240px of space on the left.
 */
 
-
 .admin-profile-content,
 .admin-product-content,
 .customer-management-content,
@@ -3354,8 +3344,6 @@
   margin-left: 240px;
   box-sizing: border-box;
 }
-
-
 
 /* =========================================================
    ADMIN DASHBOARD OFFSET
@@ -3368,7 +3356,6 @@
 
   padding-left: 240px;
 }
-
 
 /* =========================================================
    ADMIN FOOTER
@@ -3409,12 +3396,10 @@
   text-transform: uppercase;
 }
 
-
 /* =========================================================
    ADMIN PROFILE / PRODUCT / CUSTOMER / CATEGORY
    CONTENT WIDTH SAFETY
 ========================================================= */
-
 
 .admin-profile-content,
 .admin-product-content,
@@ -3425,28 +3410,23 @@
   width: auto;
 }
 
-
-
 /* =========================================================
    ADMIN SIDEBAR RESPONSIVE
 ========================================================= */
 
 @media (max-width: 900px) {
-
   .admin-sidebar {
     width: 210px;
   }
 
- 
-.admin-profile-content,
-.admin-product-content,
-.customer-management-content,
-.customer-details-content,
-.admin-category-content,
-.admin-main-content {
-  margin-left: 210px;
-}
-
+  .admin-profile-content,
+  .admin-product-content,
+  .customer-management-content,
+  .customer-details-content,
+  .admin-category-content,
+  .admin-main-content {
+    margin-left: 210px;
+  }
 
   .admin-dashboard {
     padding-left: 210px;
@@ -3464,16 +3444,13 @@
   .admin-sidebar-link {
     font-size: 10px;
   }
-
 }
-
 
 /* =========================================================
    MOBILE ADMIN LAYOUT
 ========================================================= */
 
 @media (max-width: 650px) {
-
   .admin-sidebar {
     position: relative;
 
@@ -3535,16 +3512,14 @@
     justify-content: center;
   }
 
-  
-.admin-profile-content,
-.admin-product-content,
-.customer-management-content,
-.customer-details-content,
-.admin-category-content,
-.admin-main-content {
-  margin-left: 0;
-}
-
+  .admin-profile-content,
+  .admin-product-content,
+  .customer-management-content,
+  .customer-details-content,
+  .admin-category-content,
+  .admin-main-content {
+    margin-left: 0;
+  }
 
   .admin-dashboard {
     padding-left: 0;
@@ -3553,9 +3528,7 @@
   .admin-footer {
     margin-left: 0;
   }
-
 }
-
 
 /* =========================================
    ESSENZA ADMIN DASHBOARD
@@ -3569,7 +3542,6 @@
   overflow-x: hidden;
 }
 
-
 .admin-dashboard-content {
   box-sizing: border-box;
   width: 100%;
@@ -3577,7 +3549,6 @@
   margin-left: 0;
   padding: 34px 24px 24px;
 }
-
 
 /* Welcome header */
 
@@ -3670,7 +3641,8 @@
   padding: 22px 20px;
   border: 1px solid #e9e7e2;
   background: #fff;
-  transition: border-color 0.2s ease,
+  transition:
+    border-color 0.2s ease,
     transform 0.2s ease;
 }
 
@@ -4225,173 +4197,158 @@
   }
 }
 
-
 /* ========================================
    PRODUCT IMAGE CROP MODAL
 ======================================== */
 
 .image-crop-overlay {
-    position: fixed;
-    inset: 0;
+  position: fixed;
+  inset: 0;
 
-    z-index: 9999;
+  z-index: 9999;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.7);
 
-    padding: 30px;
+  padding: 30px;
 }
-
 
 .image-crop-modal {
-    width: 100%;
-    max-width: 700px;
+  width: 100%;
+  max-width: 700px;
 
-    background: #ffffff;
+  background: #ffffff;
 
-    padding: 30px;
+  padding: 30px;
 
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }
-
 
 .image-crop-header {
-    text-align: center;
+  text-align: center;
 
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
-
 
 .image-crop-header h2 {
-    margin: 0;
+  margin: 0;
 
-    font-family: "Playfair Display", serif;
+  font-family: "Playfair Display", serif;
 
-    font-size: 24px;
+  font-size: 24px;
 
-    font-weight: 500;
+  font-weight: 500;
 
-    letter-spacing: 2px;
+  letter-spacing: 2px;
 
-    color: #111111;
+  color: #111111;
 }
-
 
 .image-crop-header p {
-    margin-top: 8px;
+  margin-top: 8px;
 
-    font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 
-    font-size: 12px;
+  font-size: 12px;
 
-    color: #777777;
+  color: #777777;
 }
-
 
 /* CROP AREA */
 
 .image-crop-area {
-    position: relative;
+  position: relative;
 
-    width: 100%;
+  width: 100%;
 
-    height: 450px;
+  height: 450px;
 
-    background: #111111;
+  background: #111111;
 
-    overflow: hidden;
+  overflow: hidden;
 }
-
 
 /* ZOOM */
 
 .image-crop-controls {
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    gap: 15px;
+  gap: 15px;
 
-    margin-top: 20px;
+  margin-top: 20px;
 }
-
 
 .image-crop-controls label {
-    font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 
-    font-size: 11px;
+  font-size: 11px;
 
-    letter-spacing: 1px;
+  letter-spacing: 1px;
 
-    color: #111111;
+  color: #111111;
 }
-
 
 .image-crop-controls input {
-    flex: 1;
+  flex: 1;
 
-    cursor: pointer;
+  cursor: pointer;
 }
-
 
 /* BUTTONS */
 
 .image-crop-actions {
-    display: flex;
+  display: flex;
 
-    justify-content: flex-end;
+  justify-content: flex-end;
 
-    gap: 12px;
+  gap: 12px;
 
-    margin-top: 25px;
+  margin-top: 25px;
 }
-
 
 .image-crop-actions button {
-    min-width: 130px;
+  min-width: 130px;
 
-    padding: 12px 20px;
+  padding: 12px 20px;
 
-    border: 1px solid #111111;
+  border: 1px solid #111111;
 
-    background: #ffffff;
+  background: #ffffff;
 
-    color: #111111;
+  color: #111111;
 
-    font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 
-    font-size: 11px;
+  font-size: 11px;
 
-    letter-spacing: 1px;
+  letter-spacing: 1px;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition:
-        background 0.3s ease,
-        color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
-
 
 .image-crop-actions button:hover {
-    background: #111111;
+  background: #111111;
 
-    color: #ffffff;
+  color: #ffffff;
 }
-
 
 .image-crop-actions button:last-child {
-    background: #111111;
+  background: #111111;
 
-    color: #ffffff;
+  color: #ffffff;
 }
 
-
 .image-crop-actions button:last-child:hover {
-    background: #333333;
+  background: #333333;
 }
 
 /* =========================================================
@@ -4425,7 +4382,6 @@
   color: #666;
 }
 
-
 /* =========================================================
    ERROR
 ========================================================= */
@@ -4438,7 +4394,6 @@
   border: 1px solid #e2caca;
 }
 
-
 /* =========================================================
    TABLE CONTAINER
 ========================================================= */
@@ -4449,7 +4404,6 @@
   background: #ffffff;
   border: 1px solid #e5e5e5;
 }
-
 
 /* =========================================================
    TABLE
@@ -4486,7 +4440,6 @@
   background: #fafafa;
 }
 
-
 /* =========================================================
    ORDER ID
 ========================================================= */
@@ -4506,7 +4459,6 @@
   color: #777;
 }
 
-
 /* =========================================================
    CUSTOMER
 ========================================================= */
@@ -4519,7 +4471,6 @@
   display: block;
   font-size: 14px;
 }
-
 
 /* =========================================================
    PRODUCTS
@@ -4562,7 +4513,6 @@
   color: #777;
 }
 
-
 /* =========================================================
    ADDRESS
 ========================================================= */
@@ -4586,7 +4536,6 @@
   color: #666;
 }
 
-
 /* =========================================================
    PAYMENT
 ========================================================= */
@@ -4601,7 +4550,6 @@
   text-transform: uppercase;
 }
 
-
 /* =========================================================
    TOTAL
 ========================================================= */
@@ -4610,7 +4558,6 @@
   font-size: 15px;
   white-space: nowrap;
 }
-
 
 /* =========================================================
    STATUS SELECT
@@ -4636,7 +4583,6 @@
   cursor: not-allowed;
   opacity: 0.65;
 }
-
 
 /* STATUS STATES */
 
@@ -4664,7 +4610,6 @@
   border-color: #c99b9b;
 }
 
-
 /* =========================================================
    NO ORDERS
 ========================================================= */
@@ -4675,7 +4620,6 @@
   color: #777 !important;
   font-size: 14px !important;
 }
-
 
 /* =========================================================
    RESPONSIVE
@@ -4807,7 +4751,6 @@
   background: #333333;
 }
 
-
 /* ADMIN ORDER DATE FILTERS */
 
 .admin-order-filters {
@@ -4922,8 +4865,6 @@
     gap: 12px;
   }
 }
-
-
 
 /* ================================
    ESSENZA ADMIN COUPON MANAGEMENT
@@ -5103,7 +5044,9 @@
   font-size: 10px;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .coupon-primary-button {
@@ -5352,7 +5295,6 @@
   }
 }
 
-
 /* Fix admin content overlapping the sidebar */
 
 .admin-layout {
@@ -5395,7 +5337,6 @@
   }
 }
 
-
 /* FIX: COUPON MANAGEMENT SIDEBAR OVERLAP */
 
 .coupon-management-page {
@@ -5418,8 +5359,6 @@
     width: 100%;
   }
 }
-
-
 
 /* =========================================
    COUPON CONFIRMATION MODAL
@@ -5525,7 +5464,6 @@
   }
 }
 
-
 /* wallet */
 
 .wallet-admin-summary {
@@ -5567,7 +5505,6 @@
     grid-template-columns: 1fr;
   }
 }
-
 
 .wallet-admin-history {
   margin-top: 32px;
@@ -5611,7 +5548,6 @@
 .wallet-admin-table tbody tr:hover {
   background: #fafafa;
 }
-
 
 .withdrawal-admin-actions {
   display: flex;
@@ -5944,8 +5880,6 @@
   }
 }
 
-
-
 /* Fix Admin Reviews content overlapping the sidebar */
 
 /* Fix Admin Reviews content overlapping the sidebar */
@@ -5990,7 +5924,6 @@
   }
 }
 
-
 /* Keep review cards within the available content area */
 .admin-review-card {
   box-sizing: border-box;
@@ -6010,7 +5943,6 @@
     padding: 25px 20px;
   }
 }
-
 
 /* sales report */
 

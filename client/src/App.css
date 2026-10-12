@@ -5661,8 +5661,7 @@ body {
 
   border: 1px solid #e5e5e5;
 
-  box-shadow:
-    0 25px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
 }
 
 /* ==========================================
@@ -6220,7 +6219,6 @@ body {
 ========================================== */
 
 @media (max-width: 768px) {
-
   .my-orders-page {
     padding: 40px 20px;
   }
@@ -6388,7 +6386,9 @@ body {
   font-size: 10px;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .my-order-view-details-button:hover {
@@ -6396,7 +6396,6 @@ body {
   color: #fff;
   border-color: #111;
 }
-
 
 /* ==============================
    ORDER DETAILS PAGE
@@ -6635,7 +6634,9 @@ body {
   font-size: 10px;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .order-invoice-preview-button {
@@ -6832,7 +6833,6 @@ body {
   }
 }
 
-
 /* ============================
    ESSENZA WALLET PAGE
 ============================ */
@@ -7014,7 +7014,6 @@ body {
   cursor: not-allowed;
 }
 
-
 /* Wallet success message */
 .wallet-success {
   display: flex;
@@ -7081,8 +7080,6 @@ body {
   font-size: 13px;
 }
 
-
-
 /* Product offer styling */
 .product-offer-badge {
   display: inline-block;
@@ -7117,7 +7114,6 @@ body {
   font-size: 12px;
   font-weight: 500;
 }
-
 
 .cart-original-price {
   margin: 4px 0;
@@ -7181,7 +7177,6 @@ body {
 .checkout-discount-row {
   color: #795b24;
 }
-
 
 /* coupon */
 

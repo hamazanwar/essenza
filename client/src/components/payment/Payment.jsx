@@ -1,4 +1,3 @@
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
@@ -42,10 +41,7 @@ function Payment() {
           <div className="payment-message">
             <h2>Payment details not found.</h2>
 
-            <button
-              type="button"
-              onClick={() => navigate("/shop")}
-            >
+            <button type="button" onClick={() => navigate("/shop")}>
               CONTINUE SHOPPING
             </button>
           </div>
@@ -109,7 +105,7 @@ function Payment() {
             items: orderItems,
             paymentMethod: "COD",
           },
-          { headers }
+          { headers },
         );
 
         navigate("/order-confirmation", {
@@ -120,10 +116,7 @@ function Payment() {
       } catch (error) {
         console.error("Place COD order error:", error);
 
-        setError(
-          error.response?.data?.message ||
-            "Failed to place order."
-        );
+        setError(error.response?.data?.message || "Failed to place order.");
       } finally {
         setPlacingOrder(false);
       }
@@ -137,7 +130,7 @@ function Payment() {
 
       if (!scriptLoaded) {
         throw new Error(
-          "Unable to load Razorpay Checkout. Please check your internet connection."
+          "Unable to load Razorpay Checkout. Please check your internet connection.",
         );
       }
 
@@ -148,20 +141,13 @@ function Payment() {
           addressId: selectedAddress._id,
           items: orderItems,
         },
-        { headers }
+        { headers },
       );
 
-      const {
-        keyId,
-        razorpayOrderId,
-        amount,
-        currency,
-      } = response.data;
+      const { keyId, razorpayOrderId, amount, currency } = response.data;
 
       if (!keyId || !razorpayOrderId || !amount) {
-        throw new Error(
-          "Invalid payment details received from the server."
-        );
+        throw new Error("Invalid payment details received from the server.");
       }
 
       const razorpay = new window.Razorpay({
@@ -180,20 +166,15 @@ function Payment() {
             const verificationResponse = await axios.post(
               "http://localhost:5000/api/orders/verify-payment",
               {
-                razorpay_order_id:
-                  paymentResponse.razorpay_order_id,
-                razorpay_payment_id:
-                  paymentResponse.razorpay_payment_id,
-                razorpay_signature:
-                  paymentResponse.razorpay_signature,
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
               },
-              { headers }
+              { headers },
             );
 
             if (!verificationResponse.data?.order) {
-              throw new Error(
-                "Payment verification did not return an order."
-              );
+              throw new Error("Payment verification did not return an order.");
             }
 
             navigate("/order-confirmation", {
@@ -202,14 +183,11 @@ function Payment() {
               },
             });
           } catch (error) {
-            console.error(
-              "Payment verification error:",
-              error
-            );
+            console.error("Payment verification error:", error);
 
             setError(
               error.response?.data?.message ||
-                "Payment was received, but order confirmation failed. Please contact support and do not pay again until the payment is checked."
+                "Payment was received, but order confirmation failed. Please contact support and do not pay again until the payment is checked.",
             );
           } finally {
             setPlacingOrder(false);
@@ -224,14 +202,10 @@ function Payment() {
       });
 
       razorpay.on("payment.failed", (event) => {
-        console.error(
-          "Razorpay payment failed:",
-          event.error
-        );
+        console.error("Razorpay payment failed:", event.error);
 
         setError(
-          event.error?.description ||
-            "Payment failed. Please try again."
+          event.error?.description || "Payment failed. Please try again.",
         );
 
         setPlacingOrder(false);
@@ -244,7 +218,7 @@ function Payment() {
       setError(
         error.response?.data?.message ||
           error.message ||
-          "Unable to start online payment."
+          "Unable to start online payment.",
       );
 
       setPlacingOrder(false);
@@ -275,8 +249,7 @@ function Payment() {
                 <p>{selectedAddress.address}</p>
 
                 <p>
-                  {selectedAddress.city},{" "}
-                  {selectedAddress.state} -{" "}
+                  {selectedAddress.city}, {selectedAddress.state} -{" "}
                   {selectedAddress.pincode}
                 </p>
               </div>
@@ -334,9 +307,7 @@ function Payment() {
                   value="cod"
                   checked={paymentMethod === "cod"}
                   disabled={placingOrder}
-                  onChange={(event) =>
-                    setPaymentMethod(event.target.value)
-                  }
+                  onChange={(event) => setPaymentMethod(event.target.value)}
                 />
 
                 <div>
@@ -356,9 +327,7 @@ function Payment() {
                   value="online"
                   checked={paymentMethod === "online"}
                   disabled={placingOrder}
-                  onChange={(event) =>
-                    setPaymentMethod(event.target.value)
-                  }
+                  onChange={(event) => setPaymentMethod(event.target.value)}
                 />
 
                 <div>
@@ -381,9 +350,7 @@ function Payment() {
             <div className="payment-summary-row">
               <span>Delivery</span>
               <span>
-                {deliveryCharge === 0
-                  ? "FREE"
-                  : `₹${deliveryCharge}`}
+                {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
               </span>
             </div>
 
@@ -401,10 +368,10 @@ function Payment() {
               {placingOrder
                 ? "PROCESSING..."
                 : paymentMethod === "cod"
-                ? "PLACE ORDER"
-                : paymentMethod === "online"
-                ? "PAY NOW"
-                : "SELECT PAYMENT METHOD"}
+                  ? "PLACE ORDER"
+                  : paymentMethod === "online"
+                    ? "PAY NOW"
+                    : "SELECT PAYMENT METHOD"}
             </button>
           </section>
         </div>

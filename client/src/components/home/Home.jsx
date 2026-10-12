@@ -25,8 +25,8 @@ function Home() {
           </p>
 
           <Link to="/shop" className="hero-button">
-  SHOP COLLECTION →
-</Link>
+            SHOP COLLECTION →
+          </Link>
         </div>
       </section>
 

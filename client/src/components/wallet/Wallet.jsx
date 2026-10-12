@@ -152,62 +152,57 @@ function Wallet() {
     }
   };
 
-  
+  const handleWithdrawalRequest = async () => {
+    setError("");
+    setSuccess("");
 
-const handleWithdrawalRequest = async () => {
-  setError("");
-  setSuccess("");
+    const requestedAmount = Number(withdrawAmount);
 
-  const requestedAmount = Number(withdrawAmount);
+    if (
+      withdrawAmount.trim() === "" ||
+      !Number.isFinite(requestedAmount) ||
+      requestedAmount < 1 ||
+      Math.round(requestedAmount * 100) !== requestedAmount * 100
+    ) {
+      setError(
+        "Enter a valid withdrawal amount of at least ₹1, with up to two decimal places.",
+      );
+      return;
+    }
 
-  if (
-    withdrawAmount.trim() === "" ||
-    !Number.isFinite(requestedAmount) ||
-    requestedAmount < 1 ||
-    Math.round(requestedAmount * 100) !== requestedAmount * 100
-  ) {
-    setError(
-      "Enter a valid withdrawal amount of at least ₹1, with up to two decimal places."
-    );
-    return;
-  }
+    if (requestedAmount > balance) {
+      setError("Insufficient wallet balance for this withdrawal.");
+      return;
+    }
 
-  if (requestedAmount > balance) {
-    setError("Insufficient wallet balance for this withdrawal.");
-    return;
-  }
+    try {
+      const token = localStorage.getItem("token");
 
-  try {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.post(
-      "http://localhost:5000/api/wallet/withdraw",
-      { amount: requestedAmount },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        "http://localhost:5000/api/wallet/withdraw",
+        { amount: requestedAmount },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      }
-    );
+      );
 
-    setSuccess(
-      response.data.message ||
-        "Withdrawal request submitted successfully."
-    );
+      setSuccess(
+        response.data.message || "Withdrawal request submitted successfully.",
+      );
 
-    setWithdrawAmount("");
-    setShowWithdraw(false);
+      setWithdrawAmount("");
+      setShowWithdraw(false);
 
-    await loadWallet();
-  } catch (error) {
-    setError(
-      error.response?.data?.message ||
-        "Failed to submit withdrawal request. Please try again."
-    );
-  }
-};
-
-
+      await loadWallet();
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          "Failed to submit withdrawal request. Please try again.",
+      );
+    }
+  };
 
   useEffect(() => {
     loadWallet();
@@ -236,7 +231,6 @@ const handleWithdrawalRequest = async () => {
               })}
             </h2>
 
-            
             <div className="wallet-topup">
               <input
                 type="number"
@@ -295,18 +289,15 @@ const handleWithdrawalRequest = async () => {
                   Withdrawal requests require a verified payout destination.
                 </p>
 
-                
-<button
-  type="button"
-  className="wallet-add-button"
-  onClick={handleWithdrawalRequest}
->
-  Request Withdrawal
-</button>
-
+                <button
+                  type="button"
+                  className="wallet-add-button"
+                  onClick={handleWithdrawalRequest}
+                >
+                  Request Withdrawal
+                </button>
               </div>
             )}
-
           </div>
 
           {success && (

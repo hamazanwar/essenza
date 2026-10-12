@@ -8,12 +8,12 @@ function AdminOrderManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [statusConfirmation, setStatusConfirmation] = useState(null);
-const [updatingStatus, setUpdatingStatus] = useState(false);
-const [currentPage, setCurrentPage] = useState(1);
-const ordersPerPage = 15;
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 15;
 
-const [startDate, setStartDate] = useState("");
-const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const fetchOrders = async () => {
     try {
@@ -25,7 +25,7 @@ const [endDate, setEndDate] = useState("");
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       setOrders(response.data.orders);
@@ -38,117 +38,112 @@ const [endDate, setEndDate] = useState("");
     }
   };
 
-  
-const getLocalDateString = (dateValue) => {
-  const date = new Date(dateValue);
+  const getLocalDateString = (dateValue) => {
+    const date = new Date(dateValue);
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
-};
+    return `${year}-${month}-${day}`;
+  };
 
-// Filter orders by order creation date
-const filteredOrders = orders.filter((order) => {
-  const orderDate = getLocalDateString(order.createdAt);
+  // Filter orders by order creation date
+  const filteredOrders = orders.filter((order) => {
+    const orderDate = getLocalDateString(order.createdAt);
 
-  const matchesStartDate =
-    !startDate || orderDate >= startDate;
+    const matchesStartDate = !startDate || orderDate >= startDate;
 
-  const matchesEndDate =
-    !endDate || orderDate <= endDate;
+    const matchesEndDate = !endDate || orderDate <= endDate;
 
-  return matchesStartDate && matchesEndDate;
-});
+    return matchesStartDate && matchesEndDate;
+  });
 
-// Pagination calculations
-const totalPages = Math.max(
-  1,
-  Math.ceil(filteredOrders.length / ordersPerPage)
-);
+  // Pagination calculations
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredOrders.length / ordersPerPage),
+  );
 
-const startIndex = (currentPage - 1) * ordersPerPage;
+  const startIndex = (currentPage - 1) * ordersPerPage;
 
-const currentOrders = filteredOrders.slice(
-  startIndex,
-  startIndex + ordersPerPage
-);
-
+  const currentOrders = filteredOrders.slice(
+    startIndex,
+    startIndex + ordersPerPage,
+  );
 
   useEffect(() => {
     fetchOrders();
   }, []);
 
   useEffect(() => {
-  const lastPage = Math.max(
-    1,
-    Math.ceil(filteredOrders.length / ordersPerPage)
-  );
+    const lastPage = Math.max(
+      1,
+      Math.ceil(filteredOrders.length / ordersPerPage),
+    );
 
-  if (currentPage > lastPage) {
-    setCurrentPage(lastPage);
-  }
-}, [filteredOrders.length, currentPage]);
+    if (currentPage > lastPage) {
+      setCurrentPage(lastPage);
+    }
+  }, [filteredOrders.length, currentPage]);
 
   const handleStatusChange = (orderId, newStatus) => {
-  setStatusConfirmation({
-    orderId,
-    newStatus,
-  });
-};
+    setStatusConfirmation({
+      orderId,
+      newStatus,
+    });
+  };
 
-const confirmStatusChange = async () => {
-  if (!statusConfirmation) {
-    return;
-  }
+  const confirmStatusChange = async () => {
+    if (!statusConfirmation) {
+      return;
+    }
 
-  try {
-    setUpdatingStatus(true);
+    try {
+      setUpdatingStatus(true);
 
-    const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken");
 
-    const response = await axios.patch(
-      `http://localhost:5000/api/admin/orders/${statusConfirmation.orderId}/status`,
-      {
-  orderStatus: statusConfirmation.newStatus,
-  deliveryDate:
-    statusConfirmation.newStatus === "DELIVERED"
-      ? new Date().toISOString()
-      : undefined,
-},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.patch(
+        `http://localhost:5000/api/admin/orders/${statusConfirmation.orderId}/status`,
+        {
+          orderStatus: statusConfirmation.newStatus,
+          deliveryDate:
+            statusConfirmation.newStatus === "DELIVERED"
+              ? new Date().toISOString()
+              : undefined,
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-    const updatedOrder = response.data.order;
+      const updatedOrder = response.data.order;
 
-    setOrders((previousOrders) =>
-      previousOrders.map((order) =>
-        order._id === statusConfirmation.orderId
-          ? {
-              ...order,
-              ...updatedOrder,
-            }
-          : order
-      )
-    );
+      setOrders((previousOrders) =>
+        previousOrders.map((order) =>
+          order._id === statusConfirmation.orderId
+            ? {
+                ...order,
+                ...updatedOrder,
+              }
+            : order,
+        ),
+      );
 
-    setStatusConfirmation(null);
-  } catch (error) {
-    console.error("Order status update error:", error);
+      setStatusConfirmation(null);
+    } catch (error) {
+      console.error("Order status update error:", error);
 
-    setError(
-      error.response?.data?.message ||
-        "Failed to update order status."
-    );
-  } finally {
-    setUpdatingStatus(false);
-  }
-};
+      setError(
+        error.response?.data?.message || "Failed to update order status.",
+      );
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -185,67 +180,60 @@ const confirmStatusChange = async () => {
         <p className="admin-order-management-subtitle">
           Manage customer orders and update order status
         </p>
-        
-<div className="admin-order-filters">
-  <div className="admin-order-date-field">
-    <label htmlFor="order-start-date">FROM DATE</label>
-    <input
-      id="order-start-date"
-      type="date"
-      value={startDate}
-      max={endDate || undefined}
-      onChange={(event) => {
-        setStartDate(event.target.value);
-        setCurrentPage(1);
-      }}
-    />
-  </div>
 
-  <div className="admin-order-date-field">
-    <label htmlFor="order-end-date">TO DATE</label>
-    <input
-      id="order-end-date"
-      type="date"
-      value={endDate}
-      min={startDate || undefined}
-      onChange={(event) => {
-        setEndDate(event.target.value);
-        setCurrentPage(1);
-      }}
-    />
-  </div>
+        <div className="admin-order-filters">
+          <div className="admin-order-date-field">
+            <label htmlFor="order-start-date">FROM DATE</label>
+            <input
+              id="order-start-date"
+              type="date"
+              value={startDate}
+              max={endDate || undefined}
+              onChange={(event) => {
+                setStartDate(event.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
 
-  <button
-    type="button"
-    className="admin-order-clear-filter"
-    onClick={() => {
-      setStartDate("");
-      setEndDate("");
-      setCurrentPage(1);
-    }}
-  >
-    CLEAR FILTER
-  </button>
-</div>
+          <div className="admin-order-date-field">
+            <label htmlFor="order-end-date">TO DATE</label>
+            <input
+              id="order-end-date"
+              type="date"
+              value={endDate}
+              min={startDate || undefined}
+              onChange={(event) => {
+                setEndDate(event.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
 
-<p className="admin-order-results-count">
-  Showing {filteredOrders.length === 0 ? 0 : startIndex + 1}
-  {"–"}
-  {Math.min(startIndex + ordersPerPage, filteredOrders.length)}
-  {" of "}
-  {filteredOrders.length} orders
-</p>
+          <button
+            type="button"
+            className="admin-order-clear-filter"
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+              setCurrentPage(1);
+            }}
+          >
+            CLEAR FILTER
+          </button>
+        </div>
 
+        <p className="admin-order-results-count">
+          Showing {filteredOrders.length === 0 ? 0 : startIndex + 1}
+          {"–"}
+          {Math.min(startIndex + ordersPerPage, filteredOrders.length)}
+          {" of "}
+          {filteredOrders.length} orders
+        </p>
 
-        {loading && (
-          <p>Loading orders...</p>
-        )}
+        {loading && <p>Loading orders...</p>}
 
-        {error && (
-          <p className="admin-order-error">
-            {error}
-          </p>
-        )}
+        {error && <p className="admin-order-error">{error}</p>}
 
         {!loading && !error && (
           <div className="admin-order-table-container">
@@ -263,12 +251,9 @@ const confirmStatusChange = async () => {
               </thead>
 
               <tbody>
-               {filteredOrders.length === 0 ? (
+                {filteredOrders.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="7"
-                      className="admin-no-orders"
-                    >
+                    <td colSpan="7" className="admin-no-orders">
                       No orders found
                     </td>
                   </tr>
@@ -282,21 +267,15 @@ const confirmStatusChange = async () => {
                         </span>
 
                         <small>
-                          {new Date(
-                            order.createdAt
-                          ).toLocaleDateString()}
+                          {new Date(order.createdAt).toLocaleDateString()}
                         </small>
                       </td>
 
                       {/* CUSTOMER */}
                       <td>
-                        <strong>
-                          {order.userId?.name || "Unknown"}
-                        </strong>
+                        <strong>{order.userId?.name || "Unknown"}</strong>
 
-                        <small>
-                          {order.userId?.email || ""}
-                        </small>
+                        <small>{order.userId?.email || ""}</small>
                       </td>
 
                       {/* PRODUCT */}
@@ -315,17 +294,13 @@ const confirmStatusChange = async () => {
                               )}
 
                               <div>
-                                <strong>
-                                  {item.productName}
-                                </strong>
+                                <strong>{item.productName}</strong>
 
                                 <small>
                                   {item.size} × {item.quantity}
                                 </small>
 
-                                <small>
-                                  ₹{item.price}
-                                </small>
+                                <small>₹{item.price}</small>
                               </div>
                             </div>
                           ))}
@@ -336,22 +311,15 @@ const confirmStatusChange = async () => {
                       <td>
                         {order.addressId ? (
                           <div className="admin-order-address">
-                            <strong>
-                              {order.addressId.fullName}
-                            </strong>
+                            <strong>{order.addressId.fullName}</strong>
+
+                            <span>{order.addressId.address}</span>
 
                             <span>
-                              {order.addressId.address}
+                              {order.addressId.city}, {order.addressId.state}
                             </span>
 
-                            <span>
-                              {order.addressId.city},{" "}
-                              {order.addressId.state}
-                            </span>
-
-                            <span>
-                              {order.addressId.pincode}
-                            </span>
+                            <span>{order.addressId.pincode}</span>
                           </div>
                         ) : (
                           "Address unavailable"
@@ -360,65 +328,44 @@ const confirmStatusChange = async () => {
 
                       {/* PAYMENT */}
                       <td>
-                        <strong>
-                          {order.paymentMethod}
-                        </strong>
+                        <strong>{order.paymentMethod}</strong>
 
-                        <small>
-                          {order.paymentStatus}
-                        </small>
+                        <small>{order.paymentStatus}</small>
                       </td>
 
                       {/* TOTAL */}
                       <td>
-                        <strong>
-                          ₹{order.totalAmount}
-                        </strong>
+                        <strong>₹{order.totalAmount}</strong>
                       </td>
 
                       {/* STATUS */}
                       <td>
                         <select
                           className={`admin-order-status-select ${getStatusClass(
-                            order.orderStatus
+                            order.orderStatus,
                           )}`}
                           value={order.orderStatus}
                           onChange={(event) =>
-                            handleStatusChange(
-                              order._id,
-                              event.target.value
-                            )
+                            handleStatusChange(order._id, event.target.value)
                           }
                           disabled={
-                            order.orderStatus ===
-                              "CANCELLED" ||
-                            order.orderStatus ===
-                              "DELIVERED"
+                            order.orderStatus === "CANCELLED" ||
+                            order.orderStatus === "DELIVERED"
                           }
                         >
-                          <option value="PENDING">
-                            PENDING
-                          </option>
+                          <option value="PENDING">PENDING</option>
 
-                          <option value="CONFIRMED">
-                            CONFIRMED
-                          </option>
+                          <option value="CONFIRMED">CONFIRMED</option>
 
-                          <option value="SHIPPED">
-                            SHIPPED
-                          </option>
+                          <option value="SHIPPED">SHIPPED</option>
 
                           <option value="OUT_FOR_DELIVERY">
                             OUT FOR DELIVERY
                           </option>
 
-                          <option value="DELIVERED">
-                            DELIVERED
-                          </option>
+                          <option value="DELIVERED">DELIVERED</option>
 
-                          <option value="CANCELLED">
-                            CANCELLED
-                          </option>
+                          <option value="CANCELLED">CANCELLED</option>
                         </select>
                       </td>
                     </tr>
@@ -426,78 +373,66 @@ const confirmStatusChange = async () => {
                 )}
               </tbody>
             </table>
-            
-<div className="admin-order-pagination">
-  <button
-    type="button"
-    onClick={() => setCurrentPage((page) => page - 1)}
-    disabled={currentPage === 1}
-  >
-    ← PREVIOUS
-  </button>
 
-  <span>
-    PAGE {currentPage} OF {totalPages}
-  </span>
+            <div className="admin-order-pagination">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => page - 1)}
+                disabled={currentPage === 1}
+              >
+                ← PREVIOUS
+              </button>
 
-  <button
-    type="button"
-    onClick={() =>
-      setCurrentPage((page) =>
-        Math.min(page + 1, totalPages)
-      )
-    }
-    disabled={
-      currentPage === totalPages ||
-      filteredOrders.length === 0
-    }
-  >
-    NEXT →
-  </button>
-</div>
+              <span>
+                PAGE {currentPage} OF {totalPages}
+              </span>
 
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(page + 1, totalPages))
+                }
+                disabled={
+                  currentPage === totalPages || filteredOrders.length === 0
+                }
+              >
+                NEXT →
+              </button>
+            </div>
           </div>
         )}
       </main>
       {statusConfirmation && (
-  <div className="admin-order-confirmation-overlay">
-    <div className="admin-order-confirmation-box">
+        <div className="admin-order-confirmation-overlay">
+          <div className="admin-order-confirmation-box">
+            <h2>CONFIRM STATUS CHANGE</h2>
 
-      <h2>CONFIRM STATUS CHANGE</h2>
+            <p>Are you sure you want to change this order status to:</p>
 
-      <p>
-        Are you sure you want to change this order status to:
-      </p>
+            <strong>{statusConfirmation.newStatus.replaceAll("_", " ")}</strong>
 
-      <strong>
-        {statusConfirmation.newStatus.replaceAll("_", " ")}
-      </strong>
+            <div className="admin-order-confirmation-actions">
+              <button
+                type="button"
+                className="admin-order-confirmation-cancel"
+                onClick={() => setStatusConfirmation(null)}
+                disabled={updatingStatus}
+              >
+                CANCEL
+              </button>
 
-      <div className="admin-order-confirmation-actions">
-
-        <button
-          type="button"
-          className="admin-order-confirmation-cancel"
-          onClick={() => setStatusConfirmation(null)}
-          disabled={updatingStatus}
-        >
-          CANCEL
-        </button>
-
-        <button
-          type="button"
-          className="admin-order-confirmation-confirm"
-          onClick={confirmStatusChange}
-          disabled={updatingStatus}
-        >
-          {updatingStatus ? "UPDATING..." : "CONFIRM"}
-        </button>
-
-      </div>
-
-    </div>
-  </div>
-)}
+              <button
+                type="button"
+                className="admin-order-confirmation-confirm"
+                onClick={confirmStatusChange}
+                disabled={updatingStatus}
+              >
+                {updatingStatus ? "UPDATING..." : "CONFIRM"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <AdminFooter />
     </div>

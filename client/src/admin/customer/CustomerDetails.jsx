@@ -12,100 +12,96 @@ function CustomerDetails() {
   const [addresses, setAddresses] = useState([]);
   const [wallet, setWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
-const [withdrawalRequests, setWithdrawalRequests] = useState([]);
+  const [withdrawalRequests, setWithdrawalRequests] = useState([]);
 
-const [reviewLoadingId, setReviewLoadingId] = useState(null);
-const [reviewMessage, setReviewMessage] = useState("");
-const [reviewError, setReviewError] = useState("");
+  const [reviewLoadingId, setReviewLoadingId] = useState(null);
+  const [reviewMessage, setReviewMessage] = useState("");
+  const [reviewError, setReviewError] = useState("");
 
-const [walletLoading, setWalletLoading] = useState(true);
-const [walletError, setWalletError] = useState("");
+  const [walletLoading, setWalletLoading] = useState(true);
+  const [walletError, setWalletError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  
-const fetchCustomerWallet = async () => {
-  try {
-    setWalletLoading(true);
-    setWalletError("");
+  const fetchCustomerWallet = async () => {
+    try {
+      setWalletLoading(true);
+      setWalletError("");
 
-    const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken");
 
-    const response = await axios.get(
-      `http://localhost:5000/api/admin/customers/${id}/wallet`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `http://localhost:5000/api/admin/customers/${id}/wallet`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      }
+      );
+
+      setWallet(response.data.wallet);
+      setTransactions(response.data.transactions || []);
+      setWithdrawalRequests(response.data.withdrawalRequests || []);
+    } catch (error) {
+      console.error("Customer wallet fetch error:", error);
+
+      setWalletError(
+        error.response?.data?.message || "Failed to load customer wallet.",
+      );
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  const handleReviewWithdrawal = async (requestId, action) => {
+    const actionText = action === "APPROVE" ? "approve" : "reject";
+
+    const confirmed = window.confirm(
+      `Are you sure you want to ${actionText} this withdrawal request?`,
     );
 
-    setWallet(response.data.wallet);
-setTransactions(response.data.transactions || []);
-setWithdrawalRequests(response.data.withdrawalRequests || []);
-  } catch (error) {
-    console.error("Customer wallet fetch error:", error);
+    if (!confirmed) return;
 
-    setWalletError(
-      error.response?.data?.message ||
-        "Failed to load customer wallet."
-    );
-  } finally {
-    setWalletLoading(false);
-  }
-};
+    try {
+      setReviewLoadingId(requestId);
+      setReviewMessage("");
+      setReviewError("");
 
+      const token = localStorage.getItem("adminToken");
 
-const handleReviewWithdrawal = async (requestId, action) => {
-  const actionText = action === "APPROVE" ? "approve" : "reject";
-
-  const confirmed = window.confirm(
-    `Are you sure you want to ${actionText} this withdrawal request?`
-  );
-
-  if (!confirmed) return;
-
-  try {
-    setReviewLoadingId(requestId);
-    setReviewMessage("");
-    setReviewError("");
-
-    const token = localStorage.getItem("adminToken");
-
-    const response = await axios.patch(
-      `http://localhost:5000/api/admin/customers/${id}/wallet/withdrawals/${requestId}`,
-      {
-        action,
-        adminNote: "",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.patch(
+        `http://localhost:5000/api/admin/customers/${id}/wallet/withdrawals/${requestId}`,
+        {
+          action,
+          adminNote: "",
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-    setReviewMessage(
-      response.data.message || "Withdrawal request reviewed successfully."
-    );
+      setReviewMessage(
+        response.data.message || "Withdrawal request reviewed successfully.",
+      );
 
-    await fetchCustomerWallet();
-  } catch (error) {
-    console.error("Withdrawal review error:", error);
+      await fetchCustomerWallet();
+    } catch (error) {
+      console.error("Withdrawal review error:", error);
 
-    setReviewError(
-      error.response?.data?.message ||
-        "Failed to review withdrawal request. Please try again."
-    );
-  } finally {
-    setReviewLoadingId(null);
-  }
-};
+      setReviewError(
+        error.response?.data?.message ||
+          "Failed to review withdrawal request. Please try again.",
+      );
+    } finally {
+      setReviewLoadingId(null);
+    }
+  };
 
-
-useEffect(() => {
-  fetchCustomerWallet();
-}, [id]);
+  useEffect(() => {
+    fetchCustomerWallet();
+  }, [id]);
 
   useEffect(() => {
     const fetchCustomerDetails = async () => {
@@ -118,7 +114,7 @@ useEffect(() => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const data = response.data;
@@ -130,7 +126,7 @@ useEffect(() => {
 
         setError(
           error.response?.data?.message ||
-            "Something went wrong. Please try again."
+            "Something went wrong. Please try again.",
         );
       } finally {
         setLoading(false);
@@ -210,9 +206,7 @@ useEffect(() => {
                   alt=""
                 />
               ) : (
-                <div className="customer-profile-placeholder">
-                  👤
-                </div>
+                <div className="customer-profile-placeholder">👤</div>
               )}
             </div>
 
@@ -234,20 +228,12 @@ useEffect(() => {
 
               <div>
                 <span>EMAIL VERIFICATION</span>
-                <p>
-                  {customer.isEmailVerified
-                    ? "Verified"
-                    : "Not Verified"}
-                </p>
+                <p>{customer.isEmailVerified ? "Verified" : "Not Verified"}</p>
               </div>
 
               <div>
                 <span>REGISTERED</span>
-                <p>
-                  {new Date(
-                    customer.createdAt
-                  ).toLocaleDateString()}
-                </p>
+                <p>{new Date(customer.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
           </div>
@@ -265,10 +251,7 @@ useEffect(() => {
           ) : (
             <div className="customer-address-list">
               {addresses.map((address) => (
-                <div
-                  className="customer-address-card"
-                  key={address._id}
-                >
+                <div className="customer-address-card" key={address._id}>
                   {address.isDefault && (
                     <span className="default-address-label">
                       DEFAULT ADDRESS
@@ -289,190 +272,197 @@ useEffect(() => {
             </div>
           )}
         </section>
-        
 
-{/* WALLET MANAGEMENT */}
+        {/* WALLET MANAGEMENT */}
 
-<section className="customer-details-card">
-  <h2>WALLET MANAGEMENT</h2>
+        <section className="customer-details-card">
+          <h2>WALLET MANAGEMENT</h2>
 
-  {walletLoading ? (
-    <p>Loading wallet details...</p>
-  ) : walletError ? (
-    <p className="customer-error">{walletError}</p>
-  ) : !wallet ? (
-    <p>This customer has not created a wallet yet.</p>
-  ) : (
-    <>
-      <div className="wallet-admin-summary">
-        <div className="wallet-admin-stat">
-          <span>TOTAL BALANCE</span>
-          <h3>
-            {Number(wallet.balance).toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
-            })}
-          </h3>
-        </div>
+          {walletLoading ? (
+            <p>Loading wallet details...</p>
+          ) : walletError ? (
+            <p className="customer-error">{walletError}</p>
+          ) : !wallet ? (
+            <p>This customer has not created a wallet yet.</p>
+          ) : (
+            <>
+              <div className="wallet-admin-summary">
+                <div className="wallet-admin-stat">
+                  <span>TOTAL BALANCE</span>
+                  <h3>
+                    {Number(wallet.balance).toLocaleString("en-IN", {
+                      style: "currency",
+                      currency: "INR",
+                    })}
+                  </h3>
+                </div>
 
-        <div className="wallet-admin-stat">
-          <span>RESERVED BALANCE</span>
-          <h3>
-            {Number(wallet.reservedBalance || 0).toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
-            })}
-          </h3>
-        </div>
-
-        <div className="wallet-admin-stat">
-          <span>AVAILABLE BALANCE</span>
-          <h3>
-            {Number(wallet.availableBalance).toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
-            })}
-          </h3>
-        </div>
-      </div>
-
-      <p className="wallet-admin-status">
-        Wallet status:{" "}
-        <strong>{wallet.isActive ? "Active" : "Inactive"}</strong>
-      </p>
-
-      {/* WITHDRAWAL REQUESTS */}
-
-      <div className="wallet-admin-history">
-        <h3>WITHDRAWAL REQUESTS</h3>
-        
-{reviewMessage && (
-  <p className="wallet-review-success">{reviewMessage}</p>
-)}
-
-{reviewError && (
-  <p className="customer-error">{reviewError}</p>
-)}
-
-
-        {withdrawalRequests.length === 0 ? (
-          <p>No withdrawal requests found for this customer.</p>
-        ) : (
-          <div className="wallet-admin-table-wrapper">
-            <table className="wallet-admin-table">
-              <thead>
-                <tr>
-                  <th>REQUEST DATE</th>
-                  <th>AMOUNT</th>
-                  <th>STATUS</th>
-                  <th>ACTIONS</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {withdrawalRequests.map((request) => (
-                  <tr key={request._id}>
-                    <td>
-                      {new Date(request.createdAt).toLocaleDateString()}
-                    </td>
-                    <td>
-                      {Number(request.amount).toLocaleString("en-IN", {
+                <div className="wallet-admin-stat">
+                  <span>RESERVED BALANCE</span>
+                  <h3>
+                    {Number(wallet.reservedBalance || 0).toLocaleString(
+                      "en-IN",
+                      {
                         style: "currency",
                         currency: "INR",
-                      })}
-                    </td>
-                    
-<td>{request.status}</td>
+                      },
+                    )}
+                  </h3>
+                </div>
 
-<td>
-  {request.status === "PENDING" ? (
-    <div className="withdrawal-admin-actions">
-      <button
-        type="button"
-        className="withdrawal-approve-button"
-        disabled={reviewLoadingId !== null}
-        onClick={() =>
-          handleReviewWithdrawal(request._id, "APPROVE")
-        }
-      >
-        {reviewLoadingId === request._id
-          ? "Processing..."
-          : "Approve"}
-      </button>
+                <div className="wallet-admin-stat">
+                  <span>AVAILABLE BALANCE</span>
+                  <h3>
+                    {Number(wallet.availableBalance).toLocaleString("en-IN", {
+                      style: "currency",
+                      currency: "INR",
+                    })}
+                  </h3>
+                </div>
+              </div>
 
-      <button
-        type="button"
-        className="withdrawal-reject-button"
-        disabled={reviewLoadingId !== null}
-        onClick={() =>
-          handleReviewWithdrawal(request._id, "REJECT")
-        }
-      >
-        {reviewLoadingId === request._id
-          ? "Processing..."
-          : "Reject"}
-      </button>
-    </div>
-  ) : (
-    "—"
-  )}
-</td>
+              <p className="wallet-admin-status">
+                Wallet status:{" "}
+                <strong>{wallet.isActive ? "Active" : "Inactive"}</strong>
+              </p>
 
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              {/* WITHDRAWAL REQUESTS */}
 
-      {/* TRANSACTION HISTORY */}
+              <div className="wallet-admin-history">
+                <h3>WITHDRAWAL REQUESTS</h3>
 
-      <div className="wallet-admin-history">
-        <h3>TRANSACTION HISTORY</h3>
+                {reviewMessage && (
+                  <p className="wallet-review-success">{reviewMessage}</p>
+                )}
 
-        {transactions.length === 0 ? (
-          <p>No wallet transactions found.</p>
-        ) : (
-          <div className="wallet-admin-table-wrapper">
-            <table className="wallet-admin-table">
-              <thead>
-                <tr>
-                  <th>DATE</th>
-                  <th>TYPE</th>
-                  <th>SOURCE</th>
-                  <th>AMOUNT</th>
-                  <th>STATUS</th>
-                </tr>
-              </thead>
+                {reviewError && <p className="customer-error">{reviewError}</p>}
 
-              <tbody>
-                {transactions.map((transaction) => (
-                  <tr key={transaction._id}>
-                    <td>
-                      {new Date(transaction.createdAt).toLocaleDateString()}
-                    </td>
-                    <td>{transaction.type}</td>
-                    <td>{transaction.source}</td>
-                    <td>
-                      {Number(transaction.amount).toLocaleString("en-IN", {
-                        style: "currency",
-                        currency: "INR",
-                      })}
-                    </td>
-                    <td>{transaction.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </>
-  )}
-</section>
+                {withdrawalRequests.length === 0 ? (
+                  <p>No withdrawal requests found for this customer.</p>
+                ) : (
+                  <div className="wallet-admin-table-wrapper">
+                    <table className="wallet-admin-table">
+                      <thead>
+                        <tr>
+                          <th>REQUEST DATE</th>
+                          <th>AMOUNT</th>
+                          <th>STATUS</th>
+                          <th>ACTIONS</th>
+                        </tr>
+                      </thead>
 
+                      <tbody>
+                        {withdrawalRequests.map((request) => (
+                          <tr key={request._id}>
+                            <td>
+                              {new Date(request.createdAt).toLocaleDateString()}
+                            </td>
+                            <td>
+                              {Number(request.amount).toLocaleString("en-IN", {
+                                style: "currency",
+                                currency: "INR",
+                              })}
+                            </td>
 
+                            <td>{request.status}</td>
+
+                            <td>
+                              {request.status === "PENDING" ? (
+                                <div className="withdrawal-admin-actions">
+                                  <button
+                                    type="button"
+                                    className="withdrawal-approve-button"
+                                    disabled={reviewLoadingId !== null}
+                                    onClick={() =>
+                                      handleReviewWithdrawal(
+                                        request._id,
+                                        "APPROVE",
+                                      )
+                                    }
+                                  >
+                                    {reviewLoadingId === request._id
+                                      ? "Processing..."
+                                      : "Approve"}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    className="withdrawal-reject-button"
+                                    disabled={reviewLoadingId !== null}
+                                    onClick={() =>
+                                      handleReviewWithdrawal(
+                                        request._id,
+                                        "REJECT",
+                                      )
+                                    }
+                                  >
+                                    {reviewLoadingId === request._id
+                                      ? "Processing..."
+                                      : "Reject"}
+                                  </button>
+                                </div>
+                              ) : (
+                                "—"
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* TRANSACTION HISTORY */}
+
+              <div className="wallet-admin-history">
+                <h3>TRANSACTION HISTORY</h3>
+
+                {transactions.length === 0 ? (
+                  <p>No wallet transactions found.</p>
+                ) : (
+                  <div className="wallet-admin-table-wrapper">
+                    <table className="wallet-admin-table">
+                      <thead>
+                        <tr>
+                          <th>DATE</th>
+                          <th>TYPE</th>
+                          <th>SOURCE</th>
+                          <th>AMOUNT</th>
+                          <th>STATUS</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {transactions.map((transaction) => (
+                          <tr key={transaction._id}>
+                            <td>
+                              {new Date(
+                                transaction.createdAt,
+                              ).toLocaleDateString()}
+                            </td>
+                            <td>{transaction.type}</td>
+                            <td>{transaction.source}</td>
+                            <td>
+                              {Number(transaction.amount).toLocaleString(
+                                "en-IN",
+                                {
+                                  style: "currency",
+                                  currency: "INR",
+                                },
+                              )}
+                            </td>
+                            <td>{transaction.status}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </section>
       </main>
 
       <AdminFooter />

@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -28,7 +27,7 @@ function AdminDashboard() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         setOrders(response.data.orders || []);
@@ -36,8 +35,7 @@ function AdminDashboard() {
         console.error("Dashboard orders error:", err);
 
         setError(
-          err.response?.data?.message ||
-            "Unable to load dashboard data."
+          err.response?.data?.message || "Unable to load dashboard data.",
         );
       } finally {
         setLoading(false);
@@ -49,18 +47,15 @@ function AdminDashboard() {
 
   const validOrders = useMemo(
     () => orders.filter((order) => order.orderStatus !== "CANCELLED"),
-    [orders]
+    [orders],
   );
 
   const totalSales = useMemo(
     () =>
       validOrders
         .filter((order) => order.paymentStatus !== "FAILED")
-        .reduce(
-          (total, order) => total + Number(order.totalAmount || 0),
-          0
-        ),
-    [validOrders]
+        .reduce((total, order) => total + Number(order.totalAmount || 0), 0),
+    [validOrders],
   );
 
   const customerCount = useMemo(
@@ -72,9 +67,9 @@ function AdminDashboard() {
             return user?._id || user;
           })
           .filter(Boolean)
-          .map(String)
+          .map(String),
       ).size,
-    [orders]
+    [orders],
   );
 
   const productsSold = useMemo(
@@ -84,12 +79,10 @@ function AdminDashboard() {
           (order.items || [])
             .map((item) => item.productId)
             .filter(Boolean)
-            .map((product) =>
-              String(product._id || product)
-            )
-        )
+            .map((product) => String(product._id || product)),
+        ),
       ).size,
-    [orders]
+    [orders],
   );
 
   const statusCounts = useMemo(() => {
@@ -114,12 +107,9 @@ function AdminDashboard() {
   const recentOrders = useMemo(
     () =>
       [...orders]
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt) - new Date(a.createdAt)
-        )
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 6),
-    [orders]
+    [orders],
   );
 
   const chartData = useMemo(() => {
@@ -128,27 +118,15 @@ function AdminDashboard() {
 
     if (period === "12") {
       for (let i = 11; i >= 0; i -= 1) {
-        const date = new Date(
-          now.getFullYear(),
-          now.getMonth() - i,
-          1
-        );
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
 
         points.push({
           key: `${date.getFullYear()}-${date.getMonth()}`,
           label: date.toLocaleDateString("en-IN", {
             month: "short",
           }),
-          start: new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            1
-          ),
-          end: new Date(
-            date.getFullYear(),
-            date.getMonth() + 1,
-            1
-          ),
+          start: new Date(date.getFullYear(), date.getMonth(), 1),
+          end: new Date(date.getFullYear(), date.getMonth() + 1, 1),
           sales: 0,
         });
       }
@@ -187,8 +165,7 @@ function AdminDashboard() {
         const orderDate = new Date(order.createdAt);
 
         const point = points.find(
-          (item) =>
-            orderDate >= item.start && orderDate < item.end
+          (item) => orderDate >= item.start && orderDate < item.end,
         );
 
         if (point) {
@@ -199,17 +176,12 @@ function AdminDashboard() {
     return points;
   }, [validOrders, period]);
 
-  const maxSales = Math.max(
-    1,
-    ...chartData.map((item) => item.sales)
-  );
+  const maxSales = Math.max(1, ...chartData.map((item) => item.sales));
 
   const chartPoints = chartData
     .map((item, index) => {
       const x =
-        chartData.length === 1
-          ? 50
-          : (index / (chartData.length - 1)) * 100;
+        chartData.length === 1 ? 50 : (index / (chartData.length - 1)) * 100;
 
       const y = 90 - (item.sales / maxSales) * 72;
 
@@ -284,9 +256,7 @@ function AdminDashboard() {
       <main className="admin-dashboard-content">
         <header className="dashboard-welcome">
           <div>
-            <p className="dashboard-eyebrow">
-              ESSENZA · STORE MANAGEMENT
-            </p>
+            <p className="dashboard-eyebrow">ESSENZA · STORE MANAGEMENT</p>
 
             <h1>Dashboard</h1>
 
@@ -305,10 +275,7 @@ function AdminDashboard() {
           <div className="dashboard-error">
             <span>{error}</span>
 
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-            >
+            <button type="button" onClick={() => window.location.reload()}>
               RETRY
             </button>
           </div>
@@ -321,9 +288,7 @@ function AdminDashboard() {
               <span className="dashboard-stat-icon">₹</span>
             </div>
 
-            <strong>
-              {loading ? "—" : formatCurrency(totalSales)}
-            </strong>
+            <strong>{loading ? "—" : formatCurrency(totalSales)}</strong>
 
             <p>Value of non-cancelled orders</p>
           </article>
@@ -385,19 +350,14 @@ function AdminDashboard() {
 
             <strong>
               {formatCurrency(
-                chartData.reduce(
-                  (total, item) => total + item.sales,
-                  0
-                )
+                chartData.reduce((total, item) => total + item.sales, 0),
               )}
             </strong>
           </div>
 
           <div className="dashboard-chart">
             {loading ? (
-              <p className="dashboard-chart-message">
-                Loading sales data...
-              </p>
+              <p className="dashboard-chart-message">Loading sales data...</p>
             ) : chartData.every((item) => item.sales === 0) ? (
               <p className="dashboard-chart-message">
                 No sales recorded for this period.
@@ -431,11 +391,7 @@ function AdminDashboard() {
                         stopColor="#c49a51"
                         stopOpacity="0.25"
                       />
-                      <stop
-                        offset="100%"
-                        stopColor="#c49a51"
-                        stopOpacity="0"
-                      />
+                      <stop offset="100%" stopColor="#c49a51" stopOpacity="0" />
                     </linearGradient>
                   </defs>
 
@@ -508,13 +464,9 @@ function AdminDashboard() {
             </div>
 
             {loading ? (
-              <p className="dashboard-empty">
-                Loading recent orders...
-              </p>
+              <p className="dashboard-empty">Loading recent orders...</p>
             ) : recentOrders.length === 0 ? (
-              <p className="dashboard-empty">
-                No orders have been placed yet.
-              </p>
+              <p className="dashboard-empty">No orders have been placed yet.</p>
             ) : (
               <div className="dashboard-table-wrap">
                 <table className="dashboard-orders-table">
@@ -537,9 +489,7 @@ function AdminDashboard() {
                           </strong>
                         </td>
 
-                        <td>
-                          {order.userId?.name || "Customer"}
-                        </td>
+                        <td>{order.userId?.name || "Customer"}</td>
 
                         <td>{formatDate(order.createdAt)}</td>
 
@@ -550,11 +500,13 @@ function AdminDashboard() {
                         <td>
                           <span
                             className={`dashboard-status ${getStatusClass(
-                              order.orderStatus
+                              order.orderStatus,
                             )}`}
                           >
-                            {String(order.orderStatus || "PENDING")
-                              .replaceAll("_", " ")}
+                            {String(order.orderStatus || "PENDING").replaceAll(
+                              "_",
+                              " ",
+                            )}
                           </span>
                         </td>
                       </tr>
@@ -582,9 +534,7 @@ function AdminDashboard() {
                     key={action.title}
                     onClick={() => navigate(action.path)}
                   >
-                    <span className="dashboard-quick-icon">
-                      {action.icon}
-                    </span>
+                    <span className="dashboard-quick-icon">{action.icon}</span>
 
                     <span className="dashboard-quick-copy">
                       <strong>{action.title}</strong>
@@ -607,27 +557,11 @@ function AdminDashboard() {
 
               {[
                 ["Pending", statusCounts.PENDING, "pending"],
-                [
-                  "Confirmed",
-                  statusCounts.CONFIRMED,
-                  "confirmed",
-                ],
+                ["Confirmed", statusCounts.CONFIRMED, "confirmed"],
                 ["Shipped", statusCounts.SHIPPED, "shipped"],
-                [
-                  "Out for delivery",
-                  statusCounts.OUT_FOR_DELIVERY,
-                  "out",
-                ],
-                [
-                  "Delivered",
-                  statusCounts.DELIVERED,
-                  "delivered",
-                ],
-                [
-                  "Cancelled",
-                  statusCounts.CANCELLED,
-                  "cancelled",
-                ],
+                ["Out for delivery", statusCounts.OUT_FOR_DELIVERY, "out"],
+                ["Delivered", statusCounts.DELIVERED, "delivered"],
+                ["Cancelled", statusCounts.CANCELLED, "cancelled"],
               ].map(([label, count, className]) => (
                 <div className="dashboard-status-row" key={label}>
                   <span className={`dashboard-status-dot ${className}`} />

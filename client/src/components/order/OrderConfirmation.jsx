@@ -31,9 +31,7 @@ function OrderConfirmation() {
 
               <h2>ORDER DETAILS NOT FOUND</h2>
 
-              <p>
-                We could not find the order details.
-              </p>
+              <p>We could not find the order details.</p>
 
               <button
                 type="button"
@@ -56,11 +54,8 @@ function OrderConfirmation() {
       <Navbar />
 
       <main className="order-confirmation-page">
-
         <div className="order-confirmation-overlay">
-
           <div className="order-confirmation-modal">
-
             {/* CLOSE BUTTON */}
 
             <button
@@ -74,9 +69,7 @@ function OrderConfirmation() {
 
             {/* SUCCESS ICON */}
 
-            <div className="order-confirmation-icon">
-              ✓
-            </div>
+            <div className="order-confirmation-icon">✓</div>
 
             {/* TITLE */}
 
@@ -91,13 +84,10 @@ function OrderConfirmation() {
             {/* ORDER INFORMATION */}
 
             <div className="order-confirmation-details">
-
               <div className="order-confirmation-detail-row">
                 <span>ORDER ID</span>
 
-                <strong>
-                  #{order._id?.slice(-8).toUpperCase()}
-                </strong>
+                <strong>#{order._id?.slice(-8).toUpperCase()}</strong>
               </div>
 
               <div className="order-confirmation-detail-row">
@@ -113,25 +103,19 @@ function OrderConfirmation() {
               <div className="order-confirmation-detail-row">
                 <span>STATUS</span>
 
-                <strong>
-                  {order.orderStatus}
-                </strong>
+                <strong>{order.orderStatus}</strong>
               </div>
 
               <div className="order-confirmation-detail-row total">
                 <span>TOTAL</span>
 
-                <strong>
-                  ₹{order.totalAmount}
-                </strong>
+                <strong>₹{order.totalAmount}</strong>
               </div>
-
             </div>
 
             {/* BUTTONS */}
 
             <div className="order-confirmation-actions">
-
               <button
                 type="button"
                 className="order-confirmation-primary-button"
@@ -147,13 +131,9 @@ function OrderConfirmation() {
               >
                 CONTINUE SHOPPING
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       </main>
 
       <Footer />
