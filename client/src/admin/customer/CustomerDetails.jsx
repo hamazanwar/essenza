@@ -22,6 +22,8 @@ function CustomerDetails() {
   const [walletError, setWalletError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [withdrawalConfirmation, setWithdrawalConfirmation] = useState(null);
+  const [withdrawalNote, setWithdrawalNote] = useState("");
 
   const fetchCustomerWallet = async () => {
     try {
@@ -54,14 +56,6 @@ function CustomerDetails() {
   };
 
   const handleReviewWithdrawal = async (requestId, action) => {
-    const actionText = action === "APPROVE" ? "approve" : "reject";
-
-    const confirmed = window.confirm(
-      `Are you sure you want to ${actionText} this withdrawal request?`,
-    );
-
-    if (!confirmed) return;
-
     try {
       setReviewLoadingId(requestId);
       setReviewMessage("");
@@ -73,7 +67,7 @@ function CustomerDetails() {
         `http://localhost:5000/api/admin/customers/${id}/wallet/withdrawals/${requestId}`,
         {
           action,
-          adminNote: "",
+          adminNote: withdrawalNote.trim(),
         },
         {
           headers: {
@@ -86,6 +80,9 @@ function CustomerDetails() {
         response.data.message || "Withdrawal request reviewed successfully.",
       );
 
+      setWithdrawalConfirmation(null);
+      setWithdrawalNote("");
+
       await fetchCustomerWallet();
     } catch (error) {
       console.error("Withdrawal review error:", error);
@@ -94,6 +91,8 @@ function CustomerDetails() {
         error.response?.data?.message ||
           "Failed to review withdrawal request. Please try again.",
       );
+
+      setWithdrawalConfirmation(null);
     } finally {
       setReviewLoadingId(null);
     }
@@ -374,10 +373,10 @@ function CustomerDetails() {
                                     className="withdrawal-approve-button"
                                     disabled={reviewLoadingId !== null}
                                     onClick={() =>
-                                      handleReviewWithdrawal(
-                                        request._id,
-                                        "APPROVE",
-                                      )
+                                      setWithdrawalConfirmation({
+                                        requestId: request._id,
+                                        action: "APPROVE",
+                                      })
                                     }
                                   >
                                     {reviewLoadingId === request._id
@@ -390,10 +389,10 @@ function CustomerDetails() {
                                     className="withdrawal-reject-button"
                                     disabled={reviewLoadingId !== null}
                                     onClick={() =>
-                                      handleReviewWithdrawal(
-                                        request._id,
-                                        "REJECT",
-                                      )
+                                      setWithdrawalConfirmation({
+                                        requestId: request._id,
+                                        action: "REJECT",
+                                      })
                                     }
                                   >
                                     {reviewLoadingId === request._id
@@ -463,6 +462,91 @@ function CustomerDetails() {
             </>
           )}
         </section>
+
+        {withdrawalConfirmation && (
+          <div
+            className="withdrawal-modal-overlay"
+            onClick={() => {
+              if (!reviewLoadingId) {
+                setWithdrawalConfirmation(null);
+                setWithdrawalNote("");
+              }
+            }}
+          >
+            <div
+              className="withdrawal-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="withdrawal-modal-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <p className="withdrawal-modal-eyebrow">
+                ESSENZA WALLET MANAGEMENT
+              </p>
+
+              <h2 id="withdrawal-modal-title">
+                {withdrawalConfirmation.action === "APPROVE"
+                  ? "Approve Withdrawal?"
+                  : "Reject Withdrawal?"}
+              </h2>
+
+              <p className="withdrawal-modal-description">
+                {withdrawalConfirmation.action === "APPROVE"
+                  ? "Are you sure you want to approve this withdrawal request?"
+                  : "Are you sure you want to reject this withdrawal request?"}
+              </p>
+
+              <label htmlFor="withdrawal-admin-note">
+                Admin note (optional)
+              </label>
+
+              <textarea
+                id="withdrawal-admin-note"
+                value={withdrawalNote}
+                onChange={(event) => setWithdrawalNote(event.target.value)}
+                placeholder="Enter a note..."
+                rows={3}
+                disabled={reviewLoadingId !== null}
+              />
+
+              <div className="withdrawal-modal-actions">
+                <button
+                  type="button"
+                  className="withdrawal-modal-cancel"
+                  disabled={reviewLoadingId !== null}
+                  onClick={() => {
+                    setWithdrawalConfirmation(null);
+                    setWithdrawalNote("");
+                  }}
+                >
+                  CANCEL
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    withdrawalConfirmation.action === "APPROVE"
+                      ? "withdrawal-modal-confirm"
+                      : "withdrawal-modal-confirm reject"
+                  }
+                  disabled={reviewLoadingId !== null}
+                  onClick={() =>
+                    handleReviewWithdrawal(
+                      withdrawalConfirmation.requestId,
+                      withdrawalConfirmation.action,
+                    )
+                  }
+                >
+                  {reviewLoadingId !== null
+                    ? "PROCESSING..."
+                    : withdrawalConfirmation.action === "APPROVE"
+                      ? "CONFIRM APPROVAL"
+                      : "CONFIRM REJECTION"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <AdminFooter />

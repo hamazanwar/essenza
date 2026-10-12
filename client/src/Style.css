@@ -6194,3 +6194,132 @@
     width: 100%;
   }
 }
+
+/* wallet */
+/* Withdrawal confirmation modal */
+
+.withdrawal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.48);
+}
+
+.withdrawal-modal {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.15);
+}
+
+.withdrawal-modal-eyebrow {
+  margin: 0 0 12px;
+  color: #a27b35;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.withdrawal-modal h2 {
+  margin: 0 0 14px;
+  color: #111;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 400;
+}
+
+.withdrawal-modal-description {
+  margin: 0 0 22px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.withdrawal-modal label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.withdrawal-modal textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.withdrawal-modal textarea:focus {
+  outline: none;
+  border-color: #a27b35;
+}
+
+.withdrawal-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.withdrawal-modal-actions button {
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #222;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.withdrawal-modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.withdrawal-modal-actions .withdrawal-modal-confirm {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.withdrawal-modal-actions .withdrawal-modal-confirm:hover:not(:disabled) {
+  background: #333;
+}
+
+.withdrawal-modal-actions .withdrawal-modal-confirm.reject {
+  border-color: #b83232;
+  background: #b83232;
+}
+
+.withdrawal-modal-actions .withdrawal-modal-cancel:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+@media (max-width: 480px) {
+  .withdrawal-modal {
+    padding: 24px 20px;
+  }
+
+  .withdrawal-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .withdrawal-modal-actions button {
+    width: 100%;
+  }
+}
