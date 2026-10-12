@@ -9,7 +9,8 @@ const {
     updateCustomerStatus,
     getCustomerDetails,
     getCustomerWallet,
-    reviewWithdrawalRequest
+    reviewWithdrawalRequest,
+    completeWithdrawalPayout
 } = require("../controllers/customerController");
 
 
@@ -28,6 +29,12 @@ router.patch(
     "/:id/wallet/withdrawals/:requestId",
     protectAdmin,
     reviewWithdrawalRequest
+);
+
+router.patch(
+    "/:id/wallet/withdrawals/:requestId/complete",
+    protectAdmin,
+    completeWithdrawalPayout
 );
 
 module.exports = router;

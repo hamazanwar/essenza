@@ -320,6 +320,162 @@ const reviewWithdrawalRequest = async (req, res) => {
     }
 };
 
+const completeWithdrawalPayout = async (req, res) => {
+    const session = await mongoose.startSession();
+
+    try {
+        const { id: customerId, requestId } = req.params;
+
+        if (
+            !mongoose.Types.ObjectId.isValid(customerId) ||
+            !mongoose.Types.ObjectId.isValid(requestId)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid customer or withdrawal request ID.",
+            });
+        }
+
+        let updatedRequest;
+
+        await session.withTransaction(async () => {
+            const request = await WithdrawalRequest.findOne({
+                _id: requestId,
+                userId: customerId,
+                status: "APPROVED",
+            }).session(session);
+
+            if (!request) {
+                const error = new Error(
+                    "Approved withdrawal request not found or already completed."
+                );
+                error.statusCode = 409;
+                throw error;
+            }
+
+            const wallet = await Wallet.findOne({
+                _id: request.walletId,
+                userId: customerId,
+                isActive: true,
+            }).session(session);
+
+            if (!wallet) {
+                const error = new Error("Active wallet not found.");
+                error.statusCode = 404;
+                throw error;
+            }
+
+            const amount = request.amount;
+
+            if (
+                !Number.isFinite(amount) ||
+                amount <= 0 ||
+                wallet.balance < amount ||
+                wallet.reservedBalance < amount
+            ) {
+                const error = new Error(
+                    "Insufficient wallet or reserved balance. Payout was not completed."
+                );
+                error.statusCode = 409;
+                throw error;
+            }
+
+            const balanceBefore = wallet.balance;
+            const referenceId = `withdrawal_${request._id}`;
+
+            // Prevent a duplicate debit for this withdrawal.
+            const existingTransaction = await WalletTransaction.findOne({
+                referenceId,
+            }).session(session);
+
+            if (existingTransaction) {
+                const error = new Error(
+                    "A transaction already exists for this withdrawal."
+                );
+                error.statusCode = 409;
+                throw error;
+            }
+
+            const updatedWallet = await Wallet.findOneAndUpdate(
+                {
+                    _id: wallet._id,
+                    userId: customerId,
+                    isActive: true,
+                    balance: { $gte: amount },
+                    reservedBalance: { $gte: amount },
+                },
+                {
+                    $inc: {
+                        balance: -amount,
+                        reservedBalance: -amount,
+                    },
+                },
+                {
+                    new: true,
+                    session,
+                }
+            );
+
+            if (!updatedWallet) {
+                const error = new Error(
+                    "Wallet balance changed. Please refresh and try again."
+                );
+                error.statusCode = 409;
+                throw error;
+            }
+
+            await WalletTransaction.create(
+                [
+                    {
+                        walletId: wallet._id,
+                        userId: customerId,
+                        type: "DEBIT",
+                        source: "ADMIN_DEBIT",
+                        amount,
+                        balanceBefore,
+                        balanceAfter: updatedWallet.balance,
+                        referenceId,
+                        status: "SUCCESS",
+                        description: `Withdrawal payout completed: ${request._id}`,
+                        performedBy:
+                            req.admin?.adminId ||
+                            req.admin?.id ||
+                            req.admin?._id ||
+                            req.admin?.userId ||
+                            null,
+                    },
+                ],
+                { session }
+            );
+
+            request.status = "COMPLETED";
+            request.payoutId = referenceId;
+            request.reviewedAt = new Date();
+
+            await request.save({ session });
+
+            updatedRequest = request;
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Withdrawal marked as completed and wallet balance deducted.",
+            data: {
+                withdrawalRequest: updatedRequest,
+            },
+        });
+    } catch (error) {
+        console.error("Complete withdrawal payout error:", error);
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message || "Failed to complete withdrawal payout.",
+        });
+    } finally {
+        await session.endSession();
+    }
+};
+
 
 
 
@@ -328,5 +484,6 @@ module.exports = {
     updateCustomerStatus,
     getCustomerDetails,
     getCustomerWallet,
-    reviewWithdrawalRequest
+    reviewWithdrawalRequest,
+    completeWithdrawalPayout
 };

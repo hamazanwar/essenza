@@ -45,10 +45,13 @@ const getWalletDetailsService = async (userId) => {
     .lean();
 
   return {
-    walletId: wallet._id,
-    balance: wallet.balance,
-    transactions,
-  };
+  walletId: wallet._id,
+  balance: wallet.balance,
+  reservedBalance: wallet.reservedBalance || 0,
+  availableBalance:
+    wallet.balance - (wallet.reservedBalance || 0),
+  transactions,
+};
 };
 
 // Apply a credit or debit exactly once.

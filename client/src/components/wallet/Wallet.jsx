@@ -5,6 +5,7 @@ import Footer from "../bars/Footer";
 
 function Wallet() {
   const [balance, setBalance] = useState(0);
+  const [availableBalance, setAvailableBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,8 +30,13 @@ function Wallet() {
         },
       });
 
-      setBalance(response.data.data.balance);
-      setTransactions(response.data.data.transactions);
+      const walletData = response.data.data;
+
+      setBalance(walletData.balance);
+      setAvailableBalance(
+        Number(walletData.balance) - Number(walletData.reservedBalance || 0),
+      );
+      setTransactions(walletData.transactions);
     } catch (err) {
       setError(err.response?.data?.message || "Unable to load wallet details.");
     } finally {
@@ -170,7 +176,7 @@ function Wallet() {
       return;
     }
 
-    if (requestedAmount > balance) {
+    if (requestedAmount > availableBalance) {
       setError("Insufficient wallet balance for this withdrawal.");
       return;
     }
@@ -225,7 +231,7 @@ function Wallet() {
           <div className="wallet-balance-card">
             <p>Available Balance</p>
             <h2>
-              {balance.toLocaleString("en-IN", {
+              {availableBalance.toLocaleString("en-IN", {
                 style: "currency",
                 currency: "INR",
               })}
