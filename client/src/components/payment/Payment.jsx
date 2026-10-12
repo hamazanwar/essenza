@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 import Navbar from "../bars/Navbar";
@@ -29,8 +29,44 @@ function Payment() {
   const checkoutData = location.state;
 
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [walletLoading, setWalletLoading] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [error, setError] = useState("");
+
+  const loadWalletBalance = async () => {
+    try {
+      setWalletLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get("http://localhost:5000/api/wallet", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const wallet = response.data.data;
+
+      setWalletBalance(
+        Number(
+          wallet.availableBalance ??
+            Number(wallet.balance) - Number(wallet.reservedBalance || 0),
+        ),
+      );
+    } catch (error) {
+      console.error("Load wallet balance error:", error);
+      setError(
+        error.response?.data?.message || "Unable to load wallet balance.",
+      );
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadWalletBalance();
+  }, []);
 
   if (!checkoutData) {
     return (
@@ -117,6 +153,37 @@ function Payment() {
         console.error("Place COD order error:", error);
 
         setError(error.response?.data?.message || "Failed to place order.");
+      } finally {
+        setPlacingOrder(false);
+      }
+
+      return;
+    }
+
+    // Handle wallet payment.
+    if (paymentMethod === "wallet") {
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/orders/wallet-payment",
+          {
+            addressId: selectedAddress._id,
+            items: orderItems,
+          },
+          { headers },
+        );
+
+        navigate("/order-confirmation", {
+          state: {
+            order: response.data.order,
+          },
+        });
+      } catch (error) {
+        console.error("Wallet payment error:", error);
+
+        setError(
+          error.response?.data?.message ||
+            "Failed to place wallet order. Please try again.",
+        );
       } finally {
         setPlacingOrder(false);
       }
@@ -335,6 +402,36 @@ function Payment() {
                   <p>Pay securely using Razorpay Checkout.</p>
                 </div>
               </label>
+
+              <label
+                className={`payment-method-card ${
+                  paymentMethod === "wallet" ? "selected" : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="wallet"
+                  checked={paymentMethod === "wallet"}
+                  disabled={placingOrder || walletLoading}
+                  onChange={(event) => setPaymentMethod(event.target.value)}
+                />
+
+                <div>
+                  <strong>WALLET</strong>
+                  <p>
+                    {walletLoading
+                      ? "Loading wallet balance..."
+                      : `Available balance: ${walletBalance.toLocaleString(
+                          "en-IN",
+                          {
+                            style: "currency",
+                            currency: "INR",
+                          },
+                        )}`}
+                  </p>
+                </div>
+              </label>
             </div>
           </section>
 
@@ -371,7 +468,9 @@ function Payment() {
                   ? "PLACE ORDER"
                   : paymentMethod === "online"
                     ? "PAY NOW"
-                    : "SELECT PAYMENT METHOD"}
+                    : paymentMethod === "wallet"
+                      ? "PAY WITH WALLET"
+                      : "SELECT PAYMENT METHOD"}
             </button>
           </section>
         </div>

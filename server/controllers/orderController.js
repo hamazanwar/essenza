@@ -15,7 +15,8 @@ const {
   getMyOrdersService,
   getOrderDetailsService,
   cancelOrderService,
-  createPaidOnlineOrderService
+  createPaidOnlineOrderService,
+  createWalletOrderService
 } = require("../services/orderService");
 
 const createOrder = async (req, res) => {
@@ -54,6 +55,46 @@ const createOrder = async (req, res) => {
     res.status(400).json({
       success: false,
       message: error.message || "Failed to create order.",
+    });
+  }
+};
+
+const createWalletOrder = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { addressId, items } = req.body;
+
+    if (!addressId) {
+      return res.status(400).json({
+        success: false,
+        message: "Delivery address is required.",
+      });
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Your cart is empty.",
+      });
+    }
+
+    const order = await createWalletOrderService({
+      userId,
+      addressId,
+      items,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Order placed successfully using your wallet.",
+      order,
+    });
+  } catch (error) {
+    console.error("Create wallet order error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Failed to place wallet order.",
     });
   }
 };
@@ -466,5 +507,6 @@ module.exports = {
   cancelOrder,
   createOnlinePaymentOrder,
   verifyOnlinePayment,
-  getOrderDetails
+  getOrderDetails,
+  createWalletOrder
 };

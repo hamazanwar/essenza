@@ -10,7 +10,8 @@ const {
   cancelOrder,
   createOnlinePaymentOrder,
   verifyOnlinePayment,
-  getOrderDetails
+  getOrderDetails,
+  createWalletOrder
 } = require("../controllers/orderController");
 
 router.post("/", protect, createOrder);
@@ -24,5 +25,6 @@ router.get("/my-orders", protect, getMyOrders);
 router.get("/:orderId", protect, getOrderDetails);
 
 router.patch("/:orderId/cancel", protect, cancelOrder);
+router.post("/wallet-payment", protect, createWalletOrder);
 
 module.exports = router;
