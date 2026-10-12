@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import SearchOverlay from "../search/SearchOverlay";
 
@@ -9,6 +9,10 @@ function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+const [cartCount, setCartCount] = useState(0);
+const [wishlistCount, setWishlistCount] = useState(0);
 
   // ==========================================
   // CHECK LOGIN STATUS
@@ -43,6 +47,68 @@ function Navbar() {
 
     fetchCategories();
   }, []);
+
+  
+useEffect(() => {
+  const fetchNavbarCounts = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setCartCount(0);
+      setWishlistCount(0);
+      return;
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/cart",
+        config
+      );
+
+      const cart = response.data.cart;
+      const items = cart?.items || response.data.items || [];
+
+      const count = items.reduce(
+        (total, item) => total + Number(item.quantity || 1),
+        0
+      );
+
+      setCartCount(count);
+    } catch (error) {
+      console.error("Navbar cart count error:", error);
+    }
+
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/wishlist",
+        config
+      );
+
+      const wishlist =
+        response.data.wishlist ||
+        response.data;
+
+      const items = Array.isArray(wishlist)
+        ? wishlist
+        : wishlist?.products ||
+          wishlist?.items ||
+          [];
+
+      setWishlistCount(items.length);
+    } catch (error) {
+      console.error("Navbar wishlist count error:", error);
+    }
+  };
+
+  fetchNavbarCounts();
+}, [location.pathname]);
+
 
   // ==========================================
   // PROFILE CLICK
@@ -233,6 +299,11 @@ const handleWalletClick = () => {
           >
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
+          {isLoggedIn && wishlistCount > 0 && (
+  <span className="navbar-count-badge">
+    {wishlistCount > 99 ? "99+" : wishlistCount}
+  </span>
+)}
         </button>
 
         {/* CART */}
@@ -269,6 +340,11 @@ const handleWalletClick = () => {
               r="1"
             />
           </svg>
+          {isLoggedIn && cartCount > 0 && (
+  <span className="navbar-count-badge">
+    {cartCount > 99 ? "99+" : cartCount}
+  </span>
+)}
         </button>
 
         {/* MY ORDERS */}
