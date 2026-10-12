@@ -34,14 +34,16 @@ const getAllOrders = async (req, res) => {
 // UPDATE ORDER STATUS - ADMIN
 // ==========================================
 
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { orderStatus } = req.body;
+    const { orderStatus, deliveryDate } = req.body;
 
     const order = await updateOrderStatusService(
       orderId,
-      orderStatus
+      orderStatus,
+      deliveryDate
     );
 
     res.status(200).json({
@@ -50,10 +52,7 @@ const updateOrderStatus = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error(
-      "Update order status error:",
-      error
-    );
+    console.error("Update order status error:", error);
 
     res.status(400).json({
       success: false,
@@ -63,6 +62,7 @@ const updateOrderStatus = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   getAllOrders,

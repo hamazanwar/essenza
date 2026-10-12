@@ -8,13 +8,18 @@ const {
   createReview,
   getProductReviews,
   getMyReviews,
+  updateMyReview,
+  deleteMyReview,
 } = require("../controllers/reviewController");
 
-// Customer routes
 router.post("/", protect, createReview);
+
 router.get("/my-reviews", protect, getMyReviews);
 
-// Public route for displaying reviews on product details
 router.get("/product/:productId", getProductReviews);
+
+router.patch("/:reviewId", protect, updateMyReview);
+
+router.delete("/:reviewId", protect, deleteMyReview);
 
 module.exports = router;

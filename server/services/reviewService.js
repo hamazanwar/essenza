@@ -103,8 +103,76 @@ const getMyReviewsService = async (userId) => {
     .lean();
 };
 
+
+const updateMyReviewService = async ({
+  userId,
+  reviewId,
+  rating,
+  comment,
+}) => {
+  if (!userId) {
+    throw new Error("User authentication is required.");
+  }
+
+  const numericRating = Number(rating);
+
+  if (
+    !Number.isInteger(numericRating) ||
+    numericRating < 1 ||
+    numericRating > 5
+  ) {
+    throw new Error("Rating must be between 1 and 5.");
+  }
+
+  if (
+    typeof comment !== "string" ||
+    comment.trim().length < 3 ||
+    comment.trim().length > 1000
+  ) {
+    throw new Error(
+      "Review must contain between 3 and 1000 characters."
+    );
+  }
+
+  const review = await Review.findOne({
+    _id: reviewId,
+    userId,
+  });
+
+  if (!review) {
+    throw new Error("Review not found or you cannot edit it.");
+  }
+
+  review.rating = numericRating;
+  review.comment = comment.trim();
+
+  await review.save();
+
+  return review;
+};
+
+const deleteMyReviewService = async ({ userId, reviewId }) => {
+  if (!userId) {
+    throw new Error("User authentication is required.");
+  }
+
+  const review = await Review.findOneAndDelete({
+    _id: reviewId,
+    userId,
+  });
+
+  if (!review) {
+    throw new Error("Review not found or you cannot delete it.");
+  }
+
+  return review;
+};
+
+
 module.exports = {
   createReviewService,
   getProductReviewsService,
   getMyReviewsService,
+  updateMyReviewService,
+  deleteMyReviewService
 };

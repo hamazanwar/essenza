@@ -17,7 +17,12 @@ const getAllOrdersService = async () => {
 // UPDATE ORDER STATUS - ADMIN
 // ==========================================
 
-const updateOrderStatusService = async (orderId, orderStatus) => {
+
+const updateOrderStatusService = async (
+  orderId,
+  orderStatus,
+  deliveryDate
+) => {
   if (!orderId) {
     throw new Error("Order ID is required.");
   }
@@ -41,19 +46,13 @@ const updateOrderStatusService = async (orderId, orderStatus) => {
     throw new Error("Order not found.");
   }
 
-  // Prevent changing a cancelled order
   if (order.orderStatus === "CANCELLED") {
     throw new Error("Cancelled orders cannot be updated.");
   }
 
-  // Prevent changing a delivered order
   if (order.orderStatus === "DELIVERED") {
     throw new Error("Delivered orders cannot be updated.");
   }
-
-  // ==========================================
-  // CANCEL ORDER
-  // ==========================================
 
   if (orderStatus === "CANCELLED") {
     for (const item of order.items) {
@@ -73,20 +72,33 @@ const updateOrderStatusService = async (orderId, orderStatus) => {
     return order;
   }
 
-  // ==========================================
-  // UPDATE NORMAL STATUS
-  // ==========================================
+  
+order.orderStatus = orderStatus;
 
-  order.orderStatus = orderStatus;
+if (orderStatus === "DELIVERED") {
+  const parsedDeliveryDate = deliveryDate
+    ? new Date(deliveryDate)
+    : new Date();
 
-  // Set delivered date when order is delivered
-  if (orderStatus === "DELIVERED") {
-    order.deliveredAt = new Date();
+  if (Number.isNaN(parsedDeliveryDate.getTime())) {
+    throw new Error("Invalid delivery date.");
   }
 
-  await order.save();
+  order.deliveredAt = parsedDeliveryDate;
+}
 
-  return order;
+// Older orders may not contain originalPrice.
+// Backfill it from the saved item price before validation.
+for (const item of order.items) {
+  if (item.originalPrice == null) {
+    item.originalPrice = item.price;
+  }
+}
+
+await order.save();
+
+return order;
+
 };
 
 module.exports = {

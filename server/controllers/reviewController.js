@@ -3,12 +3,15 @@ const {
   createReviewService,
   getProductReviewsService,
   getMyReviewsService,
+  updateMyReviewService,
+  deleteMyReviewService
 } = require("../services/reviewService");
 
 const createReview = async (req, res) => {
   try {
+    console.log("Review auth user:", req.user);
     const review = await createReviewService({
-      userId: req.user._id,
+      userId: req.user.userId,
       productId: req.body.productId,
       orderId: req.body.orderId,
       rating: req.body.rating,
@@ -58,7 +61,7 @@ const getProductReviews = async (req, res) => {
 
 const getMyReviews = async (req, res) => {
   try {
-    const reviews = await getMyReviewsService(req.user._id);
+    const reviews = await getMyReviewsService(req.user.userId);
 
     return res.status(200).json({
       success: true,
@@ -72,8 +75,59 @@ const getMyReviews = async (req, res) => {
   }
 };
 
+
+const updateMyReview = async (req, res) => {
+  try {
+    const review = await updateMyReviewService({
+      userId: req.user.userId,
+      reviewId: req.params.reviewId,
+      rating: req.body.rating,
+      comment: req.body.comment,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Review updated successfully.",
+      review,
+    });
+  } catch (error) {
+    const statusCode =
+      error.message.includes("not found") ? 404 : 400;
+
+    return res.status(statusCode).json({
+      success: false,
+      message: error.message || "Failed to update review.",
+    });
+  }
+};
+
+const deleteMyReview = async (req, res) => {
+  try {
+    await deleteMyReviewService({
+      userId: req.user.userId,
+      reviewId: req.params.reviewId,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Review deleted successfully.",
+    });
+  } catch (error) {
+    const statusCode =
+      error.message.includes("not found") ? 404 : 400;
+
+    return res.status(statusCode).json({
+      success: false,
+      message: error.message || "Failed to delete review.",
+    });
+  }
+};
+
+
 module.exports = {
   createReview,
   getProductReviews,
   getMyReviews,
+  updateMyReview,
+  deleteMyReview
 };
