@@ -75,6 +75,9 @@ const updateOrderStatusService = async (
   
 order.orderStatus = orderStatus;
 
+
+order.orderStatus = orderStatus;
+
 if (orderStatus === "DELIVERED") {
   const parsedDeliveryDate = deliveryDate
     ? new Date(deliveryDate)
@@ -85,17 +88,15 @@ if (orderStatus === "DELIVERED") {
   }
 
   order.deliveredAt = parsedDeliveryDate;
-}
 
-// Older orders may not contain originalPrice.
-// Backfill it from the saved item price before validation.
-for (const item of order.items) {
-  if (item.originalPrice == null) {
-    item.originalPrice = item.price;
+  // Mark COD payment as paid after successful delivery
+  if (order.paymentMethod === "COD") {
+    order.paymentStatus = "PAID";
   }
 }
 
 await order.save();
+
 
 return order;
 
