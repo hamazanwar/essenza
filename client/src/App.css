@@ -7372,3 +7372,137 @@ body {
     padding: 10px 12px;
   }
 }
+
+/* review */
+
+.my-order-write-review-button {
+  display: block;
+  margin-top: 10px;
+  padding: 9px 14px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.my-order-review-submitted {
+  margin-top: 10px;
+  color: #38734b;
+  font-size: 11px;
+}
+
+.my-order-review-success {
+  color: #287443;
+  margin: 16px 0;
+}
+
+.my-order-review-error {
+  color: #b42318;
+  font-size: 13px;
+  margin: 12px 0;
+}
+
+.my-review-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.my-review-form {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  padding: 32px;
+  background: #fff;
+  color: #111;
+}
+
+.my-review-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  border: 0;
+  background: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.my-review-eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.my-review-form h2 {
+  margin: 12px 0;
+  font-size: 23px;
+}
+
+.my-review-product-name {
+  color: #555;
+  margin-bottom: 24px;
+}
+
+.my-review-form label {
+  display: block;
+  margin: 16px 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.my-review-stars {
+  display: flex;
+  gap: 8px;
+}
+
+.my-review-stars button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #ccc;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.my-review-stars button.active {
+  color: #c69b42;
+}
+
+.my-review-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  font: inherit;
+  resize: vertical;
+}
+
+.my-review-submit-button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.my-review-submit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 480px) {
+  .my-review-form {
+    padding: 26px 20px;
+  }
+}

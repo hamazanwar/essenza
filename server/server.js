@@ -26,6 +26,7 @@ const adminCouponRoutes = require("./routes/adminCouponRoutes");
 const walletRoutes = require("./routes/walletRoutes");
 const offerRoutes = require("./routes/offerRoutes");
 const couponPublicRoutes = require("./routes/couponPublicRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 
 const app = express();
@@ -58,6 +59,7 @@ app.use("/api/admin/coupons", adminCouponRoutes);
 app.use("/api/wallet", walletRoutes);
 app.use("/api/admin/offers", offerRoutes);
 app.use("/api/coupons", couponPublicRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 
 app.get("/", (req, res) => {

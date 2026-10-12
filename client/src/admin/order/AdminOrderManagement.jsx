@@ -111,8 +111,12 @@ const confirmStatusChange = async () => {
     const response = await axios.patch(
       `http://localhost:5000/api/admin/orders/${statusConfirmation.orderId}/status`,
       {
-        orderStatus: statusConfirmation.newStatus,
-      },
+  orderStatus: statusConfirmation.newStatus,
+  deliveryDate:
+    statusConfirmation.newStatus === "DELIVERED"
+      ? new Date().toISOString()
+      : undefined,
+},
       {
         headers: {
           Authorization: `Bearer ${token}`,
