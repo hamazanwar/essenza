@@ -20,6 +20,13 @@ function Checkout() {
   const [addressLoading, setAddressLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [coupons, setCoupons] = useState([]);
+const [couponCode, setCouponCode] = useState("");
+const [appliedCoupon, setAppliedCoupon] = useState(null);
+const [couponDiscount, setCouponDiscount] = useState(0);
+const [couponMessage, setCouponMessage] = useState("");
+const [couponLoading, setCouponLoading] = useState(false);
+
   // ==========================================
   // FETCH CHECKOUT ITEMS
   // ==========================================
@@ -77,6 +84,7 @@ function Checkout() {
     );
     return;
   }
+
 
   
 const offerResponse = await axios.get(
@@ -196,6 +204,25 @@ const formattedItems = cartItems.map((item) => ({
   buyNowData?.quantity,
 ]);
 
+useEffect(() => {
+  const fetchCoupons = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/coupons"
+      );
+
+      setCoupons(response.data.coupons || []);
+    } catch (error) {
+      console.error(
+        "Fetch coupons error:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  fetchCoupons();
+}, []);
+
   // ==========================================
   // FETCH ADDRESSES
   // ==========================================
@@ -269,7 +296,65 @@ const formattedItems = cartItems.map((item) => ({
 
   const deliveryCharge = 0;
 
-  const total = subtotal + deliveryCharge;
+  const total = Math.round(
+  (subtotal - couponDiscount + deliveryCharge) * 100
+) / 100;
+
+  
+const handleApplyCoupon = (coupon) => {
+  const now = new Date();
+  const orderSubtotal = Math.round(subtotal * 100) / 100;
+
+  if (
+    !coupon.isActive ||
+    new Date(coupon.startDate) > now ||
+    new Date(coupon.expiryDate) <= now
+  ) {
+    setCouponMessage("This coupon is expired or unavailable.");
+    return;
+  }
+
+  if (
+    coupon.usageLimit != null &&
+    coupon.usedCount >= coupon.usageLimit
+  ) {
+    setCouponMessage("This coupon has reached its usage limit.");
+    return;
+  }
+
+  if (orderSubtotal < coupon.minOrderAmount) {
+    setCouponMessage(
+      `Minimum order amount for this coupon is ₹${coupon.minOrderAmount}.`
+    );
+    return;
+  }
+
+  let discount =
+    coupon.discountType === "PERCENTAGE"
+      ? (orderSubtotal * coupon.discountValue) / 100
+      : coupon.discountValue;
+
+  if (coupon.maxDiscount != null) {
+    discount = Math.min(discount, coupon.maxDiscount);
+  }
+
+  discount = Math.round(
+    Math.min(discount, orderSubtotal) * 100
+  ) / 100;
+
+  setAppliedCoupon(coupon);
+  setCouponCode(coupon.code);
+  setCouponDiscount(discount);
+  setCouponMessage(`Coupon ${coupon.code} applied successfully.`);
+};
+
+const handleRemoveCoupon = () => {
+  setAppliedCoupon(null);
+  setCouponCode("");
+  setCouponDiscount(0);
+  setCouponMessage("");
+};
+
 
 
   // ==========================================
@@ -294,14 +379,16 @@ const formattedItems = cartItems.map((item) => ({
   setError("");
 
   navigate("/payment", {
-    state: {
-      checkoutItems,
-      selectedAddress,
-      subtotal,
-      deliveryCharge,
-      total,
-    },
-  });
+  state: {
+    checkoutItems,
+    selectedAddress,
+    subtotal,
+    deliveryCharge,
+    total,
+    appliedCoupon,
+    couponDiscount,
+  },
+});
 };
 
   // ==========================================
@@ -531,6 +618,93 @@ const formattedItems = cartItems.map((item) => ({
 
           </section>
 
+          
+<section className="checkout-section checkout-coupons">
+  <h2>AVAILABLE COUPONS</h2>
+
+  {coupons.length === 0 ? (
+    <p>No coupons are currently available.</p>
+  ) : (
+    <div className="checkout-coupon-list">
+      {coupons.map((coupon) => (
+        <div className="checkout-coupon-card" key={coupon._id}>
+          <div>
+            <strong>{coupon.code}</strong>
+            <p>{coupon.description}</p>
+
+            <p>
+              {coupon.discountType === "PERCENTAGE"
+                ? `${coupon.discountValue}% OFF`
+                : `₹${coupon.discountValue} OFF`}
+            </p>
+
+            {coupon.minOrderAmount > 0 && (
+              <p>Minimum order: ₹{coupon.minOrderAmount}</p>
+            )}
+
+            {coupon.maxDiscount != null && (
+              <p>Maximum discount: ₹{coupon.maxDiscount}</p>
+            )}
+
+            <p>
+              Valid until:{" "}
+              {new Date(coupon.expiryDate).toLocaleDateString()}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => handleApplyCoupon(coupon)}
+            disabled={appliedCoupon?._id === coupon._id}
+          >
+            {appliedCoupon?._id === coupon._id
+              ? "APPLIED"
+              : "APPLY"}
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+
+  <div className="checkout-coupon-input">
+    <input
+      type="text"
+      placeholder="Enter coupon code"
+      value={couponCode}
+      onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+    />
+
+    <button
+      type="button"
+      onClick={() => {
+        const coupon = coupons.find(
+          (item) => item.code === couponCode.trim().toUpperCase()
+        );
+
+        if (!coupon) {
+          setCouponMessage("Invalid coupon code.");
+          return;
+        }
+
+        handleApplyCoupon(coupon);
+      }}
+    >
+      APPLY CODE
+    </button>
+
+    {appliedCoupon && (
+      <button type="button" onClick={handleRemoveCoupon}>
+        REMOVE COUPON
+      </button>
+    )}
+  </div>
+
+  {couponMessage && (
+    <p className="checkout-coupon-message">{couponMessage}</p>
+  )}
+</section>
+
+
           {/* ==========================================
               PRICE SUMMARY
           ========================================== */}
@@ -548,6 +722,13 @@ const formattedItems = cartItems.map((item) => ({
   <div className="checkout-summary-row checkout-discount-row">
     <span>Offer Discount</span>
     <span>-₹{totalDiscount.toFixed(2)}</span>
+  </div>
+)}
+
+{couponDiscount > 0 && (
+  <div className="checkout-summary-row checkout-discount-row">
+    <span>Coupon Discount ({appliedCoupon?.code})</span>
+    <span>-₹{couponDiscount.toFixed(2)}</span>
   </div>
 )}
 

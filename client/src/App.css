@@ -7181,3 +7181,194 @@ body {
 .checkout-discount-row {
   color: #795b24;
 }
+
+
+/* coupon */
+
+/* ==========================================
+   ESSENZA CHECKOUT COUPONS
+========================================== */
+
+.checkout-coupons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checkout-coupons h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+}
+
+/* Coupon list */
+
+.checkout-coupon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Coupon card */
+
+.checkout-coupon-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid #dedede;
+  background: #ffffff;
+  position: relative;
+  transition: border-color 0.25s ease;
+}
+
+.checkout-coupon-card:hover {
+  border-color: #111111;
+}
+
+.checkout-coupon-card > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkout-coupon-card strong {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 7px 12px;
+  border: 1px dashed #111111;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+}
+
+.checkout-coupon-card p {
+  margin: 7px 0;
+  color: #666666;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.checkout-coupon-card p:nth-of-type(1) {
+  color: #111111;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Apply button */
+
+.checkout-coupon-card button,
+.checkout-coupon-input button {
+  flex-shrink: 0;
+  padding: 11px 18px;
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.checkout-coupon-card button:hover,
+.checkout-coupon-input button:hover {
+  background: #ffffff;
+  color: #111111;
+}
+
+.checkout-coupon-card button:disabled {
+  background: #eeeeee;
+  border-color: #cccccc;
+  color: #555555;
+  cursor: default;
+}
+
+/* Coupon code input */
+
+.checkout-coupon-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkout-coupon-input input {
+  flex: 1;
+  min-width: 120px;
+  padding: 12px 14px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  text-transform: uppercase;
+  transition: border-color 0.2s ease;
+}
+
+.checkout-coupon-input input:focus {
+  border-color: #111111;
+}
+
+.checkout-coupon-input input::placeholder {
+  color: #999999;
+  text-transform: none;
+}
+
+/* Coupon feedback */
+
+.checkout-coupon-message {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #dddddd;
+  background: #f8f8f8;
+  color: #333333;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Coupon discount in price summary */
+
+.checkout-summary-row.checkout-discount-row {
+  color: #111111;
+}
+
+.checkout-summary-row.checkout-discount-row span:last-child {
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 600px) {
+  .checkout-coupons h2 {
+    font-size: 17px;
+  }
+
+  .checkout-coupon-card {
+    align-items: flex-start;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .checkout-coupon-card button {
+    padding: 10px 12px;
+  }
+
+  .checkout-coupon-input {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
+  .checkout-coupon-input input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .checkout-coupon-input button {
+    padding: 10px 12px;
+  }
+}

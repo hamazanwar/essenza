@@ -1,4 +1,4 @@
-
+const Coupon = require("../models/Coupon");
 const {
   createCouponService,
   getCouponsService,
@@ -109,10 +109,50 @@ const toggleCouponStatus = async (req, res) => {
   }
 };
 
+
+const getAvailableCoupons = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const coupons = await Coupon.find({
+      isActive: true,
+      startDate: { $lte: now },
+      expiryDate: { $gt: now },
+      $or: [
+        { usageLimit: null },
+        { $expr: { $lt: ["$usedCount", "$usageLimit"] } },
+      ],
+    })
+      .select(
+  "code description discountType discountValue minOrderAmount maxDiscount startDate expiryDate isActive usageLimit usedCount"
+)
+      .sort({ createdAt: -1 })
+      .lean();
+
+      console.log("Current server time:", new Date());
+
+
+
+    return res.status(200).json({
+      success: true,
+      coupons,
+    });
+  } catch (error) {
+    console.error("Get available coupons error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load available coupons.",
+    });
+  }
+};
+
+
 module.exports = {
   createCoupon,
   getCoupons,
   updateCoupon,
   deleteCoupon,
   toggleCouponStatus,
+  getAvailableCoupons
 };
