@@ -40,7 +40,7 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       // Go to Home page
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error) {
       console.log("Login error:", error);
 
@@ -174,7 +174,7 @@ function Login() {
 
               localStorage.setItem("user", JSON.stringify(data.user));
 
-              navigate("/");
+              navigate("/", { replace: true });
             } catch (error) {
               console.error("Google login error:", error);
 

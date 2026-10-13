@@ -34,7 +34,7 @@ function AdminLogin() {
 
       localStorage.setItem("admin", JSON.stringify(data.admin));
 
-      navigate("/admin/dashboard");
+      navigate("/admin/dashboard", { replace: true });
 
       // Dashboard navigation will be added next
     } catch (error) {

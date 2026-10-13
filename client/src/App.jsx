@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import "./App.css";
 import "./Style.css";
 
@@ -37,12 +37,55 @@ import OfferManagement from "./admin/offer/OfferManagement";
 import AdminReviews from "./admin/review/AdminReviews";
 import AdminSalesReport from "./admin/sales/AdminSalesReport";
 
+function GuestOnly({ children }) {
+  const token = localStorage.getItem("token");
+  const location = useLocation();
+
+  if (token) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  return children;
+}
+
+function AdminGuestOnly({ children }) {
+  const adminToken = localStorage.getItem("adminToken");
+
+  if (adminToken) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <Routes>
-      <Route path="/register" element={<Register />} />
+      <Route
+        path="/register"
+        element={
+          <GuestOnly>
+            <Register />
+          </GuestOnly>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <GuestOnly>
+            <Login />
+          </GuestOnly>
+        }
+      />
+      <Route
+        path="/admin/login"
+        element={
+          <AdminGuestOnly>
+            <AdminLogin />
+          </AdminGuestOnly>
+        }
+      />
       <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-otp" element={<ResetOtp />} />
       <Route path="/reset-password" element={<ResetPassword />} />
@@ -50,7 +93,6 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/profile" element={<AdminProfile />} />
       <Route path="/admin/customers" element={<CustomerManagement />} />
