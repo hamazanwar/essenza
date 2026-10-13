@@ -189,6 +189,17 @@ function AdminProfile() {
         >
           EDIT PROFILE
         </button>
+
+        <button
+          className="admin-profile-logout-btn"
+          onClick={() => {
+            localStorage.removeItem("adminToken");
+            localStorage.removeItem("admin");
+            window.location.replace("/admin/login");
+          }}
+        >
+          LOG OUT
+        </button>
       </main>
 
       <AdminFooter />

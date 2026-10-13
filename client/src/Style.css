@@ -6323,3 +6323,25 @@
     width: 100%;
   }
 }
+
+/* log out admin */
+.admin-profile-logout-btn {
+  display: block;
+  margin: 15px auto 30px;
+  padding: 13px 32px;
+  min-width: 163px;
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #111111;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.admin-profile-logout-btn:hover {
+  background: #111111;
+  color: #ffffff;
+}
