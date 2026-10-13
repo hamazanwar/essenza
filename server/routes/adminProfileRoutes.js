@@ -9,6 +9,7 @@ const uploadProfileImage = require("../config/upload");
 const {
   getAdminProfile,
   updateAdminProfileImage,
+  updateAdminProfile
 } = require("../controllers/adminProfileController");
 
 // ==========================================
@@ -27,5 +28,8 @@ router.patch(
   uploadProfileImage.single("profileImage"),
   updateAdminProfileImage,
 );
+
+// Update admin profile details
+router.patch("/profile", protectAdmin, updateAdminProfile);
 
 module.exports = router;

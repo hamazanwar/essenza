@@ -51,7 +51,45 @@ const updateAdminProfileImageService = async (adminId, imagePath) => {
   };
 };
 
+// ==========================================
+// UPDATE ADMIN PROFILE DETAILS
+// ==========================================
+
+const updateAdminProfileService = async (adminId, { name }) => {
+  if (typeof name !== "string" || !name.trim()) {
+    const error = new Error("Name is required.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (name.trim().length > 100) {
+    const error = new Error("Name must be 100 characters or fewer.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const admin = await Admin.findById(adminId);
+
+  if (!admin) {
+    const error = new Error("Admin not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  admin.name = name.trim();
+
+  await admin.save();
+
+  const updatedAdmin = await Admin.findById(adminId).select("-password");
+
+  return {
+    message: "Admin profile updated successfully.",
+    admin: updatedAdmin,
+  };
+};
+
 module.exports = {
   getAdminProfileService,
   updateAdminProfileImageService,
+  updateAdminProfileService
 };

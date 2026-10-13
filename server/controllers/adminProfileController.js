@@ -1,6 +1,7 @@
 const {
   getAdminProfileService,
   updateAdminProfileImageService,
+  updateAdminProfileService
 } = require("../services/adminProfileService");
 
 // ==========================================
@@ -52,7 +53,35 @@ const updateAdminProfileImage = async (req, res) => {
   }
 };
 
+// ==========================================
+// UPDATE ADMIN PROFILE DETAILS
+// ==========================================
+
+const updateAdminProfile = async (req, res) => {
+  try {
+    const result = await updateAdminProfileService(
+      req.admin.adminId,
+      { name: req.body.name }
+    );
+
+    return res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    console.error("Update admin profile error:", error);
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.statusCode
+        ? error.message
+        : "Server error",
+    });
+  }
+};
+
 module.exports = {
   getAdminProfile,
   updateAdminProfileImage,
+  updateAdminProfile
 };
