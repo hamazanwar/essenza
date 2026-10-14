@@ -68,6 +68,18 @@ function AdminNavbar() {
 
       {/* PROFILE */}
       <div className="admin-sidebar-bottom">
+        <button
+  type="button"
+  className="admin-sidebar-logout"
+  onClick={() => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
+    window.location.replace("/admin/login");
+  }}
+>
+  <span>↪</span>
+  <span>LOG OUT</span>
+</button>
         <NavLink
           to="/admin/profile"
           className={({ isActive }) =>

@@ -6345,3 +6345,28 @@
   background: #111111;
   color: #ffffff;
 }
+
+/* logout side bar */
+.admin-sidebar-logout {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: calc(100% - 32px);
+  margin: 0 16px 10px;
+  padding: 16px 14px;
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #e5e5e5;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.admin-sidebar-logout:hover {
+  background: #111111;
+  color: #ffffff;
+}
