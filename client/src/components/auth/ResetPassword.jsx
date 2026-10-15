@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -97,13 +98,20 @@ function ResetPassword() {
                 minLength={8}
               />
 
-              <button
-                type="button"
-                className="reset-eye-button"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
+              
+<button
+  type="button"
+  className="reset-eye-button"
+  onClick={() => setShowPassword(!showPassword)}
+  aria-label={showPassword ? "Hide password" : "Show password"}
+>
+  {showPassword ? (
+    <EyeOff size={18} strokeWidth={1.8} />
+  ) : (
+    <Eye size={18} strokeWidth={1.8} />
+  )}
+</button>
+
             </div>
           </div>
 
@@ -122,13 +130,24 @@ function ResetPassword() {
                 minLength={8}
               />
 
-              <button
-                type="button"
-                className="reset-eye-button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? "Hide" : "Show"}
-              </button>
+             
+<button
+  type="button"
+  className="reset-eye-button"
+  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+  aria-label={
+    showConfirmPassword
+      ? "Hide confirm password"
+      : "Show confirm password"
+  }
+>
+  {showConfirmPassword ? (
+    <EyeOff size={18} strokeWidth={1.8} />
+  ) : (
+    <Eye size={18} strokeWidth={1.8} />
+  )}
+</button>
+
             </div>
           </div>
 

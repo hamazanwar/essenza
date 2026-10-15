@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
+
 
 function Login() {
   const navigate = useNavigate();
@@ -99,44 +101,20 @@ function Login() {
                 onChange={(event) => setPassword(event.target.value)}
               />
 
-              <button
-                type="button"
-                className="login-eye-button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 3l18 18" />
-                    <path d="M10.58 10.58a2 2 0 0 0 2.83 2.83" />
-                    <path d="M9.88 4.24A10.7 10.7 0 0 1 12 4c5 0 9.27 3.11 11 8-0.67 1.87-1.68 3.48-2.88 4.72" />
-                    <path d="M6.61 6.61C4.93 7.79 3.67 6.61 6.61 6.61" />
-                  </svg>
-                ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
+              
+<button
+  type="button"
+  className="login-eye-button"
+  onClick={() => setShowPassword(!showPassword)}
+  aria-label={showPassword ? "Hide password" : "Show password"}
+>
+  {showPassword ? (
+    <EyeOff size={18} strokeWidth={1.8} />
+  ) : (
+    <Eye size={18} strokeWidth={1.8} />
+  )}
+</button>
+
             </div>
           </div>
 

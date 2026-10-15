@@ -1,6 +1,6 @@
 /* =========================================================
    GLOBAL
-   Used by: Register.jsx and general user-side pages
+   Used by: user-side pages
 ========================================================= */
 
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..600;1,400..600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap");
@@ -209,7 +209,8 @@ body {
 
 .password-wrapper {
   position: relative;
-  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .password-wrapper input {
@@ -218,23 +219,21 @@ body {
 
 .eye-button {
   position: absolute;
-  right: 0;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 4px;
   border: none;
   background: transparent;
-  color: #666666;
+  color: #666;
   cursor: pointer;
 }
 
 .eye-button:hover {
-  color: #111111;
+  color: #000;
 }
 
 .eye-button:focus {
@@ -842,7 +841,8 @@ body {
 
 .reset-password-wrapper {
   position: relative;
-  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .reset-password-wrapper input {
@@ -861,20 +861,21 @@ body {
 
 .reset-eye-button {
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
   border: none;
-  font-size: 11px;
+  background: transparent;
+  color: #666;
   cursor: pointer;
-  color: #555555;
 }
-
 .reset-eye-button:hover {
-  color: #000000;
+  color: #000;
 }
-
 .reset-button {
   width: 100%;
   height: 50px;
@@ -1044,19 +1045,20 @@ body {
    Used by: Footer.jsx
 ========================================================= */
 
+
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 77px;
+  min-height: 77px;
   background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
   border-bottom: 11px solid #1a1a1a;
+  flex-shrink: 0;
 }
+
 
 .footer p {
   margin: 0;
@@ -2033,6 +2035,7 @@ body {
   background: #333333;
 }
 
+
 .contact-message {
   min-height: 35vh;
   display: flex;
@@ -2042,7 +2045,11 @@ body {
   background: #111111;
   color: #ffffff;
   padding: 60px 20px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
+
 
 .contact-message p {
   font-family: "Playfair Display", serif;
