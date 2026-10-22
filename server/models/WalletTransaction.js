@@ -24,16 +24,17 @@ const walletTransactionSchema = new mongoose.Schema(
     },
 
     source: {
-      type: String,
-      enum: [
-        "ADD_MONEY",
-        "ORDER_PAYMENT",
-        "REFUND",
-        "ADMIN_CREDIT",
-        "ADMIN_DEBIT",
-      ],
-      required: true,
-    },
+  type: String,
+  enum: [
+    "ADD_MONEY",
+    "ORDER_PAYMENT",
+    "REFUND",
+    "EXCHANGE_PAYMENT",
+    "ADMIN_CREDIT",
+    "ADMIN_DEBIT",
+  ],
+  required: true,
+},
 
     amount: {
       type: Number,

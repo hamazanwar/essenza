@@ -75,13 +75,14 @@ const applyWalletTransactionService = async ({
     throw new Error("Invalid wallet transaction type.");
   }
 
-  const allowedSources = [
-    "ADD_MONEY",
-    "ORDER_PAYMENT",
-    "REFUND",
-    "ADMIN_CREDIT",
-    "ADMIN_DEBIT",
-  ];
+ const allowedSources = [
+  "ADD_MONEY",
+  "ORDER_PAYMENT",
+  "REFUND",
+  "EXCHANGE_PAYMENT",
+  "ADMIN_CREDIT",
+  "ADMIN_DEBIT",
+];
 
   if (!allowedSources.includes(source)) {
     throw new Error("Invalid wallet transaction source.");

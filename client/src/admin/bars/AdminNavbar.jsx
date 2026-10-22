@@ -15,6 +15,10 @@ function AdminNavbar() {
       path: "/admin/orders",
     },
     {
+  label: "Return / Exchange",
+  path: "/admin/returns",
+},
+    {
       label: "Categories",
       path: "/admin/categories",
     },

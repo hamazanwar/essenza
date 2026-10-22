@@ -6370,3 +6370,359 @@
   background: #111111;
   color: #ffffff;
 }
+
+
+/* =========================================
+   ESSENZA RETURN / EXCHANGE PAGE LAYOUT
+========================================= */
+
+.admin-return-management-page {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  min-width: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #f8f8f8;
+  overflow-x: hidden;
+}
+
+.admin-return-management-content {
+  width: 100%;
+  min-width: 0;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.admin-return-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.admin-return-heading h1 {
+  margin: 0 0 12px;
+  font-size: 30px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #111;
+}
+
+.admin-return-heading p {
+  margin: 0;
+  color: #777;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.admin-return-heading > button {
+  flex-shrink: 0;
+  padding: 12px 22px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.admin-return-heading > button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Table container */
+.admin-return-table-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #e7e7e7;
+}
+
+/* Table */
+.admin-return-table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.admin-return-table thead {
+  background: #f3f3f3;
+}
+
+.admin-return-table th {
+  padding: 16px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #555;
+  border-bottom: 1px solid #e5e5e5;
+  white-space: nowrap;
+}
+
+.admin-return-table td {
+  padding: 16px 14px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 13px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-return-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-return-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.admin-return-table td strong,
+.admin-return-table td small {
+  display: block;
+}
+
+.admin-return-table td strong {
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.admin-return-table td small {
+  margin-top: 5px;
+  color: #777;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 220px;
+}
+
+/* Status labels */
+.admin-return-status {
+  display: inline-block;
+  padding: 6px 9px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  background: #f0f0f0;
+  color: #444;
+}
+
+.admin-return-status-pending {
+  background: #fff4d8;
+  color: #805900;
+}
+
+.admin-return-status-approved {
+  background: #e7f5eb;
+  color: #216b37;
+}
+
+.admin-return-status-rejected {
+  background: #fdeaea;
+  color: #a52a2a;
+}
+
+.admin-return-status-completed {
+  background: #e9edf8;
+  color: #344c8a;
+}
+
+/* Table action buttons */
+.admin-return-action-button {
+  padding: 9px 12px;
+  border: 1px solid #222;
+  background: #fff;
+  color: #111;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.admin-return-action-button:hover {
+  background: #111;
+  color: #fff;
+}
+
+.admin-return-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Empty and loading states */
+.admin-return-message,
+.admin-return-empty {
+  padding: 35px;
+  background: #fff;
+  border: 1px solid #e7e7e7;
+  color: #666;
+}
+
+.admin-return-empty h2 {
+  color: #111;
+  font-size: 20px;
+}
+
+.admin-return-error {
+  margin: 20px 0;
+  padding: 14px 16px;
+  border: 1px solid #efcccc;
+  background: #fff0f0;
+  color: #a52a2a;
+}
+
+/* Footer alignment */
+.admin-return-management-page + footer {
+  margin-left: 240px;
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+  .admin-return-management-content {
+    padding: 24px 18px;
+  }
+
+  .admin-return-heading h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-return-management-page {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .admin-return-management-content {
+    padding: 20px 12px;
+  }
+
+  .admin-return-heading {
+    align-items: flex-start;
+  }
+
+  .admin-return-heading h1 {
+    font-size: 21px;
+  }
+}
+
+
+
+/* ===== ESSENZA Admin Return Review Modal ===== */
+
+.admin-return-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  z-index: 99999 !important;
+}
+
+.admin-return-review-modal {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  max-height: calc(100vh - 40px) !important;
+  overflow-y: auto !important;
+  margin: auto !important;
+  padding: 32px !important;
+  box-sizing: border-box !important;
+  background: #fff !important;
+  color: #111 !important;
+  border: 1px solid #e5e5e5 !important;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2) !important;
+}
+
+.admin-return-review-modal h2 {
+  margin: 0 0 24px;
+  font-size: 24px;
+}
+
+.admin-return-review-modal p {
+  margin: 12px 0;
+  line-height: 1.6;
+}
+
+.admin-return-review-modal label {
+  display: block;
+  margin: 20px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.admin-return-review-modal textarea {
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  resize: vertical;
+}
+
+.admin-return-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  margin: 0;
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  color: #111;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.admin-return-review-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.admin-return-review-actions button {
+  min-width: 110px;
+  padding: 12px 20px;
+  border: 1px solid #111;
+  cursor: pointer;
+}
+
+.admin-return-review-actions button:last-child {
+  background: #111;
+  color: #fff;
+}
+
+.admin-return-review-actions button:first-child {
+  background: #fff;
+  color: #111;
+}
+
+@media (max-width: 600px) {
+  .admin-return-overlay {
+    padding: 12px !important;
+  }
+
+  .admin-return-review-modal {
+    padding: 28px 20px 20px !important;
+  }
+}

@@ -37,6 +37,7 @@ import OfferManagement from "./admin/offer/OfferManagement";
 import AdminReviews from "./admin/review/AdminReviews";
 import AdminSalesReport from "./admin/sales/AdminSalesReport";
 import AdminProfileEdit from "./admin/profile/AdminProfileEdit";
+import AdminReturnManagement from "./admin/return/AdminReturnManagement";
 
 function GuestOnly({ children }) {
   const token = localStorage.getItem("token");
@@ -117,6 +118,7 @@ function App() {
       <Route path="/admin/reviews" element={<AdminReviews />} />
       <Route path="/admin/sales-report" element={<AdminSalesReport />} />
       <Route path="/admin/profile/edit" element={<AdminProfileEdit />} />
+      <Route path="/admin/returns" element={<AdminReturnManagement />} />
     </Routes>
   );
 }
