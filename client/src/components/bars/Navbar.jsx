@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import SearchOverlay from "../search/SearchOverlay";
+import {
+  Search,
+  Heart,
+  ShoppingCart,
+  ClipboardList,
+  Wallet,
+  UserRound,
+} from "lucide-react";
 
 function Navbar() {
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -162,17 +170,9 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      {/* ==========================================
-          LEFT - BRAND
-      ========================================== */}
-
       <div className="navbar-brand">
         <Link to="/">ESSENZA</Link>
       </div>
-
-      {/* ==========================================
-          CENTER - NAVIGATION
-      ========================================== */}
 
       <div className="navbar-menu">
         <Link to="/">HOME</Link>
@@ -214,10 +214,6 @@ function Navbar() {
         <Link to="/contact">CONTACT</Link>
       </div>
 
-      {/* ==========================================
-          RIGHT - ICONS
-      ========================================== */}
-
       <div className="navbar-actions">
         {/* SEARCH */}
 
@@ -227,20 +223,7 @@ function Navbar() {
           aria-label="Search"
           onClick={() => setSearchOpen(true)}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="7" />
-
-            <path d="M20 20l-4-4" />
-          </svg>
+          <Search size={20} strokeWidth={1.7} />
         </button>
 
         {/* WISHLIST */}
@@ -251,18 +234,7 @@ function Navbar() {
           aria-label="Wishlist"
           onClick={handleWishlistClick}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="21"
-            height="21"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
+          <Heart size={21} strokeWidth={1.7} />
           {isLoggedIn && wishlistCount > 0 && (
             <span className="navbar-count-badge">
               {wishlistCount > 99 ? "99+" : wishlistCount}
@@ -278,24 +250,7 @@ function Navbar() {
           aria-label="Cart"
           onClick={handleCartClick}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="21"
-            height="21"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M6 6h15l-1.5 9h-12z" />
-
-            <path d="M6 6L5 3H2" />
-
-            <circle cx="9" cy="20" r="1" />
-
-            <circle cx="18" cy="20" r="1" />
-          </svg>
+          <ShoppingCart size={21} strokeWidth={1.7} />
           {isLoggedIn && cartCount > 0 && (
             <span className="navbar-count-badge">
               {cartCount > 99 ? "99+" : cartCount}
@@ -311,21 +266,7 @@ function Navbar() {
           aria-label="My Orders"
           onClick={handleMyOrdersClick}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="21"
-            height="21"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M6 3h12v18H6z" />
-            <path d="M9 7h6" />
-            <path d="M9 11h6" />
-            <path d="M9 15h4" />
-          </svg>
+          <ClipboardList size={21} strokeWidth={1.7} />
         </button>
 
         {/* WALLET */}
@@ -337,21 +278,7 @@ function Navbar() {
           title="My Wallet"
           onClick={handleWalletClick}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="21"
-            height="21"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="3" y="5" width="18" height="15" rx="2" />
-            <path d="M3 9h18" />
-            <path d="M16 15h.01" />
-            <path d="M7 5V3h10v2" />
-          </svg>
+          <Wallet size={21} strokeWidth={1.7} />
         </button>
 
         {/* PROFILE */}
@@ -362,20 +289,7 @@ function Navbar() {
           aria-label="Profile"
           onClick={handleProfileClick}
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="21"
-            height="21"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="8" r="4" />
-
-            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-          </svg>
+          <UserRound size={21} strokeWidth={1.7} />
         </button>
       </div>
       {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Heart } from "lucide-react";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -33,6 +34,9 @@ function ProductDetails() {
 
   const [deleteConfirmReviewId, setDeleteConfirmReviewId] = useState(null);
   const [reviewActionLoading, setReviewActionLoading] = useState(false);
+
+  const [isWishlisted, setIsWishlisted] = useState(false);
+const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const [isImageZoomed, setIsImageZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({
@@ -83,6 +87,42 @@ function ProductDetails() {
 
     getProduct();
   }, [productId]);
+
+  useEffect(() => {
+  const fetchWishlistStatus = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setIsWishlisted(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/wishlist",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const wishlist = response.data.wishlist?.products || [];
+
+      const exists = wishlist.some(
+        (item) =>
+          String(item.productId?._id || item.productId) ===
+          String(productId),
+      );
+
+      setIsWishlisted(exists);
+    } catch (error) {
+      console.error("Fetch wishlist status error:", error);
+    }
+  };
+
+  fetchWishlistStatus();
+}, [productId]);
 
   const fetchReviews = async () => {
     try {
@@ -254,6 +294,54 @@ function ProductDetails() {
     });
   };
 
+  const toggleProductWishlist = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
+  if (wishlistLoading) return;
+
+  try {
+    setWishlistLoading(true);
+
+    if (isWishlisted) {
+      await axios.delete(
+        `http://localhost:5000/api/wishlist/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setIsWishlisted(false);
+    } else {
+      await axios.post(
+        "http://localhost:5000/api/wishlist",
+        { productId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setIsWishlisted(true);
+    }
+  } catch (error) {
+    console.error("Toggle product wishlist error:", error);
+
+    setError(
+      error.response?.data?.message || "Unable to update wishlist.",
+    );
+  } finally {
+    setWishlistLoading(false);
+  }
+};
+
   const addToCart = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -363,6 +451,24 @@ function ProductDetails() {
                 });
               }}
             >
+              <button
+  type="button"
+  className={`product-details-wishlist-button ${
+    isWishlisted ? "active" : ""
+  }`}
+  onClick={toggleProductWishlist}
+  disabled={wishlistLoading}
+  aria-label={
+    isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+  }
+  aria-pressed={isWishlisted}
+>
+  <Heart
+    size={23}
+    strokeWidth={1.8}
+    fill={isWishlisted ? "currentColor" : "none"}
+  />
+</button>
               {product.productImage?.length > 0 ? (
                 <img
                   src={`http://localhost:5000${product.productImage[selectedImage]}`}

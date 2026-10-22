@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Heart } from "lucide-react";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -13,6 +14,9 @@ function Wishlist() {
   const [error, setError] = useState("");
   const PRODUCTS_PER_PAGE = 12;
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedVariants, setSelectedVariants] = useState({});
+  const [cartLoading, setCartLoading] = useState(null);
+  const [cartMessage, setCartMessage] = useState("");
 
   // ==========================================
   // FETCH WISHLIST
@@ -75,6 +79,72 @@ function Wishlist() {
       );
     } catch (error) {
       console.error("Remove wishlist error:", error);
+    }
+  };
+
+  const addWishlistProductToCart = async (product) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const productId = product._id;
+    const variants = product.variants || [];
+
+    console.log("Product:", product);
+    console.log("Product variants:", variants);
+
+    // Get the selected variant or the first available variant
+    const selectedVariantId = selectedVariants[productId];
+
+    const selectedVariant =
+      variants.find(
+        (variant) => String(variant._id) === String(selectedVariantId),
+      ) || variants.find((variant) => Number(variant.stock) > 0);
+
+    // Check variant availability
+    if (!selectedVariant) {
+      setCartMessage(
+        "No available size found. Please select a size or open the product page.",
+      );
+      return;
+    }
+
+    try {
+      setCartLoading(productId);
+      setCartMessage("");
+
+      const response = await axios.post(
+        "http://localhost:5000/api/cart",
+        {
+          productId: productId,
+          variantId: selectedVariant._id,
+          quantity: 1,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      console.log("Cart response:", response.data);
+
+      setCartMessage(`${product.name} added to cart successfully.`);
+    } catch (error) {
+      console.error(
+        "Add to cart error:",
+        error.response?.data || error.message,
+      );
+
+      setCartMessage(
+        error.response?.data?.message ||
+          "Unable to add this product to your cart.",
+      );
+    } finally {
+      setCartLoading(null);
     }
   };
 
@@ -215,9 +285,11 @@ function Wishlist() {
 
                           removeFromWishlist(productId);
                         }}
-                      >
-                        ♥
-                      </button>
+                    
+>
+  <Heart size={20} strokeWidth={1.8} fill="currentColor" />
+</button>
+
                     </div>
 
                     {/* PRODUCT DETAILS */}
@@ -231,12 +303,46 @@ function Wishlist() {
 
                       <h2>{product.name}</h2>
 
+                      {/* SELECT SIZE */}
+
+                      {product.variants?.length > 0 && (
+                        <select
+                          className="wishlist-variant-select"
+                          value={selectedVariants[productId] || ""}
+                          onChange={(event) =>
+                            setSelectedVariants((previous) => ({
+                              ...previous,
+                              [productId]: event.target.value,
+                            }))
+                          }
+                          aria-label={`Select size for ${product.name}`}
+                        >
+                          <option value="">Select size</option>
+
+                          {product.variants.map((variant) => (
+                            <option
+                              key={variant._id}
+                              value={variant._id}
+                              disabled={variant.stock <= 0}
+                            >
+                              {variant.size}
+                              {variant.stock <= 0 ? " - Out of stock" : ""}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      {/* ADD TO CART */}
+
                       <button
                         type="button"
-                        className="wishlist-view-button"
-                        onClick={() => handleProductClick(productId)}
+                        className="wishlist-add-cart-button"
+                        onClick={() => addWishlistProductToCart(product)}
+                        disabled={cartLoading === productId}
                       >
-                        VIEW PRODUCT
+                        {cartLoading === productId
+                          ? "ADDING..."
+                          : "ADD TO CART"}
                       </button>
                     </div>
                   </article>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Heart } from "lucide-react";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -378,7 +379,13 @@ function Shop() {
                             : "Add to wishlist"
                         }
                       >
-                        {wishlistProducts.includes(product._id) ? "♥" : "♡"}
+                       <Heart
+  size={21}
+  strokeWidth={1.8}
+  fill={
+    wishlistProducts.includes(product._id) ? "currentColor" : "none"
+  }
+/>
                       </button>
                       {images.length > 0 ? (
                         <>

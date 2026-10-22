@@ -1,5 +1,6 @@
 const Wishlist = require("../models/wishlist");
 const Product = require("../models/product");
+const Variant = require("../models/variant");
 
 // ==========================================
 // ADD PRODUCT TO WISHLIST
@@ -85,13 +86,10 @@ const addToWishlistService = async (
 // GET USER WISHLIST
 // ==========================================
 
+
 const getWishlistService = async (userId) => {
+    const wishlist = await Wishlist.findOne({ userId });
 
-    const wishlist = await Wishlist.findOne({
-        userId
-    });
-
-    // NO WISHLIST
     if (!wishlist) {
         return {
             message: "Wishlist fetched successfully",
@@ -102,14 +100,10 @@ const getWishlistService = async (userId) => {
         };
     }
 
-    // ==========================================
-    // REMOVE DEACTIVATED PRODUCTS
-    // ==========================================
-
+    // Remove deactivated products
     const activeProducts = [];
 
     for (const item of wishlist.products) {
-
         const product = await Product.findOne({
             _id: item.productId,
             isActive: true
@@ -120,23 +114,12 @@ const getWishlistService = async (userId) => {
         }
     }
 
-    // CHECK WHETHER WISHLIST CHANGED
-    const wishlistChanged =
-        activeProducts.length !==
-        wishlist.products.length;
-
-    if (wishlistChanged) {
-
-        wishlist.products =
-            activeProducts;
-
+    if (activeProducts.length !== wishlist.products.length) {
+        wishlist.products = activeProducts;
         await wishlist.save();
     }
 
-    // ==========================================
-    // POPULATE PRODUCTS
-    // ==========================================
-
+    // Populate product and category details
     await wishlist.populate({
         path: "products.productId",
         select: "name productImage categoryId",
@@ -146,63 +129,69 @@ const getWishlistService = async (userId) => {
         }
     });
 
+    // Retrieve variants from the separate Variant collection
+    const productsWithVariants = await Promise.all(
+        wishlist.products.map(async (item) => {
+            const product = item.productId;
+
+            if (!product) {
+                return item;
+            }
+
+            const variants = await Variant.find({
+                productId: product._id
+            }).select("_id size price stock");
+
+            return {
+                ...item.toObject(),
+                productId: {
+                    ...product.toObject(),
+                    variants
+                }
+            };
+        })
+    );
+
     return {
         message: "Wishlist fetched successfully",
-        wishlist
+        wishlist: {
+            ...wishlist.toObject(),
+            products: productsWithVariants
+        }
     };
 };
+
 
 
 // ==========================================
 // REMOVE PRODUCT FROM WISHLIST
 // ==========================================
 
-const removeFromWishlistService = async (
-    userId,
-    productId
-) => {
 
-    const wishlist = await Wishlist.findOne({
-        userId
-    });
+const removeFromWishlistService = async (userId, productId) => {
+    const wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
-        const error = new Error(
-            "Wishlist not found"
-        );
-
+        const error = new Error("Wishlist not found");
         error.statusCode = 404;
-
         throw error;
     }
 
-    // FIND PRODUCT
-    const productIndex =
-        wishlist.products.findIndex(
-            (item) =>
-                item.productId.toString() ===
-                productId.toString()
-        );
-
-    if (productIndex === -1) {
-        const error = new Error(
-            "Product not found in wishlist"
-        );
-
-        error.statusCode = 404;
-
-        throw error;
-    }
-
-    // REMOVE PRODUCT
-    wishlist.products.splice(
-        productIndex,
-        1
+    const productIndex = wishlist.products.findIndex(
+        (item) => item.productId.toString() === productId.toString()
     );
 
+    if (productIndex === -1) {
+        const error = new Error("Product not found in wishlist");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // Remove product
+    wishlist.products.splice(productIndex, 1);
     await wishlist.save();
 
-    // POPULATE PRODUCTS
+    // Populate remaining products
     await wishlist.populate({
         path: "products.productId",
         select: "name productImage categoryId",
@@ -212,11 +201,38 @@ const removeFromWishlistService = async (
         }
     });
 
+    // Attach variants to each remaining product
+    const productsWithVariants = await Promise.all(
+        wishlist.products.map(async (item) => {
+            const product = item.productId;
+
+            if (!product) {
+                return item;
+            }
+
+            const variants = await Variant.find({
+                productId: product._id
+            }).select("_id size price stock");
+
+            return {
+                ...item.toObject(),
+                productId: {
+                    ...product.toObject(),
+                    variants
+                }
+            };
+        })
+    );
+
     return {
         message: "Product removed from wishlist",
-        wishlist
+        wishlist: {
+            ...wishlist.toObject(),
+            products: productsWithVariants
+        }
     };
 };
+
 
 
 module.exports = {
