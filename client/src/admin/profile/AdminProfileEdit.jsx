@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
 
@@ -24,14 +24,11 @@ function AdminProfileEdit() {
           return;
         }
 
-        const response = await axios.get(
-          "http://localhost:5000/api/admin/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await api.get("/admin/profile", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const admin = response.data.admin;
 
@@ -66,15 +63,15 @@ function AdminProfileEdit() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        "http://localhost:5000/api/admin/profile",
-        { name: name.trim() },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.patch(
+  "/admin/profile",
+  { name: name.trim() },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       const updatedAdmin = response.data.admin;
 

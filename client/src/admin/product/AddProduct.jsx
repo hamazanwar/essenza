@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Cropper from "react-easy-crop";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
@@ -193,14 +193,11 @@ function AddProduct() {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/admin/categories",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.get("/admin/categories", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setCategories(response.data.categories);
     } catch (error) {
@@ -292,35 +289,31 @@ function AddProduct() {
       });
 
       // CREATE PRODUCT
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/products",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.post("/admin/products", formData, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const productId = response.data.product._id;
 
       // CREATE PRODUCT VARIANTS
-      for (const variant of variants) {
-        await axios.post(
-          "http://localhost:5000/api/admin/variants",
-          {
-            productId,
-            size: variant.size,
-            price: Number(variant.price),
-            stock: Number(variant.stock),
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-      }
+for (const variant of variants) {
+  await api.post(
+    "/admin/variants",
+    {
+      productId,
+      size: variant.size,
+      price: Number(variant.price),
+      stock: Number(variant.stock),
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+}
 
       setSuccess("Product added successfully.");
 

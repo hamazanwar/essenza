@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import AdminNavbar from "../bars/AdminNavbar";
 
-const OFFER_API = "http://localhost:5000/api/admin/offers";
-const PRODUCT_API = "http://localhost:5000/api/admin/products";
-const CATEGORY_API = "http://localhost:5000/api/admin/categories";
+
 
 const initialForm = {
   name: "",
@@ -46,11 +44,11 @@ function OfferManagement() {
       setLoading(true);
       setError("");
 
-      const response = await axios.get(OFFER_API, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
+      const response = await api.get("/admin/offers", {
+  headers: {
+    Authorization: `Bearer ${getToken()}`,
+  },
+});
 
       setOffers(response.data.offers || []);
     } catch (err) {
@@ -69,9 +67,9 @@ function OfferManagement() {
       };
 
       const [productResponse, categoryResponse] = await Promise.all([
-        axios.get(PRODUCT_API, tokenConfig),
-        axios.get(CATEGORY_API, tokenConfig),
-      ]);
+  api.get("/admin/products", tokenConfig),
+  api.get("/admin/categories", tokenConfig),
+]);
 
       const productData = productResponse.data.products || productResponse.data;
 
@@ -170,13 +168,13 @@ function OfferManagement() {
         },
       };
 
-      if (editingId) {
-        await axios.patch(`${OFFER_API}/${editingId}`, payload, tokenConfig);
-        setMessage("Offer updated successfully.");
-      } else {
-        await axios.post(OFFER_API, payload, tokenConfig);
-        setMessage("Offer created successfully.");
-      }
+   if (editingId) {
+  await api.patch(`/admin/offers/${editingId}`, payload, tokenConfig);
+  setMessage("Offer updated successfully.");
+} else {
+  await api.post("/admin/offers", payload, tokenConfig);
+  setMessage("Offer created successfully.");
+}
 
       resetForm();
       await fetchOffers();
@@ -235,23 +233,23 @@ function OfferManagement() {
       };
 
       if (type === "delete") {
-        await axios.delete(`${OFFER_API}/${offer._id}`, tokenConfig);
-        setMessage("Offer deleted successfully.");
+  await api.delete(`/admin/offers/${offer._id}`, tokenConfig);
+  setMessage("Offer deleted successfully.");
 
-        if (editingId === offer._id) resetForm();
-      } else {
-        await axios.patch(
-          `${OFFER_API}/${offer._id}`,
-          { isActive: !offer.isActive },
-          tokenConfig,
-        );
+  if (editingId === offer._id) resetForm();
+} else {
+  await api.patch(
+    `/admin/offers/${offer._id}`,
+    { isActive: !offer.isActive },
+    tokenConfig,
+  );
 
-        setMessage(
-          `Offer ${offer.isActive ? "deactivated" : "activated"} successfully.`,
-        );
-      }
+  setMessage(
+    `Offer ${offer.isActive ? "deactivated" : "activated"} successfully.`,
+  );
+}
 
-      await fetchOffers();
+await fetchOffers();
     } catch (err) {
       setError(getErrorMessage(err));
     }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
@@ -45,14 +45,11 @@ function ProductManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/admin/products",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.get("/admin/products", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setProducts(response.data.products);
     } catch (error) {
@@ -71,14 +68,11 @@ function ProductManagement() {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/admin/categories",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.get("/admin/categories", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setCategories(response.data.categories);
     } catch (error) {
@@ -135,49 +129,49 @@ function ProductManagement() {
         formData.append("productImages", image);
       });
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/admin/products/${productId}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.patch(
+  `/admin/products/${productId}`,
+  formData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       // SAVE PRODUCT VARIANTS
       for (const variant of editVariants) {
         if (variant.id) {
           // UPDATE EXISTING VARIANT
-          await axios.patch(
-            `http://localhost:5000/api/admin/variants/${variant.id}`,
-            {
-              size: variant.size,
-              price: Number(variant.price),
-              stock: Number(variant.stock),
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
+          await api.patch(
+  `/admin/variants/${variant.id}`,
+  {
+    size: variant.size,
+    price: Number(variant.price),
+    stock: Number(variant.stock),
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
         } else {
           // ADD NEW VARIANT
-          await axios.post(
-            "http://localhost:5000/api/admin/variants",
-            {
-              productId,
-              size: variant.size,
-              price: Number(variant.price),
-              stock: Number(variant.stock),
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
+        await api.post(
+  "/admin/variants",
+  {
+    productId,
+    size: variant.size,
+    price: Number(variant.price),
+    stock: Number(variant.stock),
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
         }
       }
 
@@ -217,15 +211,15 @@ function ProductManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/admin/products/${productId}/status`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.patch(
+  `/admin/products/${productId}/status`,
+  {},
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setProducts((previousProducts) =>
         previousProducts.map((product) =>
@@ -251,14 +245,11 @@ function ProductManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.delete(
-        `http://localhost:5000/api/admin/products/${productId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.delete(`/admin/products/${productId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setProducts((previousProducts) =>
         previousProducts.filter((product) => product._id !== productId),
@@ -478,14 +469,11 @@ function ProductManagement() {
                                     const token =
                                       localStorage.getItem("adminToken");
 
-                                    await axios.delete(
-                                      `http://localhost:5000/api/admin/variants/${variant.id}`,
-                                      {
-                                        headers: {
-                                          Authorization: `Bearer ${token}`,
-                                        },
-                                      },
-                                    );
+                                    await api.delete(`/admin/variants/${variant.id}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
                                   }
 
                                   // Remove from React state
@@ -520,7 +508,7 @@ function ProductManagement() {
                               className="edit-product-image-item"
                             >
                               <img
-                                src={`http://localhost:5000${image}`}
+                             src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
                                 alt={`${editProductName} ${index + 1}`}
                               />
 
@@ -592,7 +580,7 @@ function ProductManagement() {
                         {product.productImage.map((image, index) => (
                           <img
                             key={index}
-                            src={`http://localhost:5000${image}`}
+                           src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
                             alt={`${product.name} ${index + 1}`}
                           />
                         ))}
@@ -669,14 +657,14 @@ function ProductManagement() {
                             const token = localStorage.getItem("adminToken");
 
                             try {
-                              const response = await axios.get(
-                                `http://localhost:5000/api/admin/variants/product/${product._id}`,
-                                {
-                                  headers: {
-                                    Authorization: `Bearer ${token}`,
-                                  },
-                                },
-                              );
+                             const response = await api.get(
+  `/admin/variants/product/${product._id}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
                               setEditVariants(
                                 response.data.variants.map((variant) => ({

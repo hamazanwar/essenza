@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
-import axios from "axios";
+import api from "../../services/api";
 
 function CustomerDetails() {
   const { id } = useParams();
@@ -32,14 +32,11 @@ function CustomerDetails() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/customers/${id}/wallet`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.get(`/admin/customers/${id}/wallet`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setWallet(response.data.wallet);
       setTransactions(response.data.transactions || []);
@@ -63,18 +60,18 @@ function CustomerDetails() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/admin/customers/${id}/wallet/withdrawals/${requestId}`,
-        {
-          action,
-          adminNote: withdrawalNote.trim(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.patch(
+  `/admin/customers/${id}/wallet/withdrawals/${requestId}`,
+  {
+    action,
+    adminNote: withdrawalNote.trim(),
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setReviewMessage(
         response.data.message || "Withdrawal request reviewed successfully.",
@@ -107,14 +104,11 @@ function CustomerDetails() {
       try {
         const token = localStorage.getItem("adminToken");
 
-        const response = await axios.get(
-          `http://localhost:5000/api/admin/customers/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const response = await api.get(`/admin/customers/${id}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const data = response.data;
 
@@ -200,7 +194,7 @@ function CustomerDetails() {
                   src={
                     customer.profileImage.startsWith("http")
                       ? customer.profileImage
-                      : `http://localhost:5000${customer.profileImage}`
+                      : `${api.defaults.baseURL.replace(/\/api$/, "")}${customer.profileImage}`
                   }
                   alt=""
                 />

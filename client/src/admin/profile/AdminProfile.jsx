@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
-import axios from "axios";
+import api from "../../services/api";
 
 function AdminProfile() {
   const navigate = useNavigate();
@@ -19,14 +19,11 @@ function AdminProfile() {
       try {
         const token = localStorage.getItem("adminToken");
 
-        const response = await axios.get(
-          "http://localhost:5000/api/admin/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+       const response = await api.get("/admin/profile", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const data = response.data;
 
@@ -65,15 +62,11 @@ function AdminProfile() {
 
       formData.append("profileImage", file);
 
-      const response = await axios.patch(
-        "http://localhost:5000/api/admin/profile/image",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.patch("/admin/profile/image", formData, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const data = response.data;
 
@@ -119,10 +112,10 @@ function AdminProfile() {
                 {admin.profileImage ? (
                   <img
                     src={
-                      admin.profileImage.startsWith("http")
-                        ? admin.profileImage
-                        : `http://localhost:5000${admin.profileImage}`
-                    }
+  admin.profileImage.startsWith("http")
+    ? admin.profileImage
+    : `${api.defaults.baseURL.replace(/\/api$/, "")}${admin.profileImage}`
+}
                     alt="Admin Profile"
                   />
                 ) : (

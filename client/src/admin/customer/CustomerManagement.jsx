@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminFooter from "../bars/AdminFooter";
 import AdminNavbar from "../bars/AdminNavbar";
-import axios from "axios";
+import api from "../../services/api";
 
 function CustomerManagement() {
   const navigate = useNavigate();
@@ -17,15 +17,15 @@ function CustomerManagement() {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/admin/customers/${customerId}/status`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.patch(
+  `/admin/customers/${customerId}/status`,
+  {},
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       const data = response.data;
 
@@ -61,14 +61,11 @@ function CustomerManagement() {
       try {
         const token = localStorage.getItem("adminToken");
 
-        const response = await axios.get(
-          "http://localhost:5000/api/admin/customers",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const response = await api.get("/admin/customers", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const data = response.data;
 

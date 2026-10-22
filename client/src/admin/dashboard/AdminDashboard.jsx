@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
@@ -21,14 +21,11 @@ function AdminDashboard() {
 
         const token = localStorage.getItem("adminToken");
 
-        const response = await axios.get(
-          "http://localhost:5000/api/admin/orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const response = await api.get("/admin/orders", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         setOrders(response.data.orders || []);
       } catch (err) {

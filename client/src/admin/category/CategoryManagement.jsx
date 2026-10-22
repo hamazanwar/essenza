@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
 
@@ -18,14 +19,11 @@ function CategoryManagement() {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/admin/categories",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await api.get("/admin/categories", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       setCategories(response.data.categories);
     } catch (error) {
@@ -60,8 +58,8 @@ function CategoryManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/categories",
+      const response = await api.post(
+        "/admin/categories",
         {
           name: categoryName,
         },
@@ -78,7 +76,6 @@ function CategoryManagement() {
       ]);
 
       setCategoryName("");
-
       setSuccess("Category added successfully.");
     } catch (error) {
       console.error("Add category error:", error);
@@ -105,8 +102,8 @@ function CategoryManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/admin/categories/${categoryId}`,
+      const response = await api.patch(
+        `/admin/categories/${categoryId}`,
         {
           name: editCategoryName,
         },
@@ -125,7 +122,6 @@ function CategoryManagement() {
 
       setEditCategoryId(null);
       setEditCategoryName("");
-
       setSuccess("Category updated successfully.");
     } catch (error) {
       console.error("Edit category error:", error);
@@ -144,8 +140,8 @@ function CategoryManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/admin/categories/${categoryId}/status`,
+      const response = await api.patch(
+        `/admin/categories/${categoryId}/status`,
         {},
         {
           headers: {
@@ -178,8 +174,8 @@ function CategoryManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.delete(
-        `http://localhost:5000/api/admin/categories/${categoryId}`,
+      const response = await api.delete(
+        `/admin/categories/${categoryId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -192,7 +188,6 @@ function CategoryManagement() {
       );
 
       setDeleteCategoryId(null);
-
       setSuccess(response.data.message);
     } catch (error) {
       console.error("Delete category error:", error);
@@ -249,7 +244,6 @@ function CategoryManagement() {
                   ) : (
                     <>
                       <h3>{category.name}</h3>
-
                       <p>{category.isActive ? "Active" : "Inactive"}</p>
                     </>
                   )}
@@ -291,7 +285,9 @@ function CategoryManagement() {
 
                       <button
                         type="button"
-                        onClick={() => handleToggleCategoryStatus(category._id)}
+                        onClick={() =>
+                          handleToggleCategoryStatus(category._id)
+                        }
                       >
                         {category.isActive ? "DEACTIVATE" : "ACTIVATE"}
                       </button>
@@ -319,7 +315,10 @@ function CategoryManagement() {
             <p>Are you sure you want to delete this category?</p>
 
             <div className="delete-modal-actions">
-              <button type="button" onClick={() => setDeleteCategoryId(null)}>
+              <button
+                type="button"
+                onClick={() => setDeleteCategoryId(null)}
+              >
                 CANCEL
               </button>
 

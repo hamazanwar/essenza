@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
@@ -20,14 +20,11 @@ function AdminReviews() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/reviews/admin",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.get("/reviews/admin", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setReviews(response.data.reviews || []);
     } catch (err) {
@@ -69,15 +66,15 @@ function AdminReviews() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/reviews/admin/${review._id}/visibility`,
-        { isVisible: !review.isVisible },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.patch(
+  `/reviews/admin/${review._id}/visibility`,
+  { isVisible: !review.isVisible },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setReviews((previous) =>
         previous.map((item) =>
@@ -103,15 +100,11 @@ function AdminReviews() {
       setError("");
 
       const token = localStorage.getItem("adminToken");
-
-      await axios.delete(
-        `http://localhost:5000/api/reviews/admin/${deleteTarget._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+await api.delete(`/reviews/admin/${deleteTarget._id}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setReviews((previous) =>
         previous.filter((review) => review._id !== deleteTarget._id),
@@ -182,7 +175,7 @@ function AdminReviews() {
                   <div className="admin-review-product">
                     {review.productId?.productImage?.[0] ? (
                       <img
-                        src={`http://localhost:5000${review.productId.productImage[0]}`}
+                        src={`${api.defaults.baseURL.replace(/\/api$/, "")}${review.productId.productImage[0]}`}
                         alt={review.productId.name || "Product"}
                       />
                     ) : (

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+
 import AdminNavbar from "../bars/AdminNavbar";
 
-const API_URL = "http://localhost:5000/api/admin/coupons";
+import api from "../../services/api";
 
 const initialForm = {
   code: "",
@@ -49,16 +49,16 @@ function CouponManagement() {
       setLoading(true);
       setError("");
 
-      const response = await axios.get(API_URL, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-        params: {
-          page,
-          limit: 10,
-          search: search.trim(),
-        },
-      });
+     const response = await api.get("/admin/coupons", {
+  headers: {
+    Authorization: `Bearer ${getToken()}`,
+  },
+  params: {
+    page,
+    limit: 10,
+    search: search.trim(),
+  },
+});
 
       setCoupons(response.data.coupons || []);
       setPagination(
@@ -143,13 +143,13 @@ function CouponManagement() {
         },
       };
 
-      if (editingId) {
-        await axios.patch(`${API_URL}/${editingId}`, payload, config);
-        setMessage("Coupon updated successfully.");
-      } else {
-        await axios.post(API_URL, payload, config);
-        setMessage("Coupon created successfully.");
-      }
+     if (editingId) {
+  await api.patch(`/admin/coupons/${editingId}`, payload, config);
+  setMessage("Coupon updated successfully.");
+} else {
+  await api.post("/admin/coupons", payload, config);
+  setMessage("Coupon created successfully.");
+}
 
       resetForm();
       setPage(1);
@@ -205,48 +205,54 @@ function CouponManagement() {
     });
   };
 
-  const handleConfirmAction = async () => {
-    if (!confirmAction) return;
+  
+const handleConfirmAction = async () => {
+  if (!confirmAction) return;
 
-    const { type, coupon } = confirmAction;
+  const { type, coupon } = confirmAction;
 
-    setConfirmAction(null);
-    setError("");
-    setMessage("");
+  setConfirmAction(null);
+  setError("");
+  setMessage("");
 
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      };
+  try {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    };
 
-      if (type === "delete") {
-        await axios.delete(`${API_URL}/${coupon._id}`, config);
+    if (type === "delete") {
+      await api.delete(`/admin/coupons/${coupon._id}`, config);
 
-        setMessage("Coupon deleted successfully.");
+      setMessage("Coupon deleted successfully.");
 
-        if (coupons.length === 1 && page > 1) {
-          setPage((previous) => previous - 1);
-        } else {
-          await fetchCoupons();
-        }
-
-        if (editingId === coupon._id) {
-          resetForm();
-        }
-      } else if (type === "status") {
-        const action = coupon.isActive ? "deactivate" : "activate";
-
-        await axios.patch(`${API_URL}/${coupon._id}/status`, {}, config);
-
-        setMessage(`Coupon ${action}d successfully.`);
+      if (coupons.length === 1 && page > 1) {
+        setPage((previous) => previous - 1);
+      } else {
         await fetchCoupons();
       }
-    } catch (err) {
-      setError(getErrorMessage(err));
+
+      if (editingId === coupon._id) {
+        resetForm();
+      }
+    } else if (type === "status") {
+      const action = coupon.isActive ? "deactivate" : "activate";
+
+      await api.patch(
+        `/admin/coupons/${coupon._id}/status`,
+        {},
+        config
+      );
+
+      setMessage(`Coupon ${action}d successfully.`);
+      await fetchCoupons();
     }
-  };
+  } catch (err) {
+    setError(getErrorMessage(err));
+  }
+};
+
 
   const formatDate = (date) =>
     date

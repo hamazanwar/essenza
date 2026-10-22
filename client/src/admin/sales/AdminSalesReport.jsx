@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 
 import AdminNavbar from "../bars/AdminNavbar";
 import AdminFooter from "../bars/AdminFooter";
@@ -18,18 +18,15 @@ function AdminSalesReport() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/admin/sales-report",
-        {
-          params: {
-            ...(startDate && { from: startDate }),
-            ...(endDate && { to: endDate }),
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.get("/admin/sales-report", {
+  params: {
+    ...(startDate && { from: startDate }),
+    ...(endDate && { to: endDate }),
+  },
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setReport(response.data.report);
     } catch (err) {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminFooter from "../bars/AdminFooter";
 import AdminNavbar from "../bars/AdminNavbar";
-import axios from "axios";
+import api from "../../services/api";
 
 function AdminOrderManagement() {
   const [orders, setOrders] = useState([]);
@@ -19,14 +19,11 @@ function AdminOrderManagement() {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/admin/orders",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.get("/admin/orders", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setOrders(response.data.orders);
     } catch (error) {
@@ -104,21 +101,21 @@ function AdminOrderManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/admin/orders/${statusConfirmation.orderId}/status`,
-        {
-          orderStatus: statusConfirmation.newStatus,
-          deliveryDate:
-            statusConfirmation.newStatus === "DELIVERED"
-              ? new Date().toISOString()
-              : undefined,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.patch(
+  `/admin/orders/${statusConfirmation.orderId}/status`,
+  {
+    orderStatus: statusConfirmation.newStatus,
+    deliveryDate:
+      statusConfirmation.newStatus === "DELIVERED"
+        ? new Date().toISOString()
+        : undefined,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       const updatedOrder = response.data.order;
 
@@ -288,7 +285,7 @@ function AdminOrderManagement() {
                             >
                               {item.productImage && (
                                 <img
-                                  src={`http://localhost:5000${item.productImage}`}
+                                  src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
                                   alt={item.productName}
                                 />
                               )}

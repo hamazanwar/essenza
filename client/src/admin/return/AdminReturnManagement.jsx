@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import AdminFooter from "../bars/AdminFooter";
 import AdminNavbar from "../bars/AdminNavbar";
 
@@ -24,14 +24,11 @@ function AdminReturnManagement() {
         return;
       }
 
-      const response = await axios.get(
-        "http://localhost:5000/api/admin/returns",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.get("/admin/returns", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setReturnRequests(response.data.returnRequests || []);
     } catch (requestError) {
@@ -57,19 +54,19 @@ function AdminReturnManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      await axios.patch(
-        `http://localhost:5000/api/admin/returns/${request._id}`,
-        {
-          itemId: item._id,
-          decision,
-          adminNote: adminNote.trim(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      await api.patch(
+  `/admin/returns/${request._id}`,
+  {
+    itemId: item._id,
+    decision,
+    adminNote: adminNote.trim(),
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setSelectedRequest(null);
       setAdminNote("");
@@ -94,15 +91,15 @@ function AdminReturnManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      await axios.patch(
-        `http://localhost:5000/api/admin/returns/${request._id}/complete`,
-        { itemId: item._id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     await api.patch(
+  `/admin/returns/${request._id}/complete`,
+  { itemId: item._id },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       await fetchReturnRequests();
     } catch (requestError) {
@@ -125,15 +122,15 @@ const completeExchange = async (request, item) => {
 
     const token = localStorage.getItem("adminToken");
 
-    await axios.patch(
-      `http://localhost:5000/api/admin/returns/${request._id}/complete-exchange`,
-      { itemId: item._id },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+  await api.patch(
+  `/admin/returns/${request._id}/complete-exchange`,
+  { itemId: item._id },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
     await fetchReturnRequests();
   } catch (requestError) {

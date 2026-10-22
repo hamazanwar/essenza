@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -18,25 +19,19 @@ function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/auth/login",
-        {
-          email,
-          password,
-        },
-      );
+      const response = await api.post("/admin/auth/login", {
+        email,
+        password,
+      });
 
       const data = response.data;
 
       console.log("Admin login successful:", data);
 
       localStorage.setItem("adminToken", data.token);
-
       localStorage.setItem("admin", JSON.stringify(data.admin));
 
       navigate("/admin/dashboard", { replace: true });
-
-      // Dashboard navigation will be added next
     } catch (error) {
       console.error("Admin login error:", error);
 
@@ -53,11 +48,11 @@ function AdminLogin() {
 
         <h2 className="admin-title">Admin Login</h2>
 
-        <p className="admin-subtitle">Sign in to manage your store</p>
+        <p className="admin-subtitle">
+          Sign in to manage your store
+        </p>
 
         <form className="admin-login-form" onSubmit={handleSubmit}>
-          {/* EMAIL */}
-
           <div className="admin-input-group">
             <label htmlFor="admin-email">Email</label>
 
@@ -69,8 +64,6 @@ function AdminLogin() {
               onChange={(event) => setEmail(event.target.value)}
             />
           </div>
-
-          {/* PASSWORD */}
 
           <div className="admin-input-group">
             <label htmlFor="admin-password">Password</label>
@@ -84,11 +77,7 @@ function AdminLogin() {
             />
           </div>
 
-          {/* ERROR */}
-
           {error && <p className="admin-error">{error}</p>}
-
-          {/* LOGIN BUTTON */}
 
           <button
             type="submit"
