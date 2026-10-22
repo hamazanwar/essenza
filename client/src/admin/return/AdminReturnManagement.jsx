@@ -117,6 +117,38 @@ function AdminReturnManagement() {
     }
   };
 
+  
+const completeExchange = async (request, item) => {
+  try {
+    setUpdating(true);
+    setError("");
+
+    const token = localStorage.getItem("adminToken");
+
+    await axios.patch(
+      `http://localhost:5000/api/admin/returns/${request._id}/complete-exchange`,
+      { itemId: item._id },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    await fetchReturnRequests();
+  } catch (requestError) {
+    console.error("Complete exchange error:", requestError);
+
+    setError(
+      requestError.response?.data?.message ||
+        "Unable to complete this exchange.",
+    );
+  } finally {
+    setUpdating(false);
+  }
+};
+
+
   const formatDate = (date) => {
     if (!date) return "—";
 
@@ -235,32 +267,53 @@ function AdminReturnManagement() {
                         </span>
                       </td>
                       <td>{formatDate(request.createdAt)}</td>
-                      <td>
-                        {item.status === "PENDING" ? (
-                          <button
-                            type="button"
-                            className="admin-return-action-button"
-                            onClick={() => {
-                              setSelectedRequest({ request, item });
-                              setAdminNote("");
-                            }}
-                          >
-                            REVIEW
-                          </button>
-                        ) : request.requestType === "RETURN" &&
-                          item.status === "APPROVED" ? (
-                          <button
-                            type="button"
-                            className="admin-return-action-button"
-                            disabled={updating}
-                            onClick={() => completeReturn(request, item)}
-                          >
-                            {updating ? "PROCESSING..." : "COMPLETE REFUND"}
-                          </button>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
+                      
+<td>
+  {item.status === "PENDING" ? (
+    <button
+      type="button"
+      className="admin-return-action-button"
+      disabled={updating}
+      onClick={() => {
+        setSelectedRequest({ request, item });
+        setAdminNote("");
+      }}
+    >
+      REVIEW
+    </button>
+  ) : request.requestType === "RETURN" &&
+    item.status === "APPROVED" ? (
+    <button
+      type="button"
+      className="admin-return-action-button"
+      disabled={updating}
+      onClick={() => completeReturn(request, item)}
+    >
+      {updating ? "PROCESSING..." : "COMPLETE REFUND"}
+    </button>
+  ) : request.requestType === "EXCHANGE" &&
+    item.status === "APPROVED" ? (
+    <button
+      type="button"
+      className="admin-return-action-button"
+      disabled={updating}
+      onClick={() => {
+        const confirmed = window.confirm(
+          "Complete this exchange? The customer's wallet may be charged if the replacement costs more."
+        );
+
+        if (confirmed) {
+          completeExchange(request, item);
+        }
+      }}
+    >
+      {updating ? "PROCESSING..." : "COMPLETE EXCHANGE"}
+    </button>
+  ) : (
+    "—"
+  )}
+</td>
+
                     </tr>
                   )),
                 )}

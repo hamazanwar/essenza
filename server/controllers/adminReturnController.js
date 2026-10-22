@@ -1,9 +1,12 @@
-
 const {
   getAllReturnRequestsService,
   reviewReturnRequestService,
-  completeReturnAndRefundService
+  completeReturnAndRefundService,
 } = require("../services/adminReturnService");
+
+const {
+  completeExchangeService,
+} = require("../services/adminExchangeService");
 
 // ==========================================
 // GET ALL RETURN REQUESTS - ADMIN
@@ -89,8 +92,45 @@ const completeReturnAndRefund = async (req, res) => {
   }
 };
 
+
+const completeExchange = async (req, res) => {
+  try {
+    const { returnRequestId } = req.params;
+    const { itemId } = req.body;
+
+    const adminId = req.user?.userId || null;
+
+    const result = await completeExchangeService({
+      returnRequestId,
+      itemId,
+      adminId,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message:
+        result.priceDifference > 0
+          ? `Exchange completed. ₹${result.priceDifference.toFixed(2)} deducted from the customer's wallet.`
+          : "Exchange completed. No additional payment was required.",
+      priceDifference: result.priceDifference,
+      returnRequest: result.request,
+    });
+  } catch (error) {
+    console.error("Complete exchange error:", error);
+
+    return res.status(error.statusCode || 400).json({
+      success: false,
+      message: error.message || "Failed to complete exchange.",
+    });
+  }
+};
+
+
+
 module.exports = {
   getAllReturnRequests,
   reviewReturnRequest,
-  completeReturnAndRefund
+  completeReturnAndRefund,
+  completeExchange,
 };
+

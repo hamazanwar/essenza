@@ -5,6 +5,7 @@ const {
   getAllReturnRequests,
   reviewReturnRequest,
   completeReturnAndRefund,
+  completeExchange,
 } = require("../controllers/adminReturnController");
 
 const protectAdmin = require("../middleware/adminAuthMiddleware");
@@ -20,6 +21,13 @@ router.patch(
   "/:returnRequestId/complete",
   protectAdmin,
   completeReturnAndRefund
+);
+
+// Complete an approved exchange
+router.patch(
+  "/:returnRequestId/complete-exchange",
+  protectAdmin,
+  completeExchange
 );
 
 module.exports = router;
