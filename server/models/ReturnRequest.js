@@ -1,21 +1,8 @@
 
 const mongoose = require("mongoose");
 
-const returnRequestSchema = new mongoose.Schema(
+const returnItemSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true,
-    },
-
-    orderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Order",
-      required: true,
-    },
-
     productId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
@@ -46,6 +33,13 @@ const returnRequestSchema = new mongoose.Schema(
       min: 1,
     },
 
+    // Amount actually paid per unit, excluding the original price.
+    unitPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
     reason: {
       type: String,
       required: true,
@@ -64,6 +58,13 @@ const returnRequestSchema = new mongoose.Schema(
       default: "",
     },
 
+    // Exchanges can optionally request a different variant.
+    exchangeVariantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Variant",
+      default: null,
+    },
+
     status: {
       type: String,
       enum: [
@@ -73,7 +74,6 @@ const returnRequestSchema = new mongoose.Schema(
         "COMPLETED",
       ],
       default: "PENDING",
-      index: true,
     },
 
     adminNote: {
@@ -81,6 +81,12 @@ const returnRequestSchema = new mongoose.Schema(
       trim: true,
       maxlength: 1000,
       default: "",
+    },
+
+    refundAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
 
     reviewedAt: {
@@ -93,16 +99,69 @@ const returnRequestSchema = new mongoose.Schema(
       default: null,
     },
   },
+  { _id: true }
+);
+
+const returnRequestSchema = new mongoose.Schema(
   {
-    timestamps: true,
-  }
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      required: true,
+      index: true,
+    },
+
+    requestType: {
+      type: String,
+      enum: ["RETURN", "EXCHANGE"],
+      required: true,
+      default: "RETURN",
+    },
+
+    // ONE_PRODUCT or ALL_PRODUCTS indicates the customer's selection.
+    selectionType: {
+      type: String,
+      enum: ["ONE_PRODUCT", "ALL_PRODUCTS"],
+      required: true,
+      default: "ONE_PRODUCT",
+    },
+
+    items: {
+      type: [returnItemSchema],
+      required: true,
+      validate: {
+        validator: (items) => items.length > 0,
+        message: "At least one item is required.",
+      },
+    },
+
+    status: {
+      type: String,
+      enum: [
+        "PENDING",
+        "PARTIALLY_APPROVED",
+        "APPROVED",
+        "REJECTED",
+        "COMPLETED",
+      ],
+      default: "PENDING",
+      index: true,
+    },
+  },
+  { timestamps: true }
 );
 
 returnRequestSchema.index({
   userId: 1,
   orderId: 1,
-  productId: 1,
-  variantId: 1,
+  createdAt: -1,
 });
 
 module.exports = mongoose.model(

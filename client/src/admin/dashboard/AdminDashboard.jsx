@@ -250,8 +250,10 @@ function AdminDashboard() {
   ];
 
   return (
+    <>
+    <AdminNavbar />
     <div className="admin-dashboard">
-      <AdminNavbar />
+      
 
       <main className="admin-dashboard-content">
         <header className="dashboard-welcome">
@@ -578,8 +580,10 @@ function AdminDashboard() {
         </p>
       </main>
 
-      <AdminFooter />
+      
     </div>
+    <AdminFooter />
+    </>
   );
 }
 

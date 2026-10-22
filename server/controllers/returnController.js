@@ -14,21 +14,17 @@ const createReturnRequest = async (req, res) => {
 
     const {
       orderId,
-      productId,
-      variantId,
-      quantity,
-      reason,
-      description,
+      requestType,
+      selectionType,
+      items,
     } = req.body;
 
     const returnRequest = await createReturnRequestService({
       userId,
       orderId,
-      productId,
-      variantId,
-      quantity,
-      reason,
-      description,
+      requestType,
+      selectionType,
+      items,
     });
 
     return res.status(201).json({

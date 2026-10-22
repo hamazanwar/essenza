@@ -12,12 +12,103 @@ function MyOrders() {
     navigate(`/my-orders/${orderId}`);
   };
 
+  const handleOpenReturnModal = (order, item) => {
+  setSelectedReturnOrder(order);
+  setSelectedReturnItem(item);
+  setReturnType("RETURN");
+  setReturnQuantity(1);
+  setReturnReason("");
+  setReturnDescription("");
+  setReturnMessage("");
+  setReturnError("");
+  setExchangeVariants([]);
+setExchangeVariantId("");
+  setReturnModalOpen(true);
+};
+
+
+const handleReturnTypeChange = async (type) => {
+  setReturnType(type);
+  setExchangeVariants([]);
+  setExchangeVariantId("");
+  setReturnError("");
+
+  if (type !== "EXCHANGE" || !selectedReturnItem) {
+    return;
+  }
+
+  const productId = getProductId(selectedReturnItem);
+
+  if (!productId) {
+    setReturnError("Unable to identify this product.");
+    return;
+  }
+
+  try {
+    setExchangeVariantsLoading(true);
+
+    const response = await axios.get(
+      `http://localhost:5000/api/products/${productId}`,
+    );
+
+    const variants = response.data.product?.variants || [];
+
+    console.table(
+  variants.map((variant) => ({
+    id: variant._id,
+    size: variant.size,
+    price: variant.price,
+    stock: variant.stock,
+  })),
+);
+
+    const currentVariantId =
+      typeof selectedReturnItem.variantId === "object"
+        ? selectedReturnItem.variantId?._id
+        : selectedReturnItem.variantId;
+
+    const availableVariants = variants.filter(
+  (variant) => Number(variant.stock) > 0,
+);
+
+    setExchangeVariants(availableVariants);
+
+    if (availableVariants.length === 0) {
+      setReturnError("No alternative sizes are currently available.");
+    }
+  } catch (error) {
+    console.error("Fetch exchange variants error:", error);
+
+    setReturnError(
+      error.response?.data?.message ||
+        "Unable to load replacement sizes.",
+    );
+  } finally {
+    setExchangeVariantsLoading(false);
+  }
+};
+
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancelOrderId, setCancelOrderId] = useState(null);
   const [cancelling, setCancelling] = useState(false);
   const [myReviews, setMyReviews] = useState([]);
+  const [myReturnRequests, setMyReturnRequests] = useState([]);
+const [returnLoading, setReturnLoading] = useState(false);
+const [returnModalOpen, setReturnModalOpen] = useState(false);
+const [selectedReturnOrder, setSelectedReturnOrder] = useState(null);
+const [selectedReturnItem, setSelectedReturnItem] = useState(null);
+const [exchangeVariants, setExchangeVariants] = useState([]);
+const [exchangeVariantId, setExchangeVariantId] = useState("");
+const [exchangeVariantsLoading, setExchangeVariantsLoading] = useState(false);
+const [returnType, setReturnType] = useState("RETURN");
+const [returnQuantity, setReturnQuantity] = useState(1);
+const [returnReason, setReturnReason] = useState("");
+const [returnDescription, setReturnDescription] = useState("");
+const [returnMessage, setReturnMessage] = useState("");
+const [returnError, setReturnError] = useState("");
   const [reviewTarget, setReviewTarget] = useState(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -55,6 +146,20 @@ function MyOrders() {
           );
 
           setMyReviews(reviewsResponse.data.reviews || []);
+          try {
+  const returnResponse = await axios.get(
+    "http://localhost:5000/api/returns/my",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  setMyReturnRequests(returnResponse.data.returnRequests || []);
+} catch (returnError) {
+  console.error("Fetch return requests error:", returnError);
+}
         } catch (reviewError) {
           console.error("Fetch reviews error:", reviewError);
         }
@@ -201,6 +306,74 @@ function MyOrders() {
     }
   };
 
+  const handleSubmitReturn = async (event) => {
+  event.preventDefault();
+
+  if (!selectedReturnOrder || !selectedReturnItem) return;
+
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    setReturnLoading(true);
+    setReturnError("");
+    setReturnMessage("");
+
+    const response = await axios.post(
+      "http://localhost:5000/api/returns",
+      {
+  orderId: selectedReturnOrder._id,
+  requestType: returnType,
+  selectionType: "ONE_PRODUCT",
+  items: [
+  {
+    productId: getProductId(selectedReturnItem),
+    variantId:
+      typeof selectedReturnItem.variantId === "object"
+        ? selectedReturnItem.variantId?._id
+        : selectedReturnItem.variantId,
+    quantity: Number(returnQuantity),
+    reason: returnReason,
+    description: returnDescription.trim(),
+    ...(returnType === "EXCHANGE" && {
+      exchangeVariantId,
+    }),
+  },
+],
+},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    setMyReturnRequests((previous) => [
+      ...(response.data.returnRequest ? [response.data.returnRequest] : []),
+      ...previous,
+    ]);
+
+   setReturnMessage(
+  returnType === "EXCHANGE"
+    ? "Your exchange request has been submitted successfully."
+    : "Your return request has been submitted successfully.",
+);
+
+   
+  } catch (error) {
+    setReturnError(
+      error.response?.data?.message ||
+        "Unable to submit your request. Please try again.",
+    );
+  } finally {
+    setReturnLoading(false);
+  }
+};
+
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-IN", {
       day: "2-digit",
@@ -208,6 +381,46 @@ function MyOrders() {
       year: "numeric",
     });
   };
+
+  const isWithinReturnWindow = (order) => {
+  if (
+    String(order.orderStatus).toUpperCase() !== "DELIVERED" ||
+    !order.deliveredAt
+  ) {
+    return false;
+  }
+
+  const deliveredTime = new Date(order.deliveredAt).getTime();
+
+  if (Number.isNaN(deliveredTime)) {
+    return false;
+  }
+
+  const deadline = deliveredTime + 4 * 24 * 60 * 60 * 1000;
+
+  return Date.now() <= deadline;
+};
+
+const getItemReturnStatus = (orderId, item) => {
+  const productId = String(item.productId?._id || item.productId || "");
+  const variantId = String(item.variantId?._id || item.variantId || "");
+
+  const matchingItems = myReturnRequests.flatMap((request) =>
+    request.orderId?._id === orderId || request.orderId === orderId
+      ? request.items.filter(
+          (returnItem) =>
+            String(returnItem.productId?._id || returnItem.productId) === productId &&
+            String(returnItem.variantId?._id || returnItem.variantId) === variantId
+        )
+      : []
+  );
+
+  return matchingItems.reduce(
+    (total, returnItem) =>
+      returnItem.status !== "REJECTED" ? total + returnItem.quantity : total,
+    0
+  );
+};
 
   if (loading) {
     return (
@@ -296,6 +509,17 @@ function MyOrders() {
 
                           <p>Size: {item.size}</p>
                           <p>Quantity: {item.quantity}</p>
+                          {String(order.orderStatus).toUpperCase() === "DELIVERED" &&
+  isWithinReturnWindow(order) && (
+    <button
+      type="button"
+      className="my-order-return-button"
+      onClick={() => handleOpenReturnModal(order, item)}
+    >
+      RETURN / EXCHANGE
+    </button>
+  )}
+                          
 
                           <button
                             type="button"
@@ -406,6 +630,144 @@ function MyOrders() {
           {reviewMessage && (
             <p className="my-order-review-success">{reviewMessage}</p>
           )}
+
+          {returnModalOpen && selectedReturnOrder && selectedReturnItem && (
+  <div
+    className="my-return-overlay"
+    onClick={() => {
+      if (!returnLoading) {
+        setReturnModalOpen(false);
+      }
+    }}
+  >
+    <form
+      className="my-return-modal"
+      onSubmit={handleSubmitReturn}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        type="button"
+        className="my-return-close"
+        onClick={() => setReturnModalOpen(false)}
+        disabled={returnLoading}
+        aria-label="Close return form"
+      >
+        ×
+      </button>
+
+      <p className="my-return-eyebrow">ESSENZA CUSTOMER CARE</p>
+      <h2>RETURN / EXCHANGE</h2>
+
+      <p className="my-return-product">
+        {selectedReturnItem.productName}
+      </p>
+
+      <p className="my-return-info">
+        Order #{selectedReturnOrder._id.slice(-8).toUpperCase()}
+      </p>
+
+      <label htmlFor="return-type">REQUEST TYPE</label>
+    <select
+  id="return-type"
+  value={returnType}
+  onChange={(event) => handleReturnTypeChange(event.target.value)}
+  disabled={returnLoading}
+>
+  <option value="RETURN">Return product</option>
+  <option value="EXCHANGE">Exchange product</option>
+</select>
+
+{returnType === "EXCHANGE" && (
+  <>
+    <label htmlFor="exchange-variant">
+      SELECT REPLACEMENT SIZE
+    </label>
+
+    {exchangeVariantsLoading ? (
+      <p>Loading available sizes...</p>
+    ) : (
+      <select
+        id="exchange-variant"
+        value={exchangeVariantId}
+        onChange={(event) => setExchangeVariantId(event.target.value)}
+        required
+        disabled={returnLoading || exchangeVariants.length === 0}
+      >
+        <option value="">Choose a replacement size</option>
+
+        {exchangeVariants.map((variant) => (
+          <option key={variant._id} value={variant._id}>
+            {variant.size} — ₹{variant.price} ({variant.stock} available)
+          </option>
+        ))}
+      </select>
+    )}
+  </>
+)}
+
+      <label htmlFor="return-quantity">QUANTITY</label>
+      <select
+        id="return-quantity"
+        value={returnQuantity}
+        onChange={(event) => setReturnQuantity(Number(event.target.value))}
+        disabled={returnLoading}
+      >
+        {Array.from(
+          { length: selectedReturnItem.quantity },
+          (_, index) => index + 1,
+        ).map((quantity) => (
+          <option key={quantity} value={quantity}>
+            {quantity}
+          </option>
+        ))}
+      </select>
+
+      <label htmlFor="return-reason">REASON</label>
+      <select
+        id="return-reason"
+        value={returnReason}
+        onChange={(event) => setReturnReason(event.target.value)}
+        required
+        disabled={returnLoading}
+      >
+        <option value="">Select a reason</option>
+        <option value="QUALITY_ISSUE">Quality issue</option>
+       <option value="DAMAGED_PRODUCT">Product damaged</option>
+<option value="WRONG_PRODUCT">Wrong product received</option>
+        <option value="OTHER">Other</option>
+      </select>
+
+      <label htmlFor="return-description">
+        ADDITIONAL DETAILS (OPTIONAL)
+      </label>
+      <textarea
+        id="return-description"
+        value={returnDescription}
+        onChange={(event) => setReturnDescription(event.target.value)}
+        placeholder="Tell us more about your request..."
+        rows={3}
+        maxLength={1000}
+        disabled={returnLoading}
+      />
+
+      {returnError && (
+        <p className="my-return-error">{returnError}</p>
+      )}
+
+      {returnMessage && (
+        <p className="my-return-success">{returnMessage}</p>
+      )}
+
+      <button
+        type="submit"
+        className="my-return-submit"
+        disabled={returnLoading}
+      >
+        {returnLoading ? "SUBMITTING..." : "SUBMIT REQUEST"}
+      </button>
+    </form>
+  </div>
+)}
 
           {reviewTarget && (
             <div className="my-review-overlay">

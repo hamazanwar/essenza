@@ -7698,3 +7698,150 @@ body {
   line-height: 1;
   z-index: 2;
 }
+
+
+
+/* Return / Exchange Popup */
+.my-return-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.my-return-modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  background: #fff;
+  color: #111;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.my-return-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  border: none;
+  background: transparent;
+  color: #111;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.my-return-eyebrow {
+  margin: 0 0 8px;
+  color: #777;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.my-return-modal h2 {
+  margin: 0 0 16px;
+  font-size: 23px;
+  letter-spacing: 1px;
+}
+
+.my-return-product {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.my-return-info {
+  margin: 0 0 24px;
+  color: #777;
+  font-size: 13px;
+}
+
+.my-return-modal label {
+  display: block;
+  margin: 16px 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.my-return-modal select,
+.my-return-modal textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d5d5d5;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+}
+
+.my-return-modal textarea {
+  resize: vertical;
+}
+
+.my-return-submit {
+  width: 100%;
+  margin-top: 22px;
+  padding: 14px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.my-return-submit:disabled,
+.my-return-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.my-return-error {
+  color: #c62828;
+  font-size: 13px;
+}
+
+.my-return-success {
+  color: #24733b;
+  font-size: 13px;
+}
+
+.my-order-return-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 9px 12px;
+  border: 1px solid #111;
+  border-radius: 4px;
+  background: #fff;
+  color: #111;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.my-order-return-button:hover {
+  background: #111;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .my-return-modal {
+    padding: 26px 20px;
+  }
+
+  .my-return-modal h2 {
+    font-size: 20px;
+  }
+}
