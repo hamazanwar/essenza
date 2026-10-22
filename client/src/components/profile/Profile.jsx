@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
-import axios from "axios";
+import api from "../../services/api";
 
 function Profile() {
   const navigate = useNavigate();
@@ -48,14 +48,11 @@ function Profile() {
         // GET PROFILE
         // ==========================================
 
-        const profileResponse = await axios.get(
-          "http://localhost:5000/api/users/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const profileResponse = await api.get("/users/profile", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const profileData = profileResponse.data;
 
@@ -65,14 +62,11 @@ function Profile() {
         // GET ADDRESSES
         // ==========================================
 
-        const addressResponse = await axios.get(
-          "http://localhost:5000/api/users/addresses",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const addressResponse = await api.get("/users/addresses", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const addressData = addressResponse.data;
 
@@ -125,17 +119,17 @@ function Profile() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.patch(
-        "http://localhost:5000/api/users/profile",
-        {
-          name: editName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.patch(
+  "/users/profile",
+  {
+    name: editName,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       const data = response.data;
 
@@ -218,30 +212,30 @@ function Profile() {
       // ==========================================
 
       if (editingAddressId) {
-        response = await axios.patch(
-          `http://localhost:5000/api/users/address/${editingAddressId}`,
-          addressData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        response = await api.patch(
+  `/users/address/${editingAddressId}`,
+  addressData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
       }
 
       // ==========================================
       // ADD ADDRESS
       // ==========================================
       else {
-        response = await axios.post(
-          "http://localhost:5000/api/users/address",
-          addressData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+       response = await api.post(
+  "/users/address",
+  addressData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
       }
 
       const data = response.data;
@@ -316,14 +310,11 @@ function Profile() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(
-        `http://localhost:5000/api/users/address/${addressId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      await api.delete(`/users/address/${addressId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       // Remove address from screen
       setAddresses((previousAddresses) =>
@@ -350,15 +341,15 @@ function Profile() {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.patch(
-        `http://localhost:5000/api/users/address/${addressId}/default`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     await api.patch(
+  `/users/address/${addressId}/default`,
+  {},
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       // Update all addresses
       setAddresses((previousAddresses) =>
@@ -418,22 +409,13 @@ function Profile() {
       const formData = new FormData();
       formData.append("profileImage", file);
 
-      const response = await fetch(
-        "http://localhost:5000/api/users/profile/image",
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        },
-      );
+     const response = await api.patch("/users/profile/image", formData, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to upload profile image");
-      }
+const data = response.data;
 
       const updatedUser = {
         ...user,
@@ -459,21 +441,13 @@ function Profile() {
 
       const token = localStorage.getItem("token");
 
-      const response = await fetch(
-        "http://localhost:5000/api/users/profile/image",
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+    const response = await api.delete("/users/profile/image", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to remove profile image");
-      }
+const data = response.data;
 
       const updatedUser = {
         ...user,
@@ -545,10 +519,10 @@ function Profile() {
                 {user.profileImage ? (
                   <img
                     src={
-                      user.profileImage.startsWith("http")
-                        ? user.profileImage
-                        : `http://localhost:5000${user.profileImage}`
-                    }
+  user.profileImage.startsWith("http")
+    ? user.profileImage
+    : `${api.defaults.baseURL.replace(/\/api$/, "")}${user.profileImage}`
+}
                     alt=""
                     className="profile-photo"
                   />

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 function SearchOverlay({ onClose }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,11 +44,9 @@ function SearchOverlay({ onClose }) {
       try {
         setLoading(true);
 
-        const response = await axios.get(
-          `http://localhost:5000/api/products?search=${encodeURIComponent(
-            trimmedSearch,
-          )}`,
-        );
+        const response = await api.get(
+  `/products?search=${encodeURIComponent(trimmedSearch)}`,
+);
 
         setProducts(response.data.products || []);
       } catch (error) {
@@ -152,7 +150,7 @@ function SearchOverlay({ onClose }) {
                     <div className="search-product-image">
                       {image ? (
                         <img
-                          src={`http://localhost:5000${image}`}
+                          src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
                           alt={product.name}
                         />
                       ) : (

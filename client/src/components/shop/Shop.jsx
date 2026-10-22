@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import { Heart } from "lucide-react";
 
 import Navbar from "../bars/Navbar";
@@ -32,13 +32,9 @@ function Shop() {
         setLoading(true);
         setError("");
 
-        let url = "http://localhost:5000/api/products";
+       const params = category ? { category } : {};
 
-        if (category) {
-          url += `?category=${encodeURIComponent(category)}`;
-        }
-
-        const response = await axios.get(url);
+const response = await api.get("/products", { params });
 
         setProducts(response.data.products || []);
 
@@ -73,11 +69,11 @@ function Shop() {
       }
 
       try {
-        const response = await axios.get("http://localhost:5000/api/wishlist", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+       const response = await api.get("/wishlist", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const wishlist = response.data.wishlist?.products || [];
 
@@ -183,27 +179,25 @@ function Shop() {
 
     try {
       if (isWishlisted) {
-        await axios.delete(`http://localhost:5000/api/wishlist/${productId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await api.delete(`/wishlist/${productId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         setWishlistProducts((previous) =>
           previous.filter((id) => id !== productId),
         );
       } else {
-        await axios.post(
-          "http://localhost:5000/api/wishlist",
-          {
-            productId,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+       await api.post(
+  "/wishlist",
+  { productId },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
         setWishlistProducts((previous) => [...previous, productId]);
       }
@@ -390,7 +384,7 @@ function Shop() {
                       {images.length > 0 ? (
                         <>
                           <img
-                            src={`http://localhost:5000${images[currentImageIndex]}`}
+                            src={`${api.defaults.baseURL.replace(/\/api$/, "")}${images[currentImageIndex]}`}
                             alt={product.name}
                             className="product-image"
                             onClick={() => navigate(`/product/${product._id}`)}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 
@@ -15,7 +15,7 @@ function Wallet() {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [showWithdraw, setShowWithdraw] = useState(false);
 
-  const API_URL = "http://localhost:5000/api/wallet";
+  const API_URL = "/wallet";
 
   const loadWallet = async () => {
     try {
@@ -24,11 +24,11 @@ function Wallet() {
 
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(API_URL, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.get(API_URL, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const walletData = response.data.data;
 
@@ -78,15 +78,15 @@ function Wallet() {
       const token = localStorage.getItem("token");
 
       // Create Razorpay order
-      const orderResponse = await axios.post(
-        `${API_URL}/top-up/create-order`,
-        { amount: enteredAmount },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const orderResponse = await api.post(
+  `${API_URL}/top-up/create-order`,
+  { amount: enteredAmount },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       const order = orderResponse.data.data;
 
@@ -101,20 +101,19 @@ function Wallet() {
         handler: async (paymentResponse) => {
           try {
             // Verify payment on the backend
-            await axios.post(
-              `${API_URL}/top-up/verify`,
-              {
-                razorpay_order_id: paymentResponse.razorpay_order_id,
-                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                razorpay_signature: paymentResponse.razorpay_signature,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              },
-            );
-
+            await api.post(
+  `${API_URL}/top-up/verify`,
+  {
+    razorpay_order_id: paymentResponse.razorpay_order_id,
+    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+    razorpay_signature: paymentResponse.razorpay_signature,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
             setAmount("");
             setSuccess("Money added to your wallet successfully!");
             await loadWallet();
@@ -184,15 +183,15 @@ function Wallet() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/wallet/withdraw",
-        { amount: requestedAmount },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.post(
+  `${API_URL}/withdraw`,
+  { amount: requestedAmount },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setSuccess(
         response.data.message || "Withdrawal request submitted successfully.",

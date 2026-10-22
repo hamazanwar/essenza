@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import { Heart } from "lucide-react";
 
 import Navbar from "../bars/Navbar";
@@ -50,17 +50,12 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
         setLoading(true);
         setError("");
 
-        const response = await axios.get(
-          `http://localhost:5000/api/products/${productId}`,
-        );
+       const response = await api.get(`/products/${productId}`);
 
         const productData = response.data.product;
 
         try {
-          const offerResponse = await axios.get(
-            "http://localhost:5000/api/admin/offers/active",
-          );
-
+         const offerResponse = await api.get("/admin/offers/active");
           setActiveOffers(offerResponse.data.offers || []);
         } catch (offerError) {
           console.error("Get active offers error:", offerError);
@@ -98,14 +93,11 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
     }
 
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/wishlist",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+    const response = await api.get("/wishlist", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const wishlist = response.data.wishlist?.products || [];
 
@@ -129,9 +121,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
       setReviewsLoading(true);
       setReviewsError("");
 
-      const response = await axios.get(
-        `http://localhost:5000/api/reviews/product/${productId}`,
-      );
+     const response = await api.get(`/reviews/product/${productId}`);
 
       setReviews(response.data.reviews || []);
 
@@ -139,14 +129,11 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
 
       if (token) {
         try {
-          const myResponse = await axios.get(
-            "http://localhost:5000/api/reviews/my-reviews",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
+          const myResponse = await api.get("/reviews/my-reviews", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
           setMyReviews(myResponse.data.reviews || []);
         } catch (error) {
@@ -188,18 +175,18 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
       setReviewsError("");
       setReviewActionMessage("");
 
-      await axios.patch(
-        `http://localhost:5000/api/reviews/${reviewId}`,
-        {
-          rating: editRating,
-          comment: editComment,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     await api.patch(
+  `/reviews/${reviewId}`,
+  {
+    rating: editRating,
+    comment: editComment,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setEditingReviewId(null);
       setReviewActionMessage("Review updated successfully.");
@@ -229,11 +216,11 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
       setReviewsError("");
       setReviewActionMessage("");
 
-      await axios.delete(`http://localhost:5000/api/reviews/${reviewId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+     await api.delete(`/reviews/${reviewId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setDeleteConfirmReviewId(null);
       setEditingReviewId(null);
@@ -308,26 +295,23 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
     setWishlistLoading(true);
 
     if (isWishlisted) {
-      await axios.delete(
-        `http://localhost:5000/api/wishlist/${productId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     await api.delete(`/wishlist/${productId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setIsWishlisted(false);
     } else {
-      await axios.post(
-        "http://localhost:5000/api/wishlist",
-        { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      await api.post(
+  "/wishlist",
+  { productId },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setIsWishlisted(true);
     }
@@ -359,20 +343,19 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
         return;
       }
 
-      const response = await axios.post(
-        "http://localhost:5000/api/cart",
-        {
-          productId: productId,
-          variantId: selectedVariant._id,
-          quantity: quantity,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
+     const response = await api.post(
+  "/cart",
+  {
+    productId: productId,
+    variantId: selectedVariant._id,
+    quantity: quantity,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
       console.log("Add to cart response:", response.data);
 
       setCartMessage("Product added to cart successfully.");
@@ -471,7 +454,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
 </button>
               {product.productImage?.length > 0 ? (
                 <img
-                  src={`http://localhost:5000${product.productImage[selectedImage]}`}
+                 src={`${api.defaults.baseURL.replace(/\/api$/, "")}${product.productImage[selectedImage]}`}
                   alt={product.name}
                   style={{
                     transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
@@ -494,7 +477,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
                     onClick={() => setSelectedImage(index)}
                   >
                     <img
-                      src={`http://localhost:5000${image}`}
+                    src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
                       alt={`${product.name} ${index + 1}`}
                     />
                   </button>

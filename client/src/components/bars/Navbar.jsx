@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import SearchOverlay from "../search/SearchOverlay";
 import {
   Search,
@@ -35,9 +35,7 @@ function Navbar() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/categories",
-        );
+        const response = await api.get("/categories");
 
         const activeCategories = response.data.categories.filter(
           (category) => category.isActive,
@@ -69,10 +67,7 @@ function Navbar() {
       };
 
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/cart",
-          config,
-        );
+       const response = await api.get("/cart", config);
 
         const cart = response.data.cart;
         const items = cart?.items || response.data.items || [];
@@ -88,10 +83,7 @@ function Navbar() {
       }
 
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/wishlist",
-          config,
-        );
+       const response = await api.get("/wishlist", config);
 
         const wishlist = response.data.wishlist || response.data;
 

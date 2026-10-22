@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -40,11 +40,11 @@ function Payment() {
 
       const token = localStorage.getItem("token");
 
-      const response = await axios.get("http://localhost:5000/api/wallet", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+     const response = await api.get("/wallet", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       const wallet = response.data.data;
 
@@ -134,15 +134,15 @@ function Payment() {
     // Keep the existing COD flow.
     if (paymentMethod === "cod") {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/orders",
-          {
-            addressId: selectedAddress._id,
-            items: orderItems,
-            paymentMethod: "COD",
-          },
-          { headers },
-        );
+       const response = await api.post(
+  "/orders",
+  {
+    addressId: selectedAddress._id,
+    items: orderItems,
+    paymentMethod: "COD",
+  },
+  { headers },
+);
 
         navigate("/order-confirmation", {
           state: {
@@ -163,14 +163,14 @@ function Payment() {
     // Handle wallet payment.
     if (paymentMethod === "wallet") {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/orders/wallet-payment",
-          {
-            addressId: selectedAddress._id,
-            items: orderItems,
-          },
-          { headers },
-        );
+       const response = await api.post(
+  "/orders/wallet-payment",
+  {
+    addressId: selectedAddress._id,
+    items: orderItems,
+  },
+  { headers },
+);
 
         navigate("/order-confirmation", {
           state: {
@@ -202,14 +202,14 @@ function Payment() {
       }
 
       // The backend calculates the real amount using database prices.
-      const response = await axios.post(
-        "http://localhost:5000/api/orders/create-payment-order",
-        {
-          addressId: selectedAddress._id,
-          items: orderItems,
-        },
-        { headers },
-      );
+    const response = await api.post(
+  "/orders/create-payment-order",
+  {
+    addressId: selectedAddress._id,
+    items: orderItems,
+  },
+  { headers },
+);
 
       const { keyId, razorpayOrderId, amount, currency } = response.data;
 
@@ -230,15 +230,15 @@ function Payment() {
             setError("");
 
             // The backend verifies the signature and payment status.
-            const verificationResponse = await axios.post(
-              "http://localhost:5000/api/orders/verify-payment",
-              {
-                razorpay_order_id: paymentResponse.razorpay_order_id,
-                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                razorpay_signature: paymentResponse.razorpay_signature,
-              },
-              { headers },
-            );
+         const verificationResponse = await api.post(
+  "/orders/verify-payment",
+  {
+    razorpay_order_id: paymentResponse.razorpay_order_id,
+    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+    razorpay_signature: paymentResponse.razorpay_signature,
+  },
+  { headers },
+);
 
             if (!verificationResponse.data?.order) {
               throw new Error("Payment verification did not return an order.");
@@ -336,7 +336,7 @@ function Payment() {
                   <div className="payment-item-image">
                     {item.productImage ? (
                       <img
-                        src={`http://localhost:5000${item.productImage}`}
+                       src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
                         alt={item.productName}
                       />
                     ) : (

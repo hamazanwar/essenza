@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import { Heart } from "lucide-react";
 
 import Navbar from "../bars/Navbar";
@@ -32,11 +32,11 @@ function Wishlist() {
       }
 
       try {
-        const response = await axios.get("http://localhost:5000/api/wishlist", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+       const response = await api.get("/wishlist", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const products = response.data.wishlist?.products || [];
 
@@ -66,11 +66,11 @@ function Wishlist() {
     }
 
     try {
-      await axios.delete(`http://localhost:5000/api/wishlist/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.delete(`/wishlist/${productId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setWishlistProducts((previous) =>
         previous.filter(
@@ -116,19 +116,19 @@ function Wishlist() {
       setCartLoading(productId);
       setCartMessage("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/cart",
-        {
-          productId: productId,
-          variantId: selectedVariant._id,
-          quantity: 1,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+    const response = await api.post(
+  "/cart",
+  {
+    productId: productId,
+    variantId: selectedVariant._id,
+    quantity: 1,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       console.log("Cart response:", response.data);
 
@@ -264,7 +264,7 @@ function Wishlist() {
                     >
                       {image ? (
                         <img
-                          src={`http://localhost:5000${image}`}
+                          src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
                           alt={product.name}
                           className="wishlist-image"
                         />

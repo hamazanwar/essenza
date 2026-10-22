@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
-import axios from "axios";
+import api from "../../services/api";
 import { Eye, EyeOff } from "lucide-react";
 
 
@@ -24,13 +24,10 @@ function Login() {
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        {
-          email,
-          password,
-        },
-      );
+      const response = await api.post("/auth/login", {
+  email,
+  password,
+});
       const data = response.data;
 
       console.log("Login response:", data);
@@ -139,12 +136,9 @@ function Login() {
         <GoogleLogin
           onSuccess={async (credentialResponse) => {
             try {
-              const response = await axios.post(
-                "http://localhost:5000/api/auth/google-login",
-                {
-                  credential: credentialResponse.credential,
-                },
-              );
+             const response = await api.post("/auth/google-login", {
+  credential: credentialResponse.credential,
+});
 
               const data = response.data;
 

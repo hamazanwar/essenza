@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 function VerifyEmail() {
   const navigate = useNavigate();
@@ -55,13 +55,10 @@ function VerifyEmail() {
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-email-otp",
-        {
-          email,
-          otp,
-        },
-      );
+     const response = await api.post("/auth/verify-email-otp", {
+  email,
+  otp,
+});
 
       const data = response.data;
 
@@ -106,12 +103,9 @@ function VerifyEmail() {
     try {
       setResending(true);
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/resend-email-otp",
-        {
-          email,
-        },
-      );
+     const response = await api.post("/auth/resend-email-otp", {
+  email,
+});
       const data = response.data;
 
       setMessage(data.message);

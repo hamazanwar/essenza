@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -34,15 +34,12 @@ function Register() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        {
-          name,
-          email,
-          password,
-          confirmPassword,
-        },
-      );
+    const response = await api.post("/auth/register", {
+  name,
+  email,
+  password,
+  confirmPassword,
+});
 
       const data = response.data;
 
@@ -72,12 +69,9 @@ function Register() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/google-login",
-        {
-          credential: credentialResponse.credential,
-        },
-      );
+    const response = await api.post("/auth/google-login", {
+  credential: credentialResponse.credential,
+});
 
       const data = response.data;
 

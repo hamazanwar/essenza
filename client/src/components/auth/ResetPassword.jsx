@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import { Eye, EyeOff } from "lucide-react";
 
 function ResetPassword() {
@@ -38,14 +38,11 @@ function ResetPassword() {
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/reset-password",
-        {
-          email,
-          otp,
-          newPassword,
-        },
-      );
+      const response = await api.post("/auth/reset-password", {
+  email,
+  otp,
+  newPassword,
+});
 
       console.log("Reset password response:", response.data);
 

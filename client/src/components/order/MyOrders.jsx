@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -47,9 +47,7 @@ const handleReturnTypeChange = async (type) => {
   try {
     setExchangeVariantsLoading(true);
 
-    const response = await axios.get(
-      `http://localhost:5000/api/products/${productId}`,
-    );
+   const response = await api.get(`/products/${productId}`);
 
     const variants = response.data.product?.variants || [];
 
@@ -126,35 +124,26 @@ const [returnError, setReturnError] = useState("");
           return;
         }
 
-        const response = await axios.get(
-          "http://localhost:5000/api/orders/my-orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+     const response = await api.get("/orders/my-orders", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
         setOrders(response.data.orders || []);
         try {
-          const reviewsResponse = await axios.get(
-            "http://localhost:5000/api/reviews/my-reviews",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
+          const reviewsResponse = await api.get("/reviews/my-reviews", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
           setMyReviews(reviewsResponse.data.reviews || []);
           try {
-  const returnResponse = await axios.get(
-    "http://localhost:5000/api/returns/my",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+ const returnResponse = await api.get("/returns/my", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
   setMyReturnRequests(returnResponse.data.returnRequests || []);
 } catch (returnError) {
@@ -189,15 +178,15 @@ const [returnError, setReturnError] = useState("");
       setCancelling(true);
       setError("");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/orders/${orderId}/cancel`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.patch(
+  `/orders/${orderId}/cancel`,
+  {},
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setOrders((previousOrders) =>
         previousOrders.map((order) =>
@@ -275,20 +264,20 @@ const [returnError, setReturnError] = useState("");
       setReviewError("");
       setReviewMessage("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/reviews",
-        {
-          productId: reviewTarget.productId,
-          orderId: reviewTarget.orderId,
-          rating,
-          comment,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.post(
+  "/reviews",
+  {
+    productId: reviewTarget.productId,
+    orderId: reviewTarget.orderId,
+    rating,
+    comment,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setMyReviews((previous) => [response.data.review, ...previous]);
 
@@ -323,8 +312,8 @@ const [returnError, setReturnError] = useState("");
     setReturnError("");
     setReturnMessage("");
 
-    const response = await axios.post(
-      "http://localhost:5000/api/returns",
+   const response = await api.post(
+  "/returns",
       {
   orderId: selectedReturnOrder._id,
   requestType: returnType,
@@ -497,7 +486,7 @@ const getItemReturnStatus = (orderId, item) => {
                         <div className="my-order-item-image">
                           {item.productImage ? (
                             <img
-                              src={`http://localhost:5000${item.productImage}`}
+                              src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
                               alt={item.productName}
                             />
                           ) : (

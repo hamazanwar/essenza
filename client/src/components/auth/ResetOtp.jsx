@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 function ResetOtp() {
   const navigate = useNavigate();
@@ -57,13 +57,10 @@ function ResetOtp() {
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-reset-otp",
-        {
-          email,
-          otp,
-        },
-      );
+     const response = await api.post("/auth/verify-reset-otp", {
+  email,
+  otp,
+});
 
       setMessage(response.data.message);
 
@@ -108,12 +105,9 @@ function ResetOtp() {
     try {
       setResending(true);
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/forgot-password",
-        {
-          email,
-        },
-      );
+      const response = await api.post("/auth/forgot-password", {
+  email,
+});
 
       setMessage(response.data.message);
 

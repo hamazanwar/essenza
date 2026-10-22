@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -48,9 +48,7 @@ function Checkout() {
         if (productId || buyNowData?.productId) {
           const selectedProductId = buyNowData?.productId || productId;
 
-          const response = await axios.get(
-            `http://localhost:5000/api/products/${selectedProductId}`,
-          );
+          const response = await api.get(`/products/${selectedProductId}`);
 
           const product = response.data.product;
 
@@ -81,9 +79,7 @@ function Checkout() {
             return;
           }
 
-          const offerResponse = await axios.get(
-            "http://localhost:5000/api/admin/offers/active",
-          );
+         const offerResponse = await api.get("/admin/offers/active");
 
           const activeOffers = offerResponse.data.offers || [];
 
@@ -139,11 +135,11 @@ function Checkout() {
         }
 
         // CART CHECKOUT
-        const response = await axios.get("http://localhost:5000/api/cart", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await api.get("/cart", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const cartItems = response.data.cart?.items || [];
 
@@ -192,7 +188,7 @@ function Checkout() {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/coupons");
+        const response = await api.get("/coupons");
 
         setCoupons(response.data.coupons || []);
       } catch (error) {
@@ -222,14 +218,11 @@ function Checkout() {
 
         setAddressLoading(true);
 
-        const response = await axios.get(
-          "http://localhost:5000/api/users/addresses",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const response = await api.get("/users/addresses", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         const userAddresses = response.data.addresses || [];
 
@@ -487,7 +480,7 @@ function Checkout() {
                   <div className="checkout-item-image">
                     {item.productImage ? (
                       <img
-                        src={`http://localhost:5000${item.productImage}`}
+                        src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
                         alt={item.productName}
                       />
                     ) : (

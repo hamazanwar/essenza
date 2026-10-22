@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import { jsPDF } from "jspdf";
 
 import Navbar from "../bars/Navbar";
@@ -25,14 +25,11 @@ function OrderDetails() {
           return;
         }
 
-        const response = await axios.get(
-          `http://localhost:5000/api/orders/${orderId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+        const response = await api.get(`/orders/${orderId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         setOrder(response.data.order);
       } catch (err) {
@@ -321,7 +318,7 @@ function OrderDetails() {
                   <div className="order-details-image">
                     {item.productImage ? (
                       <img
-                        src={`http://localhost:5000${item.productImage}`}
+                        src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
                         alt={item.productName}
                       />
                     ) : (

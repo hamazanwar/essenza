@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
@@ -24,11 +24,11 @@ function Cart() {
           return;
         }
 
-        const response = await axios.get("http://localhost:5000/api/cart", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await api.get("/cart", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         setCart(response.data.cart);
       } catch (error) {
@@ -56,17 +56,17 @@ function Cart() {
       setError("");
       setCartMessage("");
 
-      const response = await axios.patch(
-        `http://localhost:5000/api/cart/${itemId}`,
-        {
-          quantity: newQuantity,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+     const response = await api.patch(
+  `/cart/${itemId}`,
+  {
+    quantity: newQuantity,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  },
+);
 
       setCart(response.data.cart);
     } catch (error) {
@@ -89,14 +89,11 @@ function Cart() {
       setError("");
       setCartMessage("");
 
-      const response = await axios.delete(
-        `http://localhost:5000/api/cart/${itemId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+   const response = await api.delete(`/cart/${itemId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
       setCart(response.data.cart);
       setCartMessage("Product removed from cart.");
@@ -174,7 +171,7 @@ function Cart() {
                     <div className="cart-item-image">
                       {item.productId?.productImage?.length > 0 ? (
                         <img
-                          src={`http://localhost:5000${item.productId.productImage[0]}`}
+                          src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productId.productImage[0]}`}
                           alt={item.productId.name}
                         />
                       ) : (
