@@ -384,11 +384,15 @@ const response = await api.get("/products", { params });
                       {images.length > 0 ? (
                         <>
                           <img
-                            src={`${api.defaults.baseURL.replace(/\/api$/, "")}${images[currentImageIndex]}`}
-                            alt={product.name}
-                            className="product-image"
-                            onClick={() => navigate(`/product/${product._id}`)}
-                          />
+  src={
+    images[currentImageIndex]?.startsWith("http")
+      ? images[currentImageIndex]
+      : `${api.defaults.baseURL.replace(/\/api$/, "")}${images[currentImageIndex]}`
+  }
+  alt={product.name}
+  className="product-image"
+  onClick={() => navigate(`/product/${product._id}`)}
+/>
 
                           {/* IMAGE ARROWS */}
 

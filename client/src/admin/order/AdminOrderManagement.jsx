@@ -15,6 +15,20 @@ function AdminOrderManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  const getImageUrl = (image) => {
+  if (!image) return "";
+
+  // Cloudinary image URL
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  // Old local server image path
+  const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
+
+  return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -284,11 +298,11 @@ function AdminOrderManagement() {
                               key={item.variantId}
                             >
                               {item.productImage && (
-                                <img
-                                  src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
-                                  alt={item.productName}
-                                />
-                              )}
+  <img
+    src={getImageUrl(item.productImage)}
+    alt={item.productName}
+  />
+)}
 
                               <div>
                                 <strong>{item.productName}</strong>

@@ -8,6 +8,20 @@ import AdminFooter from "../bars/AdminFooter";
 function ProductManagement() {
   const navigate = useNavigate();
 
+  const getImageUrl = (image) => {
+  if (!image) return "";
+
+  // Cloudinary image URL
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  // Old local server image path
+  const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
+
+  return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -508,9 +522,9 @@ function ProductManagement() {
                               className="edit-product-image-item"
                             >
                               <img
-                             src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
-                                alt={`${editProductName} ${index + 1}`}
-                              />
+  src={getImageUrl(image)}
+  alt={`${editProductName} ${index + 1}`}
+/>
 
                               <button
                                 type="button"
@@ -579,10 +593,10 @@ function ProductManagement() {
                       <div className="product-images">
                         {product.productImage.map((image, index) => (
                           <img
-                            key={index}
-                           src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
-                            alt={`${product.name} ${index + 1}`}
-                          />
+  key={index}
+  src={getImageUrl(image)}
+  alt={`${product.name} ${index + 1}`}
+/>
                         ))}
                       </div>
                     )}

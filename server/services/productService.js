@@ -1,8 +1,7 @@
 const Product = require("../models/product");
 const Category = require("../models/category");
 const Variant = require("../models/variant");
-const fs = require("fs");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
 
 // ADD PRODUCT
 const addProductService = async (
@@ -281,27 +280,44 @@ const updateProductService = async (
     const oldImages =
         product.productImage || [];
 
-    // Delete images that were removed
-    const removedImages =
-        oldImages.filter(
-            (image) =>
-                !retainedImages.includes(image)
-        );
+    // Delete removed images from Cloudinary
+const removedImages = oldImages.filter(
+    (image) => !retainedImages.includes(image)
+);
 
-    removedImages.forEach((image) => {
-        const imagePath = path.join(
-            __dirname,
-            "..",
-            image.replace(
-                "/uploads/",
-                "uploads/"
-            )
-        );
+for (const image of removedImages) {
+    // Only delete URLs belonging to Cloudinary.
+    // Keep legacy local images untouched.
+    if (image.includes("res.cloudinary.com")) {
+        try {
+            const urlParts = image.split("/");
+            const uploadIndex = urlParts.indexOf("upload");
 
-        if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
+            if (uploadIndex !== -1) {
+                let publicIdParts = urlParts.slice(uploadIndex + 1);
+
+                // Remove the version segment, e.g. v1234567890
+                if (/^v\d+$/.test(publicIdParts[0])) {
+                    publicIdParts = publicIdParts.slice(1);
+                }
+
+                const lastPart = publicIdParts.pop();
+                const fileName = lastPart.replace(/\.[^/.]+$/, "");
+
+                const publicId = [...publicIdParts, fileName].join("/");
+
+                await cloudinary.uploader.destroy(publicId, {
+                    resource_type: "image",
+                });
+            }
+        } catch (cloudinaryError) {
+            console.error(
+                "Failed to delete removed Cloudinary image:",
+                cloudinaryError
+            );
         }
-    });
+    }
+}
 
     // Combine retained images + new images
     const finalImages = [
@@ -357,9 +373,41 @@ const deleteProductService = async (productId) => {
         throw error;
     }
 
-    await Product.findByIdAndDelete(
-        productId
-    );
+    // Delete Cloudinary images associated with this product
+for (const image of product.productImage || []) {
+    if (!image.includes("res.cloudinary.com")) {
+        continue;
+    }
+
+    try {
+        const urlParts = image.split("/");
+        const uploadIndex = urlParts.indexOf("upload");
+
+        if (uploadIndex === -1) continue;
+
+        let publicIdParts = urlParts.slice(uploadIndex + 1);
+
+        if (/^v\d+$/.test(publicIdParts[0])) {
+            publicIdParts = publicIdParts.slice(1);
+        }
+
+        const lastPart = publicIdParts.pop();
+        const fileName = lastPart.replace(/\.[^/.]+$/, "");
+
+        const publicId = [...publicIdParts, fileName].join("/");
+
+        await cloudinary.uploader.destroy(publicId, {
+            resource_type: "image",
+        });
+    } catch (cloudinaryError) {
+        console.error(
+            "Failed to delete Cloudinary product image:",
+            cloudinaryError
+        );
+    }
+}
+
+await Product.findByIdAndDelete(productId);
 
     return {
         message: "Product deleted successfully"

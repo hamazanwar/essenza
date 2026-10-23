@@ -6,6 +6,17 @@ import { Heart } from "lucide-react";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 
+// Handle Cloudinary URLs and legacy local image paths
+const getImageUrl = (image) => {
+  if (!image) return "";
+
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  return `${api.defaults.baseURL.replace(/\/api\/?$/, "")}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
 function Wishlist() {
   const navigate = useNavigate();
 
@@ -264,10 +275,10 @@ function Wishlist() {
                     >
                       {image ? (
                         <img
-                          src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
-                          alt={product.name}
-                          className="wishlist-image"
-                        />
+  src={getImageUrl(image)}
+  alt={product.name}
+  className="wishlist-image"
+/>
                       ) : (
                         <div className="wishlist-image-placeholder">
                           NO IMAGE

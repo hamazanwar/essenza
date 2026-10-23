@@ -29,12 +29,11 @@ const addProduct = async (req, res) => {
                     "Category, name and description are required"
             });
         }
+        console.log("Product upload files:", req.files);
+console.log("Request body fields:", Object.keys(req.body));
 
         const productImages =
-    req.files?.map(
-        (file) =>
-            `/uploads/product/${file.filename}`
-    ) || [];
+    req.files?.map((file) => file.path) || [];
 
 const result =
     await addProductService(
@@ -120,10 +119,7 @@ const updateProduct = async (req, res) => {
         }
 
         const productImages =
-            req.files?.map(
-                (file) =>
-                    `/uploads/product/${file.filename}`
-            ) || [];
+    req.files?.map((file) => file.path) || [];
 
         const result =
     await updateProductService(

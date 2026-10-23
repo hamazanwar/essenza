@@ -5,6 +5,17 @@ import api from "../../services/api";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 
+// Handle Cloudinary URLs and legacy local image paths
+const getImageUrl = (image) => {
+  if (!image) return "";
+
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  return `${api.defaults.baseURL.replace(/\/api\/?$/, "")}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
 function Cart() {
   const navigate = useNavigate();
 
@@ -171,9 +182,9 @@ function Cart() {
                     <div className="cart-item-image">
                       {item.productId?.productImage?.length > 0 ? (
                         <img
-                          src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productId.productImage[0]}`}
-                          alt={item.productId.name}
-                        />
+  src={getImageUrl(item.productId.productImage[0])}
+  alt={item.productId.name}
+/>
                       ) : (
                         <div>No Image</div>
                       )}

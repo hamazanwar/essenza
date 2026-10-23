@@ -283,10 +283,22 @@ function AddProduct() {
       formData.append("howToUse", howToUse);
       formData.append("shippingAndReturns", shippingAndReturns);
 
-      // ADD PRODUCT IMAGES
-      productImages.forEach((image) => {
-        formData.append("productImages", image);
-      });
+      // DEBUG: CHECK SELECTED IMAGES
+console.log("Product images state:", productImages);
+console.log(
+  "Are images File objects?",
+  productImages.map((image) => image instanceof File)
+);
+
+// ADD PRODUCT IMAGES
+productImages.forEach((image) => {
+  formData.append("productImages", image);
+});
+
+console.log(
+  "FormData image entries:",
+  [...formData.entries()].filter(([key]) => key === "productImages")
+);
 
       // CREATE PRODUCT
       const response = await api.post("/admin/products", formData, {

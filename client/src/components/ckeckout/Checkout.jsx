@@ -5,6 +5,19 @@ import api from "../../services/api";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 
+// Handle Cloudinary URLs and legacy local image paths
+const getImageUrl = (image) => {
+  if (!image) return "";
+
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
+
+  return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
 function Checkout() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -480,9 +493,9 @@ function Checkout() {
                   <div className="checkout-item-image">
                     {item.productImage ? (
                       <img
-                        src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
-                        alt={item.productName}
-                      />
+  src={getImageUrl(item.productImage)}
+  alt={item.productName}
+/>
                     ) : (
                       <div>No Image</div>
                     )}

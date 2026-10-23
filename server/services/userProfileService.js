@@ -1,7 +1,6 @@
 const User = require("../models/user");
 const Address = require("../models/Address");
-const fs = require("fs");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
 
 // ==========================================
 // GET USER PROFILE
@@ -359,116 +358,121 @@ const deleteUserAddress = async (
 // UPDATE PROFILE IMAGE
 // ==========================================
 
-const updateProfileImage = async (
-    userId,
-    file
-) => {
 
+const updateProfileImage = async (userId, file) => {
     const user = await User.findById(userId);
 
     if (!user) {
-
-        const error = new Error(
-            "User not found"
-        );
-
+        const error = new Error("User not found");
         error.statusCode = 404;
-
         throw error;
     }
 
-
-    // Delete old profile image
-    if (user.profileImage) {
-
-        const oldImagePath =
-            path.join(
-                __dirname,
-                "..",
-                user.profileImage.replace(
-                    "/uploads/",
-                    "uploads/"
-                )
-            );
-
-        if (fs.existsSync(oldImagePath)) {
-
-            fs.unlinkSync(oldImagePath);
-
-        }
-
+    if (!file || !file.path) {
+        const error = new Error("Uploaded image URL is missing");
+        error.statusCode = 400;
+        throw error;
     }
 
+    // Delete the previous Cloudinary image, if applicable.
+    if (user.profileImage && user.profileImage.includes("res.cloudinary.com")) {
+        try {
+            const urlParts = new URL(user.profileImage).pathname.split("/");
+            const uploadIndex = urlParts.indexOf("upload");
 
-    // Save new image path
-    user.profileImage =
-        `/uploads/profile/${file.filename}`;
+            if (uploadIndex !== -1) {
+                const publicIdParts = urlParts.slice(uploadIndex + 1);
 
+                // Remove an optional Cloudinary transformation/version.
+                if (publicIdParts[0]?.startsWith("v") &&
+                    /^v\d+$/.test(publicIdParts[0])) {
+                    publicIdParts.shift();
+                }
+
+                const lastPart = publicIdParts.pop();
+                if (lastPart) {
+                    publicIdParts.push(lastPart.replace(/\.[^.]+$/, ""));
+                }
+
+                const publicId = publicIdParts.join("/");
+
+                if (publicId) {
+                    await cloudinary.uploader.destroy(publicId, {
+                        resource_type: "image",
+                    });
+                }
+            }
+        } catch (error) {
+            // Keep the new upload working even if old-image cleanup fails.
+            console.error("Previous profile image cleanup failed:", error);
+        }
+    }
+
+    // Cloudinary's secure URL is provided by Multer storage.
+    user.profileImage = file.path;
     await user.save();
-
 
     return {
         message: "Profile image updated successfully",
-        profileImage: user.profileImage
+        profileImage: user.profileImage,
     };
-
 };
+
 
 // ==========================================
 // REMOVE PROFILE IMAGE
 // ==========================================
 
-const removeProfileImage = async (
-    userId
-) => {
 
+const removeProfileImage = async (userId) => {
     const user = await User.findById(userId);
 
     if (!user) {
-
-        const error = new Error(
-            "User not found"
-        );
-
+        const error = new Error("User not found");
         error.statusCode = 404;
-
         throw error;
     }
 
+    // Delete from Cloudinary only when the saved URL is a Cloudinary URL.
+    if (user.profileImage && user.profileImage.includes("res.cloudinary.com")) {
+        const urlParts = new URL(user.profileImage).pathname.split("/");
+        const uploadIndex = urlParts.indexOf("upload");
 
-    // Delete image from server
-    if (user.profileImage) {
+        if (uploadIndex !== -1) {
+            const publicIdParts = urlParts.slice(uploadIndex + 1);
 
-        const imagePath =
-            path.join(
-                __dirname,
-                "..",
-                user.profileImage.replace(
-                    "/uploads/",
-                    "uploads/"
-                )
-            );
+            // Remove an optional version segment such as v123456789.
+            if (
+                publicIdParts[0] &&
+                /^v\d+$/.test(publicIdParts[0])
+            ) {
+                publicIdParts.shift();
+            }
 
-        if (fs.existsSync(imagePath)) {
+            const lastPart = publicIdParts.pop();
 
-            fs.unlinkSync(imagePath);
+            if (lastPart) {
+                publicIdParts.push(lastPart.replace(/\.[^.]+$/, ""));
+            }
 
+            const publicId = publicIdParts.join("/");
+
+            if (publicId) {
+                await cloudinary.uploader.destroy(publicId, {
+                    resource_type: "image",
+                });
+            }
         }
-
     }
 
-
-    // Remove image path from database
+    // Clear the database field, including for legacy local images.
     user.profileImage = "";
-
     await user.save();
-
 
     return {
         message: "Profile image removed successfully",
-        profileImage: ""
+        profileImage: "",
     };
-
 };
 
 

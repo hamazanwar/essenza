@@ -10,6 +10,20 @@ function OrderDetails() {
   const { orderId } = useParams();
   const navigate = useNavigate();
 
+  const getImageUrl = (image) => {
+  if (!image) return "";
+
+  // Cloudinary image URL
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  // Old local server image path
+  const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
+
+  return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -318,9 +332,9 @@ function OrderDetails() {
                   <div className="order-details-image">
                     {item.productImage ? (
                       <img
-                        src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
-                        alt={item.productName}
-                      />
+  src={getImageUrl(item.productImage)}
+  alt={item.productName}
+/>
                     ) : (
                       <span>No image</span>
                     )}

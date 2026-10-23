@@ -6,6 +6,17 @@ import { Heart } from "lucide-react";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 
+// Handle both Cloudinary URLs and legacy local image paths
+const getImageUrl = (image) => {
+  if (!image) return "";
+
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  return `${api.defaults.baseURL.replace(/\/api\/?$/, "")}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
 function ProductDetails() {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -454,7 +465,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
 </button>
               {product.productImage?.length > 0 ? (
                 <img
-                 src={`${api.defaults.baseURL.replace(/\/api$/, "")}${product.productImage[selectedImage]}`}
+                src={getImageUrl(product.productImage[selectedImage])}
                   alt={product.name}
                   style={{
                     transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
@@ -477,9 +488,9 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
                     onClick={() => setSelectedImage(index)}
                   >
                     <img
-                    src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
-                      alt={`${product.name} ${index + 1}`}
-                    />
+  src={getImageUrl(image)}
+  alt={`${product.name} ${index + 1}`}
+/>
                   </button>
                 ))}
               </div>

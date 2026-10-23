@@ -35,13 +35,13 @@ const updateAdminProfileImage = async (req, res) => {
       });
     }
 
-    // Create image path
-    const imagePath = `/uploads/profile/${req.file.filename}`;
+   // Cloudinary image URL
+const imagePath = req.file.path;
 
-    const result = await updateAdminProfileImageService(
-      req.admin.adminId,
-      imagePath,
-    );
+const result = await updateAdminProfileImageService(
+  req.admin.adminId,
+  imagePath,
+);
 
     res.status(200).json(result);
   } catch (error) {

@@ -5,6 +5,20 @@ import api from "../../services/api";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 
+
+const getImageUrl = (image) => {
+  if (!image) return "";
+
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
+
+  return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
+
 // Load Razorpay Checkout securely from Razorpay's hosted script.
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -335,10 +349,12 @@ function Payment() {
                 >
                   <div className="payment-item-image">
                     {item.productImage ? (
-                      <img
-                       src={`${api.defaults.baseURL.replace(/\/api$/, "")}${item.productImage}`}
-                        alt={item.productName}
-                      />
+                      
+<img
+  src={getImageUrl(item.productImage)}
+  alt={item.productName}
+/>
+
                     ) : (
                       <div>No Image</div>
                     )}
