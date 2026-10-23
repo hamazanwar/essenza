@@ -13,6 +13,20 @@ function AdminReviews() {
   const [actionLoading, setActionLoading] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+  const getImageUrl = (image) => {
+  if (!image) return "";
+
+  // Cloudinary image URL
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image;
+  }
+
+  // Old local server image path
+  const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
+
+  return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -174,15 +188,15 @@ await api.delete(`/reviews/admin/${deleteTarget._id}`, {
                 <article className="admin-review-card" key={review._id}>
                   <div className="admin-review-product">
                     {review.productId?.productImage?.[0] ? (
-                      <img
-                        src={`${api.defaults.baseURL.replace(/\/api$/, "")}${review.productId.productImage[0]}`}
-                        alt={review.productId.name || "Product"}
-                      />
-                    ) : (
-                      <div className="admin-review-image-placeholder">
-                        ESSENZA
-                      </div>
-                    )}
+  <img
+    src={getImageUrl(review.productId.productImage[0])}
+    alt={review.productId.name || "Product"}
+  />
+) : (
+  <div className="admin-review-image-placeholder">
+    ESSENZA
+  </div>
+)}
 
                     <div>
                       <span className="admin-review-label">PRODUCT</span>

@@ -131,6 +131,16 @@ const getAllReviewsAdmin = async (req, res) => {
   try {
     const reviews = await getAllReviewsAdminService();
 
+    console.log(
+      "Admin reviews product data:",
+      reviews.map((review) => ({
+        reviewId: review._id,
+        productId: review.productId?._id || review.productId,
+        productName: review.productId?.name,
+        productImage: review.productId?.productImage,
+      })),
+    );
+
     return res.status(200).json({
       success: true,
       reviews,
