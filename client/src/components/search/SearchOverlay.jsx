@@ -136,7 +136,16 @@ function SearchOverlay({ onClose }) {
           {!loading && products.length > 0 && (
             <div className="search-product-list">
               {products.slice(0, 8).map((product) => {
-                const image = product.productImage?.[0];
+               
+const rawImage = product.productImage?.[0];
+
+const image = rawImage
+  ? rawImage.startsWith("http://") ||
+    rawImage.startsWith("https://")
+    ? rawImage
+    : `${api.defaults.baseURL.replace(/\/api\/?$/, "")}${rawImage.startsWith("/") ? "" : "/"}${rawImage}`
+  : null;
+
 
                 const startingPrice = product.variants?.[0]?.price;
 
@@ -148,14 +157,20 @@ function SearchOverlay({ onClose }) {
                     onClick={() => handleProductClick(product._id)}
                   >
                     <div className="search-product-image">
-                      {image ? (
-                        <img
-                          src={`${api.defaults.baseURL.replace(/\/api$/, "")}${image}`}
-                          alt={product.name}
-                        />
-                      ) : (
-                        <span>No Image</span>
-                      )}
+                     
+{image ? (
+  <img
+    src={image}
+    alt={product.name}
+    onError={(event) => {
+      console.error("Failed to load product image:", image);
+      event.currentTarget.style.display = "none";
+    }}
+  />
+) : (
+  <span>No Image</span>
+)}
+
                     </div>
 
                     <div className="search-product-info">
