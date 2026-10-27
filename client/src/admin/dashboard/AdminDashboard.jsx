@@ -1,4 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -12,7 +21,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [period, setPeriod] = useState("7");
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+ 
 
   useEffect(() => {
     const fetchDashboardOrders = async () => {
@@ -177,24 +186,10 @@ orderCount: 0,
     return points;
   }, [validOrders, period]);
 
-  const maxSales = Math.max(1, ...chartData.map((item) => item.sales));
+  
 
-const chartCoordinates = chartData.map((item, index) => ({
-  x: chartData.length === 1
-    ? 50
-    : (index / (chartData.length - 1)) * 100,
-  y: 90 - (item.sales / maxSales) * 72,
-}));
 
-const chartPoints = chartCoordinates
-  .map((point) => `${point.x},${point.y}`)
-  .join(" ");
 
-const hoveredPoint =
-  hoveredIndex !== null ? chartData[hoveredIndex] : null;
-
-const hoveredCoordinate =
-  hoveredIndex !== null ? chartCoordinates[hoveredIndex] : null;
 
   const formatCurrency = (amount) =>
     `₹${Number(amount || 0).toLocaleString("en-IN", {
@@ -372,144 +367,100 @@ const hoveredCoordinate =
                 No sales recorded for this period.
               </p>
             ) : (
-              <>
-              
-<div className="dashboard-chart-grid">
-  <span />
-  <span />
-  <span />
-  <span />
-</div>
-
-<div className="dashboard-chart-plot">
-  <svg
-    className="dashboard-chart-svg"
-    viewBox="0 0 100 100"
-    preserveAspectRatio="none"
-    role="img"
-    aria-label="Interactive sales trend chart"
-    onMouseMove={(event) => {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const relativeX = (event.clientX - rect.left) / rect.width;
-      const index = Math.round(
-        relativeX * (chartData.length - 1)
-      );
-
-      setHoveredIndex(
-        Math.max(0, Math.min(chartData.length - 1, index))
-      );
-    }}
-    onMouseLeave={() => setHoveredIndex(null)}
-  >
-    <defs>
-      <linearGradient
-        id="dashboardSalesFill"
-        x1="0"
-        y1="0"
-        x2="0"
-        y2="1"
+             <>
+  <div className="dashboard-recharts">
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart
+        data={chartData}
+        margin={{ top: 20, right: 12, left: 12, bottom: 0 }}
       >
-        <stop
-          offset="0%"
-          stopColor="#c49a51"
-          stopOpacity="0.22"
+        <defs>
+          <linearGradient
+            id="salesGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop offset="0%" stopColor="#b68a3b" stopOpacity={0.2} />
+            <stop offset="100%" stopColor="#b68a3b" stopOpacity={0.01} />
+          </linearGradient>
+        </defs>
+
+        <CartesianGrid
+          vertical={false}
+          stroke="#eee7dc"
+          strokeDasharray="3 3"
         />
-        <stop
-          offset="100%"
-          stopColor="#c49a51"
-          stopOpacity="0.01"
+
+        <XAxis
+          dataKey="label"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fill: "#777", fontSize: 12 }}
+          interval="preserveStartEnd"
+          minTickGap={12}
         />
-      </linearGradient>
-    </defs>
 
-    <polygon
-      points={`0,100 ${chartPoints} 100,100`}
-      fill="url(#dashboardSalesFill)"
-    />
+        <YAxis hide domain={[0, "auto"]} />
 
-    <polyline
-      points={chartPoints}
-      fill="none"
-      stroke="#b68a3b"
-      strokeWidth="2"
-      vectorEffect="non-scaling-stroke"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
+        <Tooltip
+          cursor={{ stroke: "#b68a3b", strokeDasharray: "4 4" }}
+          content={({ active, payload }) => {
+            if (!active || !payload?.length) return null;
 
-    {hoveredCoordinate && (
-      <line
-        x1={hoveredCoordinate.x}
-        y1="10"
-        x2={hoveredCoordinate.x}
-        y2="92"
-        stroke="#b68a3b"
-        strokeWidth="1"
-        strokeDasharray="3 3"
-        vectorEffect="non-scaling-stroke"
-      />
-    )}
+            const item = payload[0].payload;
 
-    {chartCoordinates.map((point, index) => (
-      <circle
-  key={chartData[index].key}
-  cx={point.x}
-  cy={point.y}
-r={hoveredIndex === index ? 1.5 : 0.8}
-  fill={hoveredIndex === index ? "#b68a3b" : "#ffffff"}
-  stroke="#b68a3b"
-  strokeWidth="0.8"
-  vectorEffect="non-scaling-stroke"
-  pointerEvents="none"
-/>
-    ))}
-  </svg>
+            return (
+              <div className="dashboard-recharts-tooltip">
+                <span>
+                  {period === "12"
+                    ? item.start.toLocaleDateString("en-IN", {
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : item.start.toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                </span>
 
-  {hoveredPoint && hoveredCoordinate && (
-    <div
-      className="dashboard-chart-tooltip"
-      style={{
-        left: `${hoveredCoordinate.x}%`,
-        top: `${hoveredCoordinate.y}%`,
-      }}
-    >
-      <span>
-       {period === "12"
-  ? hoveredPoint.start.toLocaleDateString("en-IN", {
-      month: "long",
-      year: "numeric",
-    })
-  : hoveredPoint.start.toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    })}
-      </span>
+                <strong>{formatCurrency(item.sales)}</strong>
 
-      <strong>{formatCurrency(hoveredPoint.sales)}</strong>
+                <small>
+                  {item.orderCount}{" "}
+                  {item.orderCount === 1 ? "order" : "orders"}
+                </small>
+              </div>
+            );
+          }}
+        />
 
-      <small>
-        {hoveredPoint.orderCount}{" "}
-        {hoveredPoint.orderCount === 1 ? "order" : "orders"}
-      </small>
-    </div>
-  )}
-</div>
-
-<div className="dashboard-chart-labels">
-  {chartData.map((item) => (
-    <div key={item.key}>
-      <span>{item.label}</span>
-      <strong>{formatCurrency(item.sales)}</strong>
-    </div>
-  ))}
-</div>
-
-
-                
-
-               
-              </>
+        <Area
+          type="monotone"
+          dataKey="sales"
+          stroke="#b68a3b"
+          strokeWidth={2}
+          fill="url(#salesGradient)"
+          activeDot={{
+            r: 4,
+            fill: "#b68a3b",
+            stroke: "#ffffff",
+            strokeWidth: 2,
+          }}
+          dot={{
+            r: 2,
+            fill: "#ffffff",
+            stroke: "#b68a3b",
+            strokeWidth: 1,
+          }}
+          isAnimationActive={false}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  </div>
+</>
             )}
           </div>
         </section>
