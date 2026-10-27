@@ -2,6 +2,7 @@
 const mongoose = require("mongoose");
 const Wallet = require("../models/Wallet");
 const WalletTransaction = require("../models/WalletTransaction");
+const WithdrawalRequest = require("../models/WithdrawalRequest");
 
 // Find an existing wallet or create one for the user.
 const getOrCreateWalletService = async (userId) => {
@@ -27,6 +28,7 @@ const getOrCreateWalletService = async (userId) => {
 };
 
 // Get wallet balance and recent successful transactions.
+
 const getWalletDetailsService = async (userId) => {
   const wallet = await getOrCreateWalletService(userId);
 
@@ -36,23 +38,54 @@ const getWalletDetailsService = async (userId) => {
     throw error;
   }
 
+  // Fetch actual successful wallet transactions.
   const transactions = await WalletTransaction.find({
     walletId: wallet._id,
     status: "SUCCESS",
-  })
-    .sort({ createdAt: -1 })
-    .limit(10)
-    .lean();
+  }).lean();
+
+  // Fetch withdrawal requests that have not been completed.
+  const withdrawalRequests = await WithdrawalRequest.find({
+    userId,
+    walletId: wallet._id,
+    status: { $ne: "COMPLETED" },
+  }).lean();
+
+  // Convert requests into entries for the user's Recent Transactions.
+  const withdrawalEntries = withdrawalRequests.map((request) => ({
+    _id: `withdrawal-request-${request._id}`,
+    walletId: request.walletId,
+    userId: request.userId,
+    type: "DEBIT",
+    source: "WITHDRAWAL",
+    amount: request.amount,
+    status: request.status,
+    description: "Wallet Withdrawal",
+    createdAt: request.createdAt,
+  }));
+
+  // Combine transactions and requests, newest first.
+  const recentTransactions = [
+    ...transactions,
+    ...withdrawalEntries,
+  ]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
+    )
+    .slice(0, 10);
 
   return {
-  walletId: wallet._id,
-  balance: wallet.balance,
-  reservedBalance: wallet.reservedBalance || 0,
-  availableBalance:
-    wallet.balance - (wallet.reservedBalance || 0),
-  transactions,
+    walletId: wallet._id,
+    balance: wallet.balance,
+    reservedBalance: wallet.reservedBalance || 0,
+    availableBalance:
+      wallet.balance - (wallet.reservedBalance || 0),
+    transactions: recentTransactions,
+  };
 };
-};
+
 
 // Apply a credit or debit exactly once.
 // Call this only from trusted server-side payment/order/admin logic.

@@ -30,7 +30,8 @@ function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [cartMessage, setCartMessage] = useState("");
+ const [cartMessage, setCartMessage] = useState("");
+const [cartError, setCartError] = useState("");
 
   const [reviews, setReviews] = useState([]);
   const [myReviews, setMyReviews] = useState([]);
@@ -337,47 +338,58 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
   }
 };
 
-  const addToCart = async () => {
-    try {
-      const token = localStorage.getItem("token");
+  
+const addToCart = async () => {
+  const token = localStorage.getItem("token");
 
-      setError("");
-      setCartMessage("");
+  setCartMessage("");
+  setCartError("");
 
-      if (!token) {
-        setError("Please login to add products to your cart.");
-        return;
+  if (!token) {
+    setCartError("Please login to add products to your cart.");
+    return;
+  }
+
+  if (!selectedVariant) {
+    setCartError("Please select a product variant.");
+    return;
+  }
+
+  if (quantity > selectedVariant.stock) {
+    setCartError(
+      `Only ${selectedVariant.stock} items available in stock.`
+    );
+    return;
+  }
+
+  try {
+    const response = await api.post(
+      "/cart",
+      {
+        productId,
+        variantId: selectedVariant._id,
+        quantity,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
+    );
 
-      if (!selectedVariant) {
-        setError("Please select a product variant.");
-        return;
-      }
+    console.log("Add to cart response:", response.data);
 
-     const response = await api.post(
-  "/cart",
-  {
-    productId: productId,
-    variantId: selectedVariant._id,
-    quantity: quantity,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
-      console.log("Add to cart response:", response.data);
+    setCartMessage("Product added to cart successfully.");
+  } catch (error) {
+    console.error("Add to cart error:", error);
 
-      setCartMessage("Product added to cart successfully.");
-    } catch (error) {
-      console.error("Add to cart error:", error);
+    setCartError(
+      error.response?.data?.message ||
+      "Failed to add product to cart. Please try again."
+    );
+  }
+};
 
-      setError(
-        error.response?.data?.message || "Failed to add product to cart",
-      );
-    }
-  };
 
   if (loading) {
     return (
@@ -598,9 +610,19 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
                 </div>
               </div>
             )}
-            {cartMessage && (
-              <p className="cart-success-message">{cartMessage}</p>
-            )}
+            
+{cartMessage && (
+  <p className="cart-success-message" role="status">
+    {cartMessage}
+  </p>
+)}
+
+{cartError && (
+  <p className="cart-error-message" role="alert">
+    {cartError}
+  </p>
+)}
+
             {selectedVariant && selectedVariant.stock > 0 && (
               <div className="product-action-buttons">
                 <button

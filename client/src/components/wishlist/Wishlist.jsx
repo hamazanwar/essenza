@@ -27,7 +27,7 @@ function Wishlist() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState({});
   const [cartLoading, setCartLoading] = useState(null);
-  const [cartMessage, setCartMessage] = useState("");
+  const [cartMessages, setCartMessages] = useState({});
 
   // ==========================================
   // FETCH WISHLIST
@@ -93,71 +93,105 @@ function Wishlist() {
     }
   };
 
-  const addWishlistProductToCart = async (product) => {
-    const token = localStorage.getItem("token");
+  
+const addWishlistProductToCart = async (product) => {
+  const token = localStorage.getItem("token");
 
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+  if (!token) {
+    navigate("/login");
+    return;
+  }
 
-    const productId = product._id;
-    const variants = product.variants || [];
+  const productId = product._id;
+  const variants = product.variants || [];
 
-    console.log("Product:", product);
-    console.log("Product variants:", variants);
+  const selectedVariantId = selectedVariants[productId];
 
-    // Get the selected variant or the first available variant
-    const selectedVariantId = selectedVariants[productId];
+  const selectedVariant = variants.find(
+    (variant) => String(variant._id) === String(selectedVariantId)
+  );
 
-    const selectedVariant =
-      variants.find(
-        (variant) => String(variant._id) === String(selectedVariantId),
-      ) || variants.find((variant) => Number(variant.stock) > 0);
+  if (!selectedVariantId) {
+    setCartMessages((previous) => ({
+      ...previous,
+      [productId]: {
+        type: "error",
+        text: "Please select a size.",
+      },
+    }));
+    return;
+  }
 
-    // Check variant availability
-    if (!selectedVariant) {
-      setCartMessage(
-        "No available size found. Please select a size or open the product page.",
-      );
-      return;
-    }
+  if (!selectedVariant) {
+    setCartMessages((previous) => ({
+      ...previous,
+      [productId]: {
+        type: "error",
+        text: "Selected size is unavailable. Please choose another size.",
+      },
+    }));
+    return;
+  }
 
-    try {
-      setCartLoading(productId);
-      setCartMessage("");
+  if (Number(selectedVariant.stock) <= 0) {
+    setCartMessages((previous) => ({
+      ...previous,
+      [productId]: {
+        type: "error",
+        text: "This size is out of stock.",
+      },
+    }));
+    return;
+  }
+
+  try {
+    setCartLoading(productId);
+
+    setCartMessages((previous) => ({
+      ...previous,
+      [productId]: null,
+    }));
 
     const response = await api.post(
-  "/cart",
-  {
-    productId: productId,
-    variantId: selectedVariant._id,
-    quantity: 1,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
+      "/cart",
+      {
+        productId,
+        variantId: selectedVariant._id,
+        quantity: 1,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      console.log("Cart response:", response.data);
+    setCartMessages((previous) => ({
+      ...previous,
+      [productId]: {
+        type: "success",
+        text:
+          response.data?.message ||
+          `${product.name} added to cart successfully.`,
+      },
+    }));
+  } catch (error) {
+    console.error("Add to cart error:", error.response?.data || error.message);
 
-      setCartMessage(`${product.name} added to cart successfully.`);
-    } catch (error) {
-      console.error(
-        "Add to cart error:",
-        error.response?.data || error.message,
-      );
-
-      setCartMessage(
-        error.response?.data?.message ||
+    setCartMessages((previous) => ({
+      ...previous,
+      [productId]: {
+        type: "error",
+        text:
+          error.response?.data?.message ||
           "Unable to add this product to your cart.",
-      );
-    } finally {
-      setCartLoading(null);
-    }
-  };
+      },
+    }));
+  } finally {
+    setCartLoading(null);
+  }
+};
+
 
   // ==========================================
   // PAGINATION
@@ -345,16 +379,33 @@ function Wishlist() {
 
                       {/* ADD TO CART */}
 
-                      <button
-                        type="button"
-                        className="wishlist-add-cart-button"
-                        onClick={() => addWishlistProductToCart(product)}
-                        disabled={cartLoading === productId}
-                      >
-                        {cartLoading === productId
-                          ? "ADDING..."
-                          : "ADD TO CART"}
-                      </button>
+                      
+<button
+  type="button"
+  className="wishlist-add-cart-button"
+  onClick={() => addWishlistProductToCart(product)}
+  disabled={cartLoading === productId}
+>
+  {cartLoading === productId ? "ADDING..." : "ADD TO CART"}
+</button>
+
+{cartMessages[productId] && (
+  <p
+    className={`wishlist-cart-message ${
+      cartMessages[productId].type === "success"
+        ? "success"
+        : "error"
+    }`}
+    role={
+      cartMessages[productId].type === "success"
+        ? "status"
+        : "alert"
+    }
+  >
+    {cartMessages[productId].text}
+  </p>
+)}
+
                     </div>
                   </article>
                 );

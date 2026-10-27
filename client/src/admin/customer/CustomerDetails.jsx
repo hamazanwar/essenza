@@ -95,6 +95,43 @@ function CustomerDetails() {
     }
   };
 
+  
+  const handleCompleteWithdrawal = async (requestId) => {
+    try {
+      setReviewLoadingId(requestId);
+      setReviewMessage("");
+      setReviewError("");
+
+      const token = localStorage.getItem("adminToken");
+
+      const response = await api.patch(
+        `/admin/customers/${id}/wallet/withdrawals/${requestId}/complete`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setReviewMessage(
+        response.data.message || "Withdrawal payout completed successfully.",
+      );
+
+      await fetchCustomerWallet();
+    } catch (error) {
+      console.error("Complete withdrawal payout error:", error);
+
+      setReviewError(
+        error.response?.data?.message ||
+          "Failed to complete withdrawal payout.",
+      );
+    } finally {
+      setReviewLoadingId(null);
+    }
+  };
+
+
   useEffect(() => {
     fetchCustomerWallet();
   }, [id]);
@@ -360,43 +397,52 @@ function CustomerDetails() {
                             <td>{request.status}</td>
 
                             <td>
-                              {request.status === "PENDING" ? (
-                                <div className="withdrawal-admin-actions">
-                                  <button
-                                    type="button"
-                                    className="withdrawal-approve-button"
-                                    disabled={reviewLoadingId !== null}
-                                    onClick={() =>
-                                      setWithdrawalConfirmation({
-                                        requestId: request._id,
-                                        action: "APPROVE",
-                                      })
-                                    }
-                                  >
-                                    {reviewLoadingId === request._id
-                                      ? "Processing..."
-                                      : "Approve"}
-                                  </button>
+                              
+  {request.status === "PENDING" ? (
+    <div className="withdrawal-admin-actions">
+      <button
+        type="button"
+        className="withdrawal-approve-button"
+        disabled={reviewLoadingId !== null}
+        onClick={() =>
+          setWithdrawalConfirmation({
+            requestId: request._id,
+            action: "APPROVE",
+          })
+        }
+      >
+        Approve
+      </button>
 
-                                  <button
-                                    type="button"
-                                    className="withdrawal-reject-button"
-                                    disabled={reviewLoadingId !== null}
-                                    onClick={() =>
-                                      setWithdrawalConfirmation({
-                                        requestId: request._id,
-                                        action: "REJECT",
-                                      })
-                                    }
-                                  >
-                                    {reviewLoadingId === request._id
-                                      ? "Processing..."
-                                      : "Reject"}
-                                  </button>
-                                </div>
-                              ) : (
-                                "—"
-                              )}
+      <button
+        type="button"
+        className="withdrawal-reject-button"
+        disabled={reviewLoadingId !== null}
+        onClick={() =>
+          setWithdrawalConfirmation({
+            requestId: request._id,
+            action: "REJECT",
+          })
+        }
+      >
+        Reject
+      </button>
+    </div>
+  ) : request.status === "APPROVED" ? (
+    <button
+      type="button"
+      className="withdrawal-approve-button"
+      disabled={reviewLoadingId !== null}
+      onClick={() => handleCompleteWithdrawal(request._id)}
+    >
+      {reviewLoadingId === request._id
+        ? "Processing..."
+        : "Complete Payout"}
+    </button>
+  ) : (
+    "—"
+  )}
+
                             </td>
                           </tr>
                         ))}

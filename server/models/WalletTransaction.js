@@ -32,6 +32,7 @@ const walletTransactionSchema = new mongoose.Schema(
     "EXCHANGE_PAYMENT",
     "ADMIN_CREDIT",
     "ADMIN_DEBIT",
+    "WITHDRAWAL",
   ],
   required: true,
 },

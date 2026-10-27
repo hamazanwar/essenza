@@ -260,6 +260,22 @@ function OrderDetails() {
 
   const address = order.addressId || {};
 
+  
+const orderStages = [
+  "PENDING",
+  "CONFIRMED",
+  "SHIPPED",
+  "OUT FOR DELIVERY",
+  "DELIVERED",
+];
+
+const currentStatus = String(order.orderStatus || "")
+  .toUpperCase()
+  .replaceAll("_", " ");
+
+const currentStageIndex = orderStages.indexOf(currentStatus);
+
+
   return (
     <>
       <Navbar />
@@ -289,6 +305,54 @@ function OrderDetails() {
               {order.orderStatus}
             </span>
           </header>
+
+          
+<section className="order-tracking">
+  <h2>ORDER TRACKING</h2>
+
+  {currentStatus === "CANCELLED" ? (
+    <p className="order-tracking-cancelled">
+      This order has been cancelled.
+    </p>
+  ) : (
+    <div className="order-tracking-timeline">
+      {orderStages.map((stage, index) => {
+        const completed = index <= currentStageIndex;
+
+        return (
+          <div className="order-tracking-step" key={stage}>
+            <div className="order-tracking-step-top">
+              <div
+                className={`order-tracking-bubble ${
+                  completed ? "completed" : ""
+                }`}
+              >
+                {index < currentStageIndex ? "✓" : index + 1}
+              </div>
+
+              {index < orderStages.length - 1 && (
+                <div
+                  className={`order-tracking-line ${
+                    index < currentStageIndex ? "completed" : ""
+                  }`}
+                />
+              )}
+            </div>
+
+            <span
+              className={`order-tracking-label ${
+                completed ? "completed" : ""
+              }`}
+            >
+              {stage}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  )}
+</section>
+
 
           <section className="order-details-card">
             <h2>ORDER INFORMATION</h2>

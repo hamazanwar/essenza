@@ -217,6 +217,47 @@ function Wallet() {
     return <div className="wallet-page">Loading wallet...</div>;
   }
 
+  const getTransactionLabel = (transaction) => {
+  const source = String(transaction.source || "").toUpperCase();
+  const type = String(transaction.type || "").toUpperCase();
+  const status = String(transaction.status || "").toUpperCase();
+  const description = String(transaction.description || "");
+
+  // Withdrawals must not be displayed as refunds.
+  if (
+    source.includes("WITHDRAW") ||
+    description.toUpperCase().includes("WITHDRAW")
+  ) {
+    if (status === "APPROVED") {
+      return "Withdrawal Approved — Payout Pending";
+    }
+
+    if (status === "PENDING") {
+      return "Withdrawal Request Pending";
+    }
+
+    if (status === "REJECTED") {
+      return "Withdrawal Request Rejected";
+    }
+
+    return "Wallet Withdrawal";
+  }
+
+  if (source.includes("REFUND") || description.toUpperCase().includes("REFUND")) {
+    return "Refund";
+  }
+
+  if (source.includes("TOP_UP") || source.includes("TOPUP")) {
+    return "Wallet Top-up";
+  }
+
+  return description || source.replaceAll("_", " ") || type;
+};
+
+const isCreditTransaction = (transaction) => {
+  return String(transaction.type || "").toUpperCase() === "CREDIT";
+};
+
   return (
     <div>
       <Navbar />
@@ -330,28 +371,25 @@ function Wallet() {
               transactions.map((transaction) => (
                 <div className="wallet-transaction" key={transaction._id}>
                   <div>
-                    <h3>
-                      {transaction.description ||
-                        transaction.source.replaceAll("_", " ")}
-                    </h3>
+                    <h3>{getTransactionLabel(transaction)}</h3>
                     <p>
                       {new Date(transaction.createdAt).toLocaleString("en-IN")}
                     </p>
                   </div>
 
-                  <strong
-                    className={
-                      transaction.type === "CREDIT"
-                        ? "wallet-credit"
-                        : "wallet-debit"
-                    }
-                  >
-                    {transaction.type === "CREDIT" ? "+" : "-"}
-                    {Number(transaction.amount).toLocaleString("en-IN", {
-                      style: "currency",
-                      currency: "INR",
-                    })}
-                  </strong>
+                 <strong
+  className={
+    isCreditTransaction(transaction)
+      ? "wallet-credit"
+      : "wallet-debit"
+  }
+>
+  {isCreditTransaction(transaction) ? "+" : "-"}
+  {Number(transaction.amount).toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+  })}
+</strong>
                 </div>
               ))
             )}

@@ -404,26 +404,66 @@ const [returnError, setReturnError] = useState("");
   return Date.now() <= deadline;
 };
 
-const getItemReturnStatus = (orderId, item) => {
-  const productId = String(item.productId?._id || item.productId || "");
-  const variantId = String(item.variantId?._id || item.variantId || "");
 
-  const matchingItems = myReturnRequests.flatMap((request) =>
-    request.orderId?._id === orderId || request.orderId === orderId
-      ? request.items.filter(
-          (returnItem) =>
-            String(returnItem.productId?._id || returnItem.productId) === productId &&
-            String(returnItem.variantId?._id || returnItem.variantId) === variantId
-        )
-      : []
+const getItemReturnRequest = (orderId, item) => {
+  const getId = (value) =>
+    String(
+      value && typeof value === "object"
+        ? value._id || ""
+        : value || ""
+    );
+
+  const productId = getId(item.productId);
+  const variantId = getId(item.variantId);
+
+  const matchingRequests = myReturnRequests
+    .filter((request) => {
+      if (getId(request.orderId) !== getId(orderId)) {
+        return false;
+      }
+
+      return (request.items || []).some((returnItem) => {
+        const sameProduct =
+          getId(returnItem.productId) === productId;
+
+        const sameVariant =
+          getId(returnItem.variantId) === variantId;
+
+        return sameProduct && sameVariant;
+      });
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt || b.createdAt || 0).getTime() -
+        new Date(a.updatedAt || a.createdAt || 0).getTime()
+    );
+
+  const request = matchingRequests[0];
+
+  if (!request) return null;
+
+  const matchingItem = request.items.find(
+    (returnItem) =>
+      getId(returnItem.productId) === productId &&
+      getId(returnItem.variantId) === variantId
   );
 
-  return matchingItems.reduce(
-    (total, returnItem) =>
-      returnItem.status !== "REJECTED" ? total + returnItem.quantity : total,
-    0
-  );
+  return {
+    type: String(request.requestType || "RETURN").toUpperCase(),
+    status: String(
+      matchingItem?.status || request.status || "PENDING"
+    ).toUpperCase(),
+  };
 };
+
+
+const isReturnOrExchangeCompleted = (orderId, item) => {
+  const request = getItemReturnRequest(orderId, item);
+
+  return request?.status === "COMPLETED";
+};
+
+
 
   if (loading) {
     return (
@@ -512,8 +552,37 @@ const getItemReturnStatus = (orderId, item) => {
 
                           <p>Size: {item.size}</p>
                           <p>Quantity: {item.quantity}</p>
-                          {String(order.orderStatus).toUpperCase() === "DELIVERED" &&
-  isWithinReturnWindow(order) && (
+                          
+{(() => {
+  const returnRequest = getItemReturnRequest(order._id, item);
+
+  if (!returnRequest) return null;
+
+  const { type, status } = returnRequest;
+
+  const statusLabels = {
+    PENDING: `${type} PENDING`,
+    APPROVED: `${type} APPROVED`,
+    COMPLETED: `${type} COMPLETED`,
+    REJECTED: `${type} REJECTED`,
+  };
+
+  return (
+    <p
+      className={`my-order-return-status ${status.toLowerCase()}`}
+      role="status"
+    >
+      {statusLabels[status] || `${type}: ${status.replace(/_/g, " ")}`}
+    </p>
+  );
+})()}
+
+{String(order.orderStatus).toUpperCase() === "DELIVERED" &&
+  isWithinReturnWindow(order) &&
+  !(
+    getItemReturnRequest(order._id, item)?.type === "RETURN" &&
+    getItemReturnRequest(order._id, item)?.status === "COMPLETED"
+  ) && (
     <button
       type="button"
       className="my-order-return-button"
@@ -522,6 +591,7 @@ const getItemReturnStatus = (orderId, item) => {
       RETURN / EXCHANGE
     </button>
   )}
+
                           
 
                           <button

@@ -321,6 +321,7 @@ const reviewWithdrawalRequest = async (req, res) => {
 };
 
 const completeWithdrawalPayout = async (req, res) => {
+    console.log("✅ completeWithdrawalPayout CALLED");
     const session = await mongoose.startSession();
 
     try {
@@ -424,13 +425,21 @@ const completeWithdrawalPayout = async (req, res) => {
                 throw error;
             }
 
+            console.log("PAYOUT TRANSACTION:", {
+  walletId: String(wallet._id),
+  userId: String(customerId),
+  source: "WITHDRAWAL",
+  amount,
+  referenceId,
+});
+console.log("✅ SAVING WITHDRAWAL TRANSACTION");
             await WalletTransaction.create(
                 [
                     {
                         walletId: wallet._id,
                         userId: customerId,
                         type: "DEBIT",
-                        source: "ADMIN_DEBIT",
+                        source: "WITHDRAWAL",
                         amount,
                         balanceBefore,
                         balanceAfter: updatedWallet.balance,
