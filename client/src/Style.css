@@ -6897,3 +6897,26 @@
     font-size: 12px;
   }
 }
+
+
+
+
+.product-field {
+  width: 100%;
+  min-width: 0;
+}
+
+.product-field-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 6px 0 12px;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.product-field input,
+.product-field select,
+.product-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+}

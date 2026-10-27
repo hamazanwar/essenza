@@ -185,8 +185,10 @@ function AddProduct() {
   ]);
 
   const [adding, setAdding] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+const [error, setError] = useState("");
+const [success, setSuccess] = useState("");
+
+const [fieldErrors, setFieldErrors] = useState({});
 
   // FETCH CATEGORIES
   const fetchCategories = async () => {
@@ -209,61 +211,58 @@ function AddProduct() {
 
   // ADD PRODUCT
   const handleAddProduct = async () => {
-    // PRODUCT NAME VALIDATION
+    
+    // FIELD VALIDATION
+    const errors = {};
+
     if (!productName.trim()) {
-      setError("Product name is required.");
-      setSuccess("");
-      return;
+      errors.productName = "Product name is required.";
     }
 
-    // CATEGORY VALIDATION
     if (!categoryId) {
-      setError("Please select a category.");
-      setSuccess("");
-      return;
+      errors.categoryId = "Please select a category.";
     }
 
-    // DESCRIPTION VALIDATION
     if (!description.trim()) {
-      setError("Product description is required.");
-      setSuccess("");
-      return;
+      errors.description = "Product description is required.";
     }
 
-    // VARIANT VALIDATION
     if (variants.length === 0) {
-      setError("At least one product variant is required.");
-      setSuccess("");
+      errors.variants = "At least one product variant is required.";
+    } else {
+      const hasInvalidVariant = variants.some(
+        (variant) =>
+          !variant.size.trim() ||
+          variant.price === "" ||
+          variant.stock === "" ||
+          !Number.isFinite(Number(variant.price)) ||
+          !Number.isFinite(Number(variant.stock)) ||
+          Number(variant.price) < 0 ||
+          Number(variant.stock) < 0
+      );
+
+      if (hasInvalidVariant) {
+        errors.variants =
+          "Enter a valid size, price and stock for every variant.";
+      }
+
+      const variantSizes = variants.map((variant) =>
+        variant.size.trim().toLowerCase()
+      );
+
+      if (new Set(variantSizes).size !== variantSizes.length) {
+        errors.variants = "Each product variant must have a different size.";
+      }
+    }
+
+    setFieldErrors(errors);
+    setError("");
+    setSuccess("");
+
+    if (Object.keys(errors).length > 0) {
       return;
     }
 
-    const hasInvalidVariant = variants.some(
-      (variant) =>
-        !variant.size.trim() ||
-        variant.price === "" ||
-        variant.stock === "" ||
-        Number(variant.price) < 0 ||
-        Number(variant.stock) < 0,
-    );
-
-    if (hasInvalidVariant) {
-      setError("Please enter valid size, price and stock for all variants.");
-      setSuccess("");
-      return;
-    }
-
-    // DUPLICATE SIZE VALIDATION
-    const variantSizes = variants.map((variant) =>
-      variant.size.trim().toLowerCase(),
-    );
-
-    const hasDuplicateSize = new Set(variantSizes).size !== variantSizes.length;
-
-    if (hasDuplicateSize) {
-      setError("Each product variant must have a different size.");
-      setSuccess("");
-      return;
-    }
 
     try {
       setAdding(true);
@@ -363,35 +362,79 @@ for (const variant of variants) {
 
         <div className="product-form">
           {/* PRODUCT NAME */}
-          <input
-            type="text"
-            placeholder="Product name"
-            value={productName}
-            onChange={(event) => setProductName(event.target.value)}
-          />
+          <div className="product-field">
+  <input
+    type="text"
+    placeholder="Product name"
+    value={productName}
+    onChange={(event) => {
+      setProductName(event.target.value);
+      setFieldErrors((previous) => ({
+        ...previous,
+        productName: "",
+      }));
+    }}
+  />
+
+  {fieldErrors.productName && (
+    <p className="product-field-error">{fieldErrors.productName}</p>
+  )}
+</div>
 
           {/* CATEGORY */}
-          <select
-            value={categoryId}
-            onChange={(event) => setCategoryId(event.target.value)}
-          >
-            <option value="">Select category</option>
+         
+<div className="product-field">
+  <select
+    value={categoryId}
+    onChange={(event) => {
+      setCategoryId(event.target.value);
+      setFieldErrors((previous) => ({
+        ...previous,
+        categoryId: "",
+      }));
+    }}
+  >
+    <option value="">Select category</option>
 
-            {categories
-              .filter((category) => category.isActive)
-              .map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-          </select>
+    {categories
+      .filter((category) => category.isActive)
+      .map((category) => (
+        <option key={category._id} value={category._id}>
+          {category.name}
+        </option>
+      ))}
+  </select>
+
+  {fieldErrors.categoryId && (
+    <p className="product-field-error">
+      {fieldErrors.categoryId}
+    </p>
+  )}
+</div>
+
 
           {/* DESCRIPTION */}
-          <textarea
-            placeholder="Product description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
+          
+<div className="product-field">
+  <textarea
+    placeholder="Product description"
+    value={description}
+    onChange={(event) => {
+      setDescription(event.target.value);
+      setFieldErrors((previous) => ({
+        ...previous,
+        description: "",
+      }));
+    }}
+  />
+
+  {fieldErrors.description && (
+    <p className="product-field-error">
+      {fieldErrors.description}
+    </p>
+  )}
+</div>
+
 
           {/* FRAGRANCE NOTES */}
           <textarea
@@ -507,12 +550,20 @@ for (const variant of variants) {
                   </button>
                 )}
               </div>
+            
             ))}
+
+            {fieldErrors.variants && (
+              <p className="product-field-error">
+                {fieldErrors.variants}
+              </p>
+            )}
           </div>
 
           {/* ==========================================
     PRODUCT IMAGES
 ========================================== */}
+
 
           <input
             type="file"
