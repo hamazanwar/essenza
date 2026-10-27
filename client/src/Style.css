@@ -3788,12 +3788,51 @@
 }
 
 .dashboard-chart-svg {
-  position: relative;
-  z-index: 1;
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 175px;
+  height: 100%;
   overflow: visible;
+  cursor: crosshair;
+}
+
+.dashboard-chart-plot {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: visible;
+}
+
+.dashboard-chart-tooltip {
+  position: absolute;
+  z-index: 5;
+  min-width: 130px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #151515;
+  color: #fff;
+  border: 1px solid #b68a3b;
+  border-radius: 5px;
+  box-shadow: 0 5px 18px rgb(0 0 0 / 12%);
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 14px));
+  white-space: nowrap;
+}
+
+.dashboard-chart-tooltip span {
+  color: #d8bd8c;
+  font-size: 11px;
+}
+
+.dashboard-chart-tooltip strong {
+  font-size: 17px;
+}
+
+.dashboard-chart-tooltip small {
+  color: #c7c7c7;
+  font-size: 12px;
 }
 
 .dashboard-chart-labels {
@@ -6726,3 +6765,15 @@
     padding: 28px 20px 20px !important;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
