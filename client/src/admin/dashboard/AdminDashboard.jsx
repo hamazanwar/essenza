@@ -111,13 +111,45 @@ function AdminDashboard() {
     return counts;
   }, [orders]);
 
-  const recentOrders = useMemo(
-    () =>
-      [...orders]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 6),
-    [orders],
-  );
+
+const topSellingProducts = useMemo(() => {
+  const productMap = new Map();
+
+  orders
+    .filter((order) => order.orderStatus !== "CANCELLED")
+    .filter((order) => order.paymentStatus !== "FAILED")
+    .forEach((order) => {
+      (order.items || []).forEach((item) => {
+        const productId = String(
+          item.productId?._id || item.productId || item.productName
+        );
+
+        if (!productMap.has(productId)) {
+          productMap.set(productId, {
+            productId,
+            name: item.productName || "Unnamed product",
+            image: item.productImage || "",
+            quantitySold: 0,
+            revenue: 0,
+          });
+        }
+
+        const product = productMap.get(productId);
+
+        product.quantitySold += Number(item.quantity || 0);
+        product.revenue += Number(item.totalPrice || 0);
+
+        if (!product.image && item.productImage) {
+          product.image = item.productImage;
+        }
+      });
+    });
+
+  return Array.from(productMap.values())
+    .sort((a, b) => b.quantitySold - a.quantitySold)
+    .slice(0, 6);
+}, [orders]);
+
 
   const chartData = useMemo(() => {
     const now = new Date();
@@ -466,75 +498,56 @@ orderCount: 0,
         </section>
 
         <section className="dashboard-lower-grid">
-          <div className="dashboard-recent-panel">
-            <div className="dashboard-panel-heading">
-              <div>
-                <h2>Recent orders</h2>
-                <p>Your latest customer purchases</p>
-              </div>
+          
+<div className="dashboard-recent-panel dashboard-top-products-panel">
+  <div className="dashboard-panel-heading">
+    <div>
+      <h2>Top Selling Products</h2>
+      <p>Your best-performing perfumes</p>
+    </div>
+  </div>
 
-              <button
-                type="button"
-                className="dashboard-text-link"
-                onClick={() => navigate("/admin/orders")}
-              >
-                VIEW ALL ↗
-              </button>
-            </div>
+  {loading ? (
+    <p className="dashboard-empty">Loading top-selling products...</p>
+  ) : topSellingProducts.length === 0 ? (
+    <p className="dashboard-empty">No sales data available yet.</p>
+  ) : (
+    <div className="dashboard-top-products-list">
+      {topSellingProducts.map((product, index) => (
+        <div className="dashboard-top-product" key={product.productId}>
+          <span className="dashboard-top-product-rank">
+            {String(index + 1).padStart(2, "0")}
+          </span>
 
-            {loading ? (
-              <p className="dashboard-empty">Loading recent orders...</p>
-            ) : recentOrders.length === 0 ? (
-              <p className="dashboard-empty">No orders have been placed yet.</p>
+          <div className="dashboard-top-product-image">
+            {product.image ? (
+              <img
+                src={
+                  product.image.startsWith("http")
+                    ? product.image
+                    : `${api.defaults.baseURL.replace(/\/api\/?$/, "")}${product.image}`
+                }
+                alt={product.name}
+              />
             ) : (
-              <div className="dashboard-table-wrap">
-                <table className="dashboard-orders-table">
-                  <thead>
-                    <tr>
-                      <th>ORDER</th>
-                      <th>CUSTOMER</th>
-                      <th>DATE</th>
-                      <th>AMOUNT</th>
-                      <th>STATUS</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {recentOrders.map((order) => (
-                      <tr key={order._id}>
-                        <td>
-                          <strong>
-                            #{String(order._id).slice(-6).toUpperCase()}
-                          </strong>
-                        </td>
-
-                        <td>{order.userId?.name || "Customer"}</td>
-
-                        <td>{formatDate(order.createdAt)}</td>
-
-                        <td className="dashboard-order-amount">
-                          {formatCurrency(order.totalAmount)}
-                        </td>
-
-                        <td>
-                          <span
-                            className={`dashboard-status ${getStatusClass(
-                              order.orderStatus,
-                            )}`}
-                          >
-                            {String(order.orderStatus || "PENDING").replaceAll(
-                              "_",
-                              " ",
-                            )}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <span>ESSENZA</span>
             )}
           </div>
+
+          <div className="dashboard-top-product-info">
+            <strong>{product.name}</strong>
+            <span>{product.quantitySold} units sold</span>
+          </div>
+
+          <strong className="dashboard-top-product-revenue">
+            {formatCurrency(product.revenue)}
+          </strong>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
 
           <aside className="dashboard-side-panels">
             <div className="dashboard-quick-panel">
