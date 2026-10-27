@@ -7572,6 +7572,61 @@ body {
   }
 }
 
+.checkout-address-form {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #dedede;
+  background: #fff;
+}
+
+.checkout-address-form h3 {
+  margin: 0 0 24px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.checkout-address-form label {
+  display: block;
+  margin: 18px 0 8px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.checkout-address-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid #d8d8d8;
+  background: #fafafa;
+  font: inherit;
+}
+
+.checkout-address-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.checkout-address-form-actions button {
+  padding: 13px 22px;
+  border: 1px solid #171717;
+  background: #171717;
+  color: #fff;
+  cursor: pointer;
+}
+
+.checkout-address-form-actions button[type="button"] {
+  background: #eee;
+  border-color: #eee;
+  color: #171717;
+}
+
+.checkout-address-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* review */
 
 .my-order-write-review-button {

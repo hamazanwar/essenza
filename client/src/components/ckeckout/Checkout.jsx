@@ -40,6 +40,19 @@ function Checkout() {
   const [couponMessage, setCouponMessage] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
 
+  const [showAddressForm, setShowAddressForm] = useState(false);
+
+const [newAddress, setNewAddress] = useState({
+  fullName: "",
+  address: "",
+  city: "",
+  state: "",
+  pincode: "",
+});
+
+const [addressSaving, setAddressSaving] = useState(false);
+const [addressFormError, setAddressFormError] = useState("");
+
   // ==========================================
   // FETCH CHECKOUT ITEMS
   // ==========================================
@@ -263,6 +276,79 @@ function Checkout() {
     fetchAddresses();
   }, [navigate]);
 
+  const handleOpenAddressForm = () => {
+  setNewAddress({
+    fullName: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  setAddressFormError("");
+  setShowAddressForm(true);
+};
+
+const handleCancelAddressForm = () => {
+  setShowAddressForm(false);
+  setAddressFormError("");
+};
+
+const handleSaveCheckoutAddress = async (event) => {
+  event.preventDefault();
+
+  try {
+    setAddressSaving(true);
+    setAddressFormError("");
+
+    const token = localStorage.getItem("token");
+
+    const response = await api.post(
+      "/users/address",
+      newAddress,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const savedAddress = response.data.address;
+
+    if (!savedAddress?._id) {
+      throw new Error("Address was saved, but its details were not returned.");
+    }
+
+    setAddresses((previousAddresses) => [
+      ...previousAddresses,
+      savedAddress,
+    ]);
+
+    // Automatically select the newly saved address.
+    setSelectedAddressId(savedAddress._id);
+
+    setShowAddressForm(false);
+
+    setNewAddress({
+      fullName: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+    });
+  } catch (error) {
+    console.error("Save checkout address error:", error);
+
+    setAddressFormError(
+      error.response?.data?.message ||
+        error.message ||
+        "Unable to save address. Please try again.",
+    );
+  } finally {
+    setAddressSaving(false);
+  }
+};
+
   // PRICE CALCULATIONS
 
   const originalSubtotal = checkoutItems.reduce(
@@ -417,65 +503,173 @@ function Checkout() {
           ========================================== */}
 
           <section className="checkout-section">
-            <div className="checkout-section-header">
-              <h2>DELIVERY ADDRESS</h2>
+  <div className="checkout-section-header">
+    <h2>DELIVERY ADDRESS</h2>
 
-              <button
-                type="button"
-                className="checkout-add-address-button"
-                onClick={() => navigate("/profile")}
-              >
-                + ADD ADDRESS
-              </button>
+    {!showAddressForm && (
+      <button
+        type="button"
+        className="checkout-add-address-button"
+        onClick={handleOpenAddressForm}
+      >
+        + ADD ADDRESS
+      </button>
+    )}
+  </div>
+
+  {showAddressForm && (
+    <form
+      className="checkout-address-form"
+      onSubmit={handleSaveCheckoutAddress}
+    >
+      <h3>ADD NEW ADDRESS</h3>
+
+      {addressFormError && (
+        <p className="checkout-error-message">
+          {addressFormError}
+        </p>
+      )}
+
+      <label htmlFor="checkout-fullName">FULL NAME</label>
+      <input
+        id="checkout-fullName"
+        type="text"
+        value={newAddress.fullName}
+        onChange={(event) =>
+          setNewAddress({
+            ...newAddress,
+            fullName: event.target.value,
+          })
+        }
+        placeholder="Your name"
+        required
+      />
+
+      <label htmlFor="checkout-address">ADDRESS</label>
+      <input
+        id="checkout-address"
+        type="text"
+        value={newAddress.address}
+        onChange={(event) =>
+          setNewAddress({
+            ...newAddress,
+            address: event.target.value,
+          })
+        }
+        placeholder="House / Street / Area"
+        required
+      />
+
+      <label htmlFor="checkout-city">CITY</label>
+      <input
+        id="checkout-city"
+        type="text"
+        value={newAddress.city}
+        onChange={(event) =>
+          setNewAddress({
+            ...newAddress,
+            city: event.target.value,
+          })
+        }
+        placeholder="City"
+        required
+      />
+
+      <label htmlFor="checkout-state">STATE</label>
+      <input
+        id="checkout-state"
+        type="text"
+        value={newAddress.state}
+        onChange={(event) =>
+          setNewAddress({
+            ...newAddress,
+            state: event.target.value,
+          })
+        }
+        placeholder="State"
+        required
+      />
+
+      <label htmlFor="checkout-pincode">PINCODE</label>
+      <input
+        id="checkout-pincode"
+        type="text"
+        value={newAddress.pincode}
+        onChange={(event) =>
+          setNewAddress({
+            ...newAddress,
+            pincode: event.target.value,
+          })
+        }
+        placeholder="Pincode"
+        required
+      />
+
+      <div className="checkout-address-form-actions">
+        <button type="submit" disabled={addressSaving}>
+          {addressSaving ? "SAVING..." : "SAVE ADDRESS"}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleCancelAddressForm}
+          disabled={addressSaving}
+        >
+          CANCEL
+        </button>
+      </div>
+    </form>
+  )}
+
+  {!showAddressForm && addresses.length === 0 && (
+    <div className="checkout-no-address">
+      <p>No delivery address found.</p>
+
+      <button type="button" onClick={handleOpenAddressForm}>
+        ADD ADDRESS
+      </button>
+    </div>
+  )}
+
+  {!showAddressForm && addresses.length > 0 && (
+    <div className="checkout-address-list">
+      {addresses.map((address) => (
+        <label
+          key={address._id}
+          className={`checkout-address-card ${
+            selectedAddressId === address._id ? "selected" : ""
+          }`}
+        >
+          <input
+            type="radio"
+            name="checkout-address"
+            value={address._id}
+            checked={selectedAddressId === address._id}
+            onChange={() => setSelectedAddressId(address._id)}
+          />
+
+          <div className="checkout-address-content">
+            <div className="checkout-address-top">
+              <strong>{address.fullName}</strong>
+
+              {address.isDefault && (
+                <span className="checkout-default-label">
+                  DEFAULT
+                </span>
+              )}
             </div>
 
-            {addresses.length === 0 ? (
-              <div className="checkout-no-address">
-                <p>No delivery address found.</p>
+            <p>{address.address}</p>
 
-                <button type="button" onClick={() => navigate("/profile")}>
-                  ADD ADDRESS
-                </button>
-              </div>
-            ) : (
-              <div className="checkout-address-list">
-                {addresses.map((address) => (
-                  <label
-                    key={address._id}
-                    className={`checkout-address-card ${
-                      selectedAddressId === address._id ? "selected" : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="checkout-address"
-                      value={address._id}
-                      checked={selectedAddressId === address._id}
-                      onChange={() => setSelectedAddressId(address._id)}
-                    />
-
-                    <div className="checkout-address-content">
-                      <div className="checkout-address-top">
-                        <strong>{address.fullName}</strong>
-
-                        {address.isDefault && (
-                          <span className="checkout-default-label">
-                            DEFAULT
-                          </span>
-                        )}
-                      </div>
-
-                      <p>{address.address}</p>
-
-                      <p>
-                        {address.city}, {address.state} - {address.pincode}
-                      </p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            )}
-          </section>
+            <p>
+              {address.city}, {address.state} - {address.pincode}
+            </p>
+          </div>
+        </label>
+      ))}
+    </div>
+  )}
+</section>
 
           {/* ==========================================
               ORDER SUMMARY
