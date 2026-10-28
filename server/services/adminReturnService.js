@@ -11,7 +11,14 @@ const { applyWalletTransactionService } = require("./walletService");
 const getAllReturnRequestsService = async () => {
   return await ReturnRequest.find()
     .populate("userId", "name email")
-    .populate("orderId", "orderStatus deliveredAt")
+    .populate({
+      path: "orderId",
+      select: "orderStatus deliveredAt userId",
+      populate: {
+        path: "userId",
+        select: "name email",
+      },
+    })
     .populate("items.productId", "name productImage")
     .populate("items.variantId", "size price stock")
     .populate("items.exchangeVariantId", "size price stock")

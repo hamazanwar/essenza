@@ -7012,3 +7012,122 @@
 .admin-order-search button:hover {
   background: #333;
 }
+
+/* ADMIN RETURN / EXCHANGE PAGINATION */
+.admin-return-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 28px 16px;
+  border-top: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+/* Page indicator */
+.admin-return-pagination span {
+  font-size: 14px;
+  font-weight: 400;
+  color: #111;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* Previous and Next buttons */
+.admin-return-pagination button {
+  min-width: 100px;
+  padding: 14px 20px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Black background on hover */
+.admin-return-pagination button:hover:not(:disabled) {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+/* Disabled button */
+.admin-return-pagination button:disabled {
+  background: #fff;
+  color: #999;
+  border-color: #e5e5e5;
+  cursor: not-allowed;
+}
+
+/* Keyboard accessibility */
+.admin-return-pagination button:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
+/* Responsive layout */
+@media (max-width: 480px) {
+  .admin-return-pagination {
+    gap: 12px;
+    padding: 20px 8px;
+  }
+
+  .admin-return-pagination button {
+    min-width: auto;
+    padding: 12px 10px;
+    font-size: 10px;
+  }
+
+  .admin-return-pagination span {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* ADMIN RETURN / EXCHANGE SEARCH */
+.admin-return-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 20px 0;
+  box-sizing: border-box;
+}
+
+.admin-return-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  color: #111;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.admin-return-search input:focus {
+  border-color: #111;
+}
+
+.admin-return-search button {
+  padding: 14px 20px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.admin-return-search button:hover {
+  background: #111;
+  color: #fff;
+}
