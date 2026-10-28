@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import AdminNavbar from "../bars/AdminNavbar";
@@ -7,6 +6,7 @@ import AdminFooter from "../bars/AdminFooter";
 function CategoryManagement() {
   const [categories, setCategories] = useState([]);
   const [categoryName, setCategoryName] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
@@ -41,6 +41,10 @@ function CategoryManagement() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  const filteredCategories = categories.filter((category) =>
+    category.name.toLowerCase().includes(searchTerm.trim().toLowerCase()),
+  );
 
   const handleAddCategory = async (event) => {
     event.preventDefault();
@@ -174,14 +178,11 @@ function CategoryManagement() {
 
       const token = localStorage.getItem("adminToken");
 
-      const response = await api.delete(
-        `/admin/categories/${categoryId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await api.delete(`/admin/categories/${categoryId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       setCategories((previousCategories) =>
         previousCategories.filter((category) => category._id !== categoryId),
@@ -202,11 +203,28 @@ function CategoryManagement() {
   };
 
   return (
+    <>
+<AdminNavbar />
     <div className="admin-category-page">
-      <AdminNavbar />
+      
 
       <main className="admin-category-content">
         <h1>CATEGORY MANAGEMENT</h1>
+
+        <div className="category-search">
+          <input
+            type="text"
+            placeholder="Search category name..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+
+          {searchTerm && (
+            <button type="button" onClick={() => setSearchTerm("")}>
+              CLEAR
+            </button>
+          )}
+        </div>
 
         <form className="category-add-form" onSubmit={handleAddCategory}>
           <input
@@ -227,9 +245,9 @@ function CategoryManagement() {
 
         {loading && <p>Loading categories...</p>}
 
-        {!loading && !error && (
+        {!loading && (
           <div className="category-list">
-            {categories.map((category) => (
+            {filteredCategories.map((category) => (
               <div className="category-item" key={category._id}>
                 <div className="category-item-info">
                   {editCategoryId === category._id ? (
@@ -285,9 +303,7 @@ function CategoryManagement() {
 
                       <button
                         type="button"
-                        onClick={() =>
-                          handleToggleCategoryStatus(category._id)
-                        }
+                        onClick={() => handleToggleCategoryStatus(category._id)}
                       >
                         {category.isActive ? "DEACTIVATE" : "ACTIVATE"}
                       </button>
@@ -303,6 +319,13 @@ function CategoryManagement() {
                 </div>
               </div>
             ))}
+            {filteredCategories.length === 0 && (
+  <p className="category-search-empty">
+    {searchTerm.trim()
+      ? "NO MATCHING CATEGORIES FOUND"
+      : "NO CATEGORIES AVAILABLE"}
+  </p>
+)}
           </div>
         )}
       </main>
@@ -315,10 +338,7 @@ function CategoryManagement() {
             <p>Are you sure you want to delete this category?</p>
 
             <div className="delete-modal-actions">
-              <button
-                type="button"
-                onClick={() => setDeleteCategoryId(null)}
-              >
+              <button type="button" onClick={() => setDeleteCategoryId(null)}>
                 CANCEL
               </button>
 
@@ -333,8 +353,10 @@ function CategoryManagement() {
         </div>
       )}
 
-      <AdminFooter />
+      
     </div>
+    <AdminFooter />
+    </>
   );
 }
 
