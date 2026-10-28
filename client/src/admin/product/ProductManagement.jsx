@@ -9,18 +9,18 @@ function ProductManagement() {
   const navigate = useNavigate();
 
   const getImageUrl = (image) => {
-  if (!image) return "";
+    if (!image) return "";
 
-  // Cloudinary image URL
-  if (image.startsWith("http://") || image.startsWith("https://")) {
-    return image;
-  }
+    // Cloudinary image URL
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
 
-  // Old local server image path
-  const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
+    // Old local server image path
+    const serverUrl = api.defaults.baseURL.replace(/\/api\/?$/, "");
 
-  return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
-};
+    return `${serverUrl}${image.startsWith("/") ? image : `/${image}`}`;
+  };
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +31,7 @@ function ProductManagement() {
 
   const [editVariants, setEditVariants] = useState([]);
   const [success, setSuccess] = useState("");
+  const [variantError, setVariantError] = useState("");
   const [editProductId, setEditProductId] = useState(null);
   const [editProductName, setEditProductName] = useState("");
   const [editCategoryId, setEditCategoryId] = useState("");
@@ -60,10 +61,10 @@ function ProductManagement() {
       const token = localStorage.getItem("adminToken");
 
       const response = await api.get("/admin/products", {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setProducts(response.data.products);
     } catch (error) {
@@ -82,11 +83,11 @@ function ProductManagement() {
     try {
       const token = localStorage.getItem("adminToken");
 
-     const response = await api.get("/admin/categories", {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+      const response = await api.get("/admin/categories", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setCategories(response.data.categories);
     } catch (error) {
@@ -144,48 +145,48 @@ function ProductManagement() {
       });
 
       const response = await api.patch(
-  `/admin/products/${productId}`,
-  formData,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
+        `/admin/products/${productId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       // SAVE PRODUCT VARIANTS
       for (const variant of editVariants) {
         if (variant.id) {
           // UPDATE EXISTING VARIANT
           await api.patch(
-  `/admin/variants/${variant.id}`,
-  {
-    size: variant.size,
-    price: Number(variant.price),
-    stock: Number(variant.stock),
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
+            `/admin/variants/${variant.id}`,
+            {
+              size: variant.size,
+              price: Number(variant.price),
+              stock: Number(variant.stock),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
         } else {
           // ADD NEW VARIANT
-        await api.post(
-  "/admin/variants",
-  {
-    productId,
-    size: variant.size,
-    price: Number(variant.price),
-    stock: Number(variant.stock),
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
+          await api.post(
+            "/admin/variants",
+            {
+              productId,
+              size: variant.size,
+              price: Number(variant.price),
+              stock: Number(variant.stock),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
         }
       }
 
@@ -211,10 +212,21 @@ function ProductManagement() {
     } catch (error) {
       console.error("Edit product error:", error);
 
-      setError(
+      const message =
         error.response?.data?.message ||
-          "Something went wrong. Please try again.",
-      );
+        "Something went wrong. Please try again.";
+
+      if (
+        error.response?.status === 409 ||
+        message.toLowerCase().includes("variant size already exists") ||
+        message.toLowerCase().includes("variant size")
+      ) {
+        setError("");
+        setVariantError(message);
+      } else {
+        setError(message);
+        setVariantError("");
+      }
     }
   };
 
@@ -226,14 +238,14 @@ function ProductManagement() {
       const token = localStorage.getItem("adminToken");
 
       const response = await api.patch(
-  `/admin/products/${productId}/status`,
-  {},
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
+        `/admin/products/${productId}/status`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       setProducts((previousProducts) =>
         previousProducts.map((product) =>
@@ -260,10 +272,10 @@ function ProductManagement() {
       const token = localStorage.getItem("adminToken");
 
       const response = await api.delete(`/admin/products/${productId}`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setProducts((previousProducts) =>
         previousProducts.filter((product) => product._id !== productId),
@@ -483,11 +495,14 @@ function ProductManagement() {
                                     const token =
                                       localStorage.getItem("adminToken");
 
-                                    await api.delete(`/admin/variants/${variant.id}`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+                                    await api.delete(
+                                      `/admin/variants/${variant.id}`,
+                                      {
+                                        headers: {
+                                          Authorization: `Bearer ${token}`,
+                                        },
+                                      },
+                                    );
                                   }
 
                                   // Remove from React state
@@ -513,6 +528,11 @@ function ProductManagement() {
                             </button>
                           </div>
                         ))}
+                        {variantError && (
+  <p className="variant-error-message">
+    {variantError}
+  </p>
+)}
                       </div>
                       {editProductImages.length > 0 && (
                         <div className="edit-product-images">
@@ -522,9 +542,9 @@ function ProductManagement() {
                               className="edit-product-image-item"
                             >
                               <img
-  src={getImageUrl(image)}
-  alt={`${editProductName} ${index + 1}`}
-/>
+                                src={getImageUrl(image)}
+                                alt={`${editProductName} ${index + 1}`}
+                              />
 
                               <button
                                 type="button"
@@ -593,10 +613,10 @@ function ProductManagement() {
                       <div className="product-images">
                         {product.productImage.map((image, index) => (
                           <img
-  key={index}
-  src={getImageUrl(image)}
-  alt={`${product.name} ${index + 1}`}
-/>
+                            key={index}
+                            src={getImageUrl(image)}
+                            alt={`${product.name} ${index + 1}`}
+                          />
                         ))}
                       </div>
                     )}
@@ -629,6 +649,7 @@ function ProductManagement() {
                             setEditProductImages([]);
                             setNewProductImages([]);
                             setEditVariants([]);
+                            setVariantError("");
                           }}
                         >
                           CANCEL
@@ -667,18 +688,19 @@ function ProductManagement() {
 
                             setError("");
                             setSuccess("");
+                            setVariantError("");
 
                             const token = localStorage.getItem("adminToken");
 
                             try {
-                             const response = await api.get(
-  `/admin/variants/product/${product._id}`,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
+                              const response = await api.get(
+                                `/admin/variants/product/${product._id}`,
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${token}`,
+                                  },
+                                },
+                              );
 
                               setEditVariants(
                                 response.data.variants.map((variant) => ({
