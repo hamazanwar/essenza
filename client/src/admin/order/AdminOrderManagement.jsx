@@ -5,6 +5,7 @@ import api from "../../services/api";
 
 function AdminOrderManagement() {
   const [orders, setOrders] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [statusConfirmation, setStatusConfirmation] = useState(null);
@@ -59,16 +60,27 @@ function AdminOrderManagement() {
     return `${year}-${month}-${day}`;
   };
 
-  // Filter orders by order creation date
-  const filteredOrders = orders.filter((order) => {
-    const orderDate = getLocalDateString(order.createdAt);
+ // Filter orders by date, customer name, or order ID
+const filteredOrders = orders.filter((order) => {
+  const orderDate = getLocalDateString(order.createdAt);
 
-    const matchesStartDate = !startDate || orderDate >= startDate;
+  const matchesStartDate = !startDate || orderDate >= startDate;
+  const matchesEndDate = !endDate || orderDate <= endDate;
 
-    const matchesEndDate = !endDate || orderDate <= endDate;
+  const search = searchTerm.trim().toLowerCase();
 
-    return matchesStartDate && matchesEndDate;
-  });
+  const customerName = String(order.userId?.name || "").toLowerCase();
+  const orderId = String(order._id || "").toLowerCase();
+  const shortOrderId = orderId.slice(-6);
+
+  const matchesSearch =
+    !search ||
+    customerName.includes(search) ||
+    orderId.includes(search) ||
+    shortOrderId.includes(search);
+
+  return matchesStartDate && matchesEndDate && matchesSearch;
+});
 
   // Pagination calculations
   const totalPages = Math.max(
@@ -232,6 +244,29 @@ function AdminOrderManagement() {
           >
             CLEAR FILTER
           </button>
+          <div className="admin-order-search">
+  <input
+    type="text"
+    placeholder="Search by customer name, email or order ID..."
+    value={searchTerm}
+    onChange={(event) => {
+      setSearchTerm(event.target.value);
+      setCurrentPage(1);
+    }}
+  />
+
+  {searchTerm && (
+    <button
+      type="button"
+      onClick={() => {
+        setSearchTerm("");
+        setCurrentPage(1);
+      }}
+    >
+      CLEAR
+    </button>
+  )}
+</div>
         </div>
 
         <p className="admin-order-results-count">
