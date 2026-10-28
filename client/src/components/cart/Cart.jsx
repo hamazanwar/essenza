@@ -23,6 +23,8 @@ function Cart() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cartMessage, setCartMessage] = useState("");
+  const [stockError, setStockError] = useState("");
+  const [checkingCheckout, setCheckingCheckout] = useState(false);
 
   useEffect(() => {
     const getCart = async () => {
@@ -36,10 +38,10 @@ function Cart() {
         }
 
         const response = await api.get("/cart", {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         setCart(response.data.cart);
       } catch (error) {
@@ -67,17 +69,17 @@ function Cart() {
       setError("");
       setCartMessage("");
 
-     const response = await api.patch(
-  `/cart/${itemId}`,
-  {
-    quantity: newQuantity,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  },
-);
+      const response = await api.patch(
+        `/cart/${itemId}`,
+        {
+          quantity: newQuantity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
       setCart(response.data.cart);
     } catch (error) {
@@ -100,11 +102,11 @@ function Cart() {
       setError("");
       setCartMessage("");
 
-   const response = await api.delete(`/cart/${itemId}`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+      const response = await api.delete(`/cart/${itemId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setCart(response.data.cart);
       setCartMessage("Product removed from cart.");
@@ -112,6 +114,74 @@ function Cart() {
       console.error("Remove cart item error:", error);
 
       setError(error.response?.data?.message || "Failed to remove product");
+    }
+  };
+
+  // CHECK STOCK BEFORE PROCEEDING TO CHECKOUT
+  const handleProceedToCheckout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("Please login to continue.");
+        return;
+      }
+
+      setError("");
+setCartMessage("");
+setStockError("");
+setCheckingCheckout(true);
+
+      // Fetch the latest cart and stock information from the backend
+      const response = await api.get("/cart", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const latestCart = response.data.cart;
+
+      // Update the cart UI with the latest data
+      setCart(latestCart);
+
+      const unavailableItems = (latestCart?.items || []).filter((item) => {
+        const stock = Number(item.variantId?.stock ?? 0);
+        const quantity = Number(item.quantity ?? 0);
+
+        return stock <= 0 || quantity > stock;
+      });
+
+      // Stop checkout if any item is unavailable
+      if (unavailableItems.length > 0) {
+        const messages = unavailableItems.map((item) => {
+          const productName = item.productId?.name || "This product";
+          const stock = Number(item.variantId?.stock ?? 0);
+          const quantity = Number(item.quantity ?? 0);
+
+          if (stock <= 0) {
+            return `${productName} (${item.variantId?.size || "selected size"}) is out of stock.`;
+          }
+
+          return `${productName} has only ${stock} item(s) available, but your cart has ${quantity}.`;
+        });
+
+        setError("");
+        setCartMessage("");
+        setStockError(messages.join(" "));
+        return;
+      }
+      setStockError("");
+      // Navigate only when all cart items are available
+      navigate("/checkout");
+    } catch (error) {
+      console.error("Checkout stock validation error:", error);
+
+      setError(
+        error.response?.data?.message ||
+          "Unable to check product availability. Please try again.",
+      );
+    } finally {
+      setCheckingCheckout(false);
     }
   };
 
@@ -167,9 +237,15 @@ function Cart() {
         <div className="cart-container">
           <h1>YOUR CART</h1>
 
-          {cartMessage && <p className="cart-success-message">{cartMessage}</p>}
+          {cartMessage && (
+  <p className="cart-success-message">{cartMessage}</p>
+)}
 
-          {error && <p className="cart-error-message">{error}</p>}
+{error && <p className="cart-error-message">{error}</p>}
+
+{stockError && (
+  <p className="cart-stock-error">{stockError}</p>
+)}
 
           {cart?.items?.length === 0 ? (
             <p>Your cart is empty.</p>
@@ -182,19 +258,32 @@ function Cart() {
                     <div className="cart-item-image">
                       {item.productId?.productImage?.length > 0 ? (
                         <img
-  src={getImageUrl(item.productId.productImage[0])}
-  alt={item.productId.name}
-/>
+                          src={getImageUrl(item.productId.productImage[0])}
+                          alt={item.productId.name}
+                        />
                       ) : (
                         <div>No Image</div>
                       )}
                     </div>
 
                     {/* PRODUCT DETAILS */}
+
                     <div className="cart-item-details">
                       <h2>{item.productId?.name}</h2>
 
                       <p>Size: {item.variantId?.size}</p>
+
+                      {Number(item.variantId?.stock ?? 0) <= 0 && (
+                        <p className="cart-stock-error">Out of stock</p>
+                      )}
+
+                      {Number(item.variantId?.stock ?? 0) > 0 &&
+                        Number(item.quantity) >
+                          Number(item.variantId.stock) && (
+                          <p className="cart-stock-error">
+                            Only {item.variantId.stock} item(s) available
+                          </p>
+                        )}
 
                       {item.discountAmount > 0 ? (
                         <>
@@ -290,9 +379,12 @@ function Cart() {
                 <button
                   type="button"
                   className="checkout-button"
-                  onClick={() => navigate("/checkout")}
+                  onClick={handleProceedToCheckout}
+                  disabled={checkingCheckout}
                 >
-                  PROCEED TO CHECKOUT
+                  {checkingCheckout
+                    ? "CHECKING STOCK..."
+                    : "PROCEED TO CHECKOUT"}
                 </button>
               </div>
             </>

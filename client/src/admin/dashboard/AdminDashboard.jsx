@@ -605,9 +605,6 @@ orderCount: 0,
           </aside>
         </section>
 
-        <p className="dashboard-footer-note">
-          ESSENZA ADMINISTRATION · STORE OVERVIEW
-        </p>
       </main>
 
       
