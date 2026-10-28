@@ -6933,3 +6933,42 @@
 .product-error {
   color: #dc2626;
 }
+
+/* PRODUCT SEARCH */
+.product-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.product-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  color: #111;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.product-search input:focus {
+  border-color: #111;
+}
+
+.product-search button {
+  padding: 14px 20px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.product-search button:hover {
+  background: #333;
+}

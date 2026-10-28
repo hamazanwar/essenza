@@ -23,6 +23,7 @@ function ProductManagement() {
   };
 
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [categories, setCategories] = useState([]);
@@ -44,14 +45,20 @@ function ProductManagement() {
   const [editProductImages, setEditProductImages] = useState([]);
   const [newProductImages, setNewProductImages] = useState([]);
 
-  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
+  const filteredProducts = products.filter((product) =>
+  product.name.toLowerCase().includes(searchTerm.trim().toLowerCase()),
+);
 
-  const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+const totalPages = Math.ceil(
+  filteredProducts.length / PRODUCTS_PER_PAGE,
+);
 
-  const currentProducts = products.slice(
-    startIndex,
-    startIndex + PRODUCTS_PER_PAGE,
-  );
+const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+
+const currentProducts = filteredProducts.slice(
+  startIndex,
+  startIndex + PRODUCTS_PER_PAGE,
+);
 
   const fetchProducts = async () => {
     try {
@@ -308,8 +315,10 @@ function ProductManagement() {
   }, [currentPage, totalPages]);
 
   return (
+    <>
+    <AdminNavbar />
     <div className="admin-product-page">
-      <AdminNavbar />
+      
 
       <main className="admin-product-content">
         <div className="product-management-header">
@@ -324,15 +333,43 @@ function ProductManagement() {
           </button>
         </div>
 
+        <div className="product-search">
+  <input
+    type="text"
+    placeholder="Search products by name..."
+    value={searchTerm}
+    onChange={(event) => {
+      setSearchTerm(event.target.value);
+      setCurrentPage(1);
+    }}
+  />
+
+  {searchTerm.trim() && (
+    <button
+      type="button"
+      onClick={() => {
+        setSearchTerm("");
+        setCurrentPage(1);
+      }}
+    >
+      CLEAR
+    </button>
+  )}
+</div>
+
         {loading && <p>Loading products...</p>}
 
         {error && <p>{error}</p>}
 
-        {!loading && !error && products.length === 0 && (
-          <p>No products found.</p>
-        )}
+        {!loading && !error && filteredProducts.length === 0 && (
+  <p>
+    {searchTerm.trim()
+      ? "No products match your search."
+      : "No products found."}
+  </p>
+)}
 
-        {!loading && !error && products.length > 0 && (
+        {!loading && !error && filteredProducts.length > 0 && (
           <>
             <div className="product-list">
               {currentProducts.map((product) => (
@@ -800,8 +837,10 @@ function ProductManagement() {
         )}
       </main>
 
-      <AdminFooter />
+      
     </div>
+    <AdminFooter />
+    </>
   );
 }
 
