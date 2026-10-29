@@ -143,6 +143,7 @@ function OrderDetails() {
     pdf.setFont("helvetica", "normal");
 
     const address = order.addressId || {};
+
     const addressLines = [
       address.fullName,
       address.address,
@@ -211,12 +212,25 @@ function OrderDetails() {
     addLine();
     pdf.setFontSize(10);
 
-    addLabelValue("Subtotal", formatAmount(order.subtotal));
-    addLabelValue("Delivery Charge", formatAmount(order.deliveryCharge));
+    addLabelValue("Original Subtotal", formatAmount(originalSubtotal));
 
-    y += 2;
-    pdf.setFontSize(13);
-    addLabelValue("TOTAL", formatAmount(order.totalAmount));
+if (offerDiscount > 0) {
+  addLabelValue("Offer Discount", `-${formatAmount(offerDiscount)}`);
+}
+
+if (couponDiscount > 0) {
+  const couponLabel = order.couponCode
+    ? `Coupon Discount (${order.couponCode})`
+    : "Coupon Discount";
+
+  addLabelValue(couponLabel, `-${formatAmount(couponDiscount)}`);
+}
+
+addLabelValue("Delivery Charge", formatAmount(deliveryCharge));
+
+y += 2;
+pdf.setFontSize(13);
+addLabelValue("TOTAL", formatAmount(totalAmount));
 
     y += 10;
     pdf.setFontSize(9);
@@ -259,6 +273,24 @@ function OrderDetails() {
   }
 
   const address = order.addressId || {};
+
+  // Calculate invoice amounts from the saved order items
+const originalSubtotal = (order.items || []).reduce(
+  (sum, item) =>
+    sum + Number(item.originalPrice ?? item.price ?? 0) * Number(item.quantity || 0),
+  0
+);
+
+const offerDiscount = (order.items || []).reduce(
+  (sum, item) =>
+    sum + Number(item.discountAmount || 0) * Number(item.quantity || 0),
+  0
+);
+
+const subtotal = Number(order.subtotal || 0);
+const couponDiscount = Number(order.couponDiscount || 0);
+const deliveryCharge = Number(order.deliveryCharge || 0);
+const totalAmount = Number(order.totalAmount || 0);
 
   
 const orderStages = [
@@ -432,23 +464,40 @@ const currentStageIndex = orderStages.indexOf(currentStatus);
             </section>
 
             <section className="order-details-card">
-              <h2>ORDER SUMMARY</h2>
+  <h2>ORDER SUMMARY</h2>
 
-              <div className="order-summary-row">
-                <span>Subtotal</span>
-                <span>{formatAmount(order.subtotal)}</span>
-              </div>
+  <div className="order-summary-row">
+    <span>Original Subtotal</span>
+    <span>{formatAmount(originalSubtotal)}</span>
+  </div>
 
-              <div className="order-summary-row">
-                <span>Delivery Charge</span>
-                <span>{formatAmount(order.deliveryCharge)}</span>
-              </div>
+  {offerDiscount > 0 && (
+    <div className="order-summary-row">
+      <span>Offer Discount</span>
+      <span>-{formatAmount(offerDiscount)}</span>
+    </div>
+  )}
 
-              <div className="order-summary-row order-summary-total">
-                <strong>Total</strong>
-                <strong>{formatAmount(order.totalAmount)}</strong>
-              </div>
-            </section>
+  {couponDiscount > 0 && (
+    <div className="order-summary-row">
+      <span>
+        Coupon Discount
+        {order.couponCode ? ` (${order.couponCode})` : ""}
+      </span>
+      <span>-{formatAmount(couponDiscount)}</span>
+    </div>
+  )}
+
+  <div className="order-summary-row">
+    <span>Delivery Charge</span>
+    <span>{formatAmount(deliveryCharge)}</span>
+  </div>
+
+  <div className="order-summary-row order-summary-total">
+    <strong>Total</strong>
+    <strong>{formatAmount(totalAmount)}</strong>
+  </div>
+</section>
           </div>
 
           <section className="order-details-invoice">
@@ -501,15 +550,49 @@ const currentStageIndex = orderStages.indexOf(currentStatus);
                       {item.productName} — {item.size || "N/A"} ×{" "}
                       {item.quantity}
                     </span>
-                    <strong>{formatAmount(item.totalPrice)}</strong>
+                   <strong>
+  {formatAmount(
+    Number(item.originalPrice ?? item.price ?? 0) *
+      Number(item.quantity || 0)
+  )}
+</strong>
                   </div>
                 ))}
               </div>
 
-              <div className="order-invoice-preview-total">
-                <span>Total</span>
-                <strong>{formatAmount(order.totalAmount)}</strong>
-              </div>
+          <div className="order-invoice-preview-breakdown">
+  <div>
+    <span>Original Subtotal</span>
+    <span>{formatAmount(originalSubtotal)}</span>
+  </div>
+
+  {offerDiscount > 0 && (
+    <div>
+      <span>Offer Discount</span>
+      <span>-{formatAmount(offerDiscount)}</span>
+    </div>
+  )}
+
+  {couponDiscount > 0 && (
+    <div>
+      <span>
+        Coupon Discount
+        {order.couponCode ? ` (${order.couponCode})` : ""}
+      </span>
+      <span>-{formatAmount(couponDiscount)}</span>
+    </div>
+  )}
+
+  <div>
+    <span>Delivery Charge</span>
+    <span>{formatAmount(deliveryCharge)}</span>
+  </div>
+</div>
+
+<div className="order-invoice-preview-total">
+  <span>Total</span>
+  <strong>{formatAmount(totalAmount)}</strong>
+</div>
 
               <p className="order-invoice-thank-you">
                 Thank you for shopping with ESSENZA.

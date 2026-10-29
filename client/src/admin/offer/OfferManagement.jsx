@@ -29,6 +29,28 @@ function OfferManagement() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const [searchTerm, setSearchTerm] = useState("");
+const [currentPage, setCurrentPage] = useState(1);
+const offersPerPage = 5;
+
+const filteredOffers = offers.filter((offer) =>
+  (offer.name || "")
+    .toLowerCase()
+    .includes(searchTerm.trim().toLowerCase())
+);
+
+const totalPages = Math.ceil(filteredOffers.length / offersPerPage);
+const startIndex = (currentPage - 1) * offersPerPage;
+
+const paginatedOffers = filteredOffers.slice(
+  startIndex,
+  startIndex + offersPerPage
+);
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm]);
+
   const getToken = () => localStorage.getItem("adminToken");
 
   const getErrorMessage = (err) =>
@@ -284,7 +306,9 @@ await fetchOffers();
             <h1>Offer Management</h1>
             <p>Create product and category discounts for your store.</p>
           </div>
-          <span className="coupon-total-count">{offers.length} OFFERS</span>
+          <span className="coupon-total-count">
+  {filteredOffers.length} OFFERS
+</span>
         </div>
 
         {message && (
@@ -483,14 +507,29 @@ await fetchOffers();
             </div>
           </div>
 
+          <div className="offer-search-container">
+  <input
+    type="search"
+    value={searchTerm}
+    onChange={(event) => setSearchTerm(event.target.value)}
+    placeholder="Search offers by name..."
+    aria-label="Search offers by name"
+  />
+</div>
+
           {loading ? (
             <div className="coupon-empty-state">Loading offers...</div>
-          ) : offers.length === 0 ? (
+          ) : filteredOffers.length === 0 ? (
             <div className="coupon-empty-state">
-              <h3>No offers found</h3>
-              <p>Create an offer using the form above.</p>
+              <h3>{searchTerm ? "No matching offers" : "No offers found"}</h3>
+<p>
+  {searchTerm
+    ? "Try another offer name."
+    : "Create an offer using the form above."}
+</p>
             </div>
           ) : (
+            <>
             <div className="coupon-table-wrapper">
               <table className="coupon-table">
                 <thead>
@@ -505,7 +544,7 @@ await fetchOffers();
                 </thead>
 
                 <tbody>
-                  {offers.map((offer) => {
+                 {paginatedOffers.map((offer) => {
                     const status = getOfferStatus(offer);
                     const productNames = (offer.applicableProducts || [])
                       .map((item) =>
@@ -584,8 +623,39 @@ await fetchOffers();
                     );
                   })}
                 </tbody>
-              </table>
+                            </table>
             </div>
+
+            <div className="offer-pagination">
+              <span>
+                Showing {startIndex + 1}–
+                {Math.min(startIndex + offersPerPage, filteredOffers.length)}
+                {" "}of {filteredOffers.length} offers
+              </span>
+
+              <div className="offer-pagination-buttons">
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((page) => page - 1)}
+                >
+                  Previous
+                </button>
+
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage((page) => page + 1)}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+            </>
           )}
         </section>
       </main>

@@ -351,23 +351,28 @@ const handleSaveCheckoutAddress = async (event) => {
 
   // PRICE CALCULATIONS
 
-  const originalSubtotal = checkoutItems.reduce(
-    (total, item) => total + (item.originalPrice ?? item.price) * item.quantity,
-    0,
-  );
+const originalSubtotal = checkoutItems.reduce(
+  (total, item) =>
+    total + (item.originalPrice ?? item.price) * item.quantity,
+  0,
+);
 
-  const subtotal = checkoutItems.reduce(
-    (total, item) =>
-      total + (item.discountedPrice ?? item.price) * item.quantity,
-    0,
-  );
+const subtotal = Math.round(originalSubtotal * 100) / 100;
 
-  const totalDiscount = originalSubtotal - subtotal;
+const discountedSubtotal = checkoutItems.reduce(
+  (total, item) =>
+    total + (item.discountedPrice ?? item.price) * item.quantity,
+  0,
+);
 
-  const deliveryCharge = 0;
+const totalDiscount =
+  Math.round((subtotal - discountedSubtotal) * 100) / 100;
 
-  const total =
-    Math.round((subtotal - couponDiscount + deliveryCharge) * 100) / 100;
+const deliveryCharge = 0;
+
+const total =
+  Math.round((discountedSubtotal - couponDiscount + deliveryCharge) * 100) /
+  100;
 
   const handleApplyCoupon = (coupon) => {
     const now = new Date();
@@ -828,8 +833,8 @@ const handleSaveCheckoutAddress = async (event) => {
             <h2>PRICE SUMMARY</h2>
 
             <div className="checkout-summary-row">
-              <span>Subtotal</span>
-              <span>₹{subtotal}</span>
+             <span>Subtotal</span>
+<span>₹{subtotal.toFixed(2)}</span>
             </div>
 
             {totalDiscount > 0 && (
@@ -855,7 +860,7 @@ const handleSaveCheckoutAddress = async (event) => {
 
             <div className="checkout-summary-total">
               <span>Total</span>
-              <span>₹{total}</span>
+<span>₹{total.toFixed(2)}</span>
             </div>
 
             <button
