@@ -7300,3 +7300,31 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.admin-sales-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.admin-sales-pagination button {
+  padding: 8px 14px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+}
+
+.admin-sales-pagination button.active {
+  background: #111;
+  color: #fff;
+}
+
+.admin-sales-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

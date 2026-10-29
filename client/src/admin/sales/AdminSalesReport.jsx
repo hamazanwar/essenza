@@ -10,6 +10,11 @@ function AdminSalesReport() {
   const [error, setError] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+const [currentPage, setCurrentPage] = useState(1);
+const ordersPerPage = 8;
+
+const [dailyCurrentPage, setDailyCurrentPage] = useState(1);
+const dailySalesPerPage = 8;
 
   const fetchReport = async (startDate = from, endDate = to) => {
     try {
@@ -44,16 +49,56 @@ function AdminSalesReport() {
     fetchReport("", "");
   }, []);
 
-  const handleFilter = (event) => {
-    event.preventDefault();
-    fetchReport(from, to);
-  };
+  const totalPages = Math.ceil(
+  (report?.orders?.length || 0) / ordersPerPage
+);
 
-  const handleClearFilter = () => {
-    setFrom("");
-    setTo("");
-    fetchReport("", "");
-  };
+const safeCurrentPage = Math.min(
+  currentPage,
+  Math.max(totalPages, 1)
+);
+
+const startIndex = (safeCurrentPage - 1) * ordersPerPage;
+
+const paginatedOrders = (report?.orders || []).slice(
+  startIndex,
+  startIndex + ordersPerPage
+);
+
+const totalDailyPages = Math.ceil(
+  (report?.dailySales?.length || 0) / dailySalesPerPage
+);
+
+const safeDailyCurrentPage = Math.min(
+  dailyCurrentPage,
+  Math.max(totalDailyPages, 1)
+);
+
+const dailyStartIndex =
+  (safeDailyCurrentPage - 1) * dailySalesPerPage;
+
+const paginatedDailySales = (report?.dailySales || []).slice(
+  dailyStartIndex,
+  dailyStartIndex + dailySalesPerPage
+);
+
+useEffect(() => {
+  setCurrentPage(1);
+  setDailyCurrentPage(1);
+}, [from, to]);
+
+  const handleFilter = (event) => {
+  event.preventDefault();
+  setCurrentPage(1);
+  fetchReport(from, to);
+};
+
+const handleClearFilter = () => {
+  setFrom("");
+  setTo("");
+  setCurrentPage(1);
+  fetchReport("", "");
+};
 
   const formatCurrency = (amount) =>
     `₹${Number(amount || 0).toLocaleString("en-IN", {
@@ -230,7 +275,7 @@ function AdminSalesReport() {
                       </tr>
                     </thead>
                     <tbody>
-                      {report.dailySales.map((day) => (
+                     {paginatedDailySales.map((day) => (
                         <tr key={day.date}>
                           <td>
                             {new Date(
@@ -243,6 +288,46 @@ function AdminSalesReport() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+                           )}
+
+              {totalDailyPages > 1 && (
+                <div className="admin-sales-pagination">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDailyCurrentPage((page) => page - 1)
+                    }
+                    disabled={safeDailyCurrentPage === 1}
+                  >
+                    Previous
+                  </button>
+
+                  {Array.from(
+                    { length: totalDailyPages },
+                    (_, index) => index + 1
+                  ).map((page) => (
+                    <button
+                      type="button"
+                      key={page}
+                      className={
+                        safeDailyCurrentPage === page ? "active" : ""
+                      }
+                      onClick={() => setDailyCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDailyCurrentPage((page) => page + 1)
+                    }
+                    disabled={safeDailyCurrentPage === totalDailyPages}
+                  >
+                    Next
+                  </button>
                 </div>
               )}
             </section>
@@ -275,7 +360,7 @@ function AdminSalesReport() {
                       </tr>
                     </thead>
                     <tbody>
-                      {report.orders.map((order) => (
+                      {paginatedOrders.map((order) => (
                         <tr key={order._id}>
                           <td>#{order._id.slice(-6).toUpperCase()}</td>
                           <td>
@@ -305,6 +390,46 @@ function AdminSalesReport() {
                       ))}
                     </tbody>
                   </table>
+                                </div>
+              )}
+
+              {totalPages > 1 && (
+                <div className="admin-sales-pagination">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCurrentPage((page) => page - 1)
+                    }
+                    disabled={safeCurrentPage === 1}
+                  >
+                    Previous
+                  </button>
+
+                  {Array.from(
+                    { length: totalPages },
+                    (_, index) => index + 1
+                  ).map((page) => (
+                    <button
+                      type="button"
+                      key={page}
+                      className={
+                        safeCurrentPage === page ? "active" : ""
+                      }
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCurrentPage((page) => page + 1)
+                    }
+                    disabled={safeCurrentPage === totalPages}
+                  >
+                    Next
+                  </button>
                 </div>
               )}
             </section>
