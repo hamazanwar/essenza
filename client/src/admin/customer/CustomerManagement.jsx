@@ -11,7 +11,8 @@ function CustomerManagement() {
   const [error, setError] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const customersPerPage = 10;
+const customersPerPage = 10;
+const [search, setSearch] = useState("");
 
   const handleCustomerStatus = async (customerId) => {
     try {
@@ -47,14 +48,29 @@ function CustomerManagement() {
     }
   };
 
-  const totalPages = Math.ceil(customers.length / customersPerPage);
+ const filteredCustomers = customers.filter((customer) =>
+  customer.name?.toLowerCase().includes(search.trim().toLowerCase())
+);
 
-  const startIndex = (currentPage - 1) * customersPerPage;
+const totalPages = Math.ceil(
+  filteredCustomers.length / customersPerPage
+);
 
-  const currentCustomers = customers.slice(
-    startIndex,
-    startIndex + customersPerPage,
-  );
+const safeCurrentPage = Math.min(
+  currentPage,
+  Math.max(totalPages, 1)
+);
+
+const startIndex = (safeCurrentPage - 1) * customersPerPage;
+
+const currentCustomers = filteredCustomers.slice(
+  startIndex,
+  startIndex + customersPerPage
+);
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [search]);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -93,6 +109,15 @@ function CustomerManagement() {
           Manage registered ESSENZA customers
         </p>
 
+        <div className="customer-search-container">
+  <input
+    type="search"
+    placeholder="Search customer by name..."
+    value={search}
+    onChange={(event) => setSearch(event.target.value)}
+  />
+</div>
+
         {loading && <p>Loading customers...</p>}
 
         {error && <p className="customer-error">{error}</p>}
@@ -112,10 +137,12 @@ function CustomerManagement() {
               </thead>
 
               <tbody>
-                {customers.length === 0 ? (
+               {filteredCustomers.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="no-customers">
-                      No customers found
+                     {search.trim()
+  ? "No customers match your search"
+  : "No customers found"}
                     </td>
                   </tr>
                 ) : (
@@ -161,25 +188,29 @@ function CustomerManagement() {
                 )}
               </tbody>
             </table>
-            <div className="customer-pagination">
-              <button
-                onClick={() => setCurrentPage((page) => page - 1)}
-                disabled={currentPage === 1}
-              >
-                ← PREVIOUS
-              </button>
+            {filteredCustomers.length > 0 && totalPages > 1 && (
+  <div className="customer-pagination">
+    <button
+      type="button"
+      onClick={() => setCurrentPage((page) => page - 1)}
+      disabled={safeCurrentPage === 1}
+    >
+      ← PREVIOUS
+    </button>
 
-              <span>
-                PAGE {currentPage} OF {totalPages}
-              </span>
+    <span>
+      PAGE {safeCurrentPage} OF {totalPages}
+    </span>
 
-              <button
-                onClick={() => setCurrentPage((page) => page + 1)}
-                disabled={currentPage === totalPages}
-              >
-                NEXT →
-              </button>
-            </div>
+    <button
+      type="button"
+      onClick={() => setCurrentPage((page) => page + 1)}
+      disabled={safeCurrentPage === totalPages}
+    >
+      NEXT →
+    </button>
+  </div>
+)}
           </div>
         )}
       </main>

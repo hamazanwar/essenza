@@ -7328,3 +7328,39 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.customer-search-container {
+  margin: 20px 0;
+}
+
+.customer-search-container input {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+}
+
+.customer-search-container input:focus {
+  border-color: #222;
+}
+
+.wallet-history-toggle {
+  display: block;
+  margin: 14px 0 0 auto;
+  padding: 8px 16px;
+  background: #fff;
+  color: #111;
+  border: 1px solid #222;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 1px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.wallet-history-toggle:hover {
+  background: #111;
+  color: #fff;
+}

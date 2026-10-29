@@ -13,6 +13,8 @@ function CustomerDetails() {
   const [wallet, setWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [withdrawalRequests, setWithdrawalRequests] = useState([]);
+  const [showAllWithdrawals, setShowAllWithdrawals] = useState(false);
+const [showAllTransactions, setShowAllTransactions] = useState(false);
 
   const [reviewLoadingId, setReviewLoadingId] = useState(null);
   const [reviewMessage, setReviewMessage] = useState("");
@@ -24,6 +26,22 @@ function CustomerDetails() {
   const [error, setError] = useState("");
   const [withdrawalConfirmation, setWithdrawalConfirmation] = useState(null);
   const [withdrawalNote, setWithdrawalNote] = useState("");
+
+  const sortedWithdrawalRequests = [...withdrawalRequests].sort(
+  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+);
+
+const visibleWithdrawalRequests = showAllWithdrawals
+  ? sortedWithdrawalRequests
+  : sortedWithdrawalRequests.slice(0, 5);
+
+const sortedTransactions = [...transactions].sort(
+  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+);
+
+const visibleTransactions = showAllTransactions
+  ? sortedTransactions
+  : sortedTransactions.slice(0, 5);
 
   const fetchCustomerWallet = async () => {
     try {
@@ -382,7 +400,7 @@ function CustomerDetails() {
                       </thead>
 
                       <tbody>
-                        {withdrawalRequests.map((request) => (
+                        {visibleWithdrawalRequests.map((request) => (
                           <tr key={request._id}>
                             <td>
                               {new Date(request.createdAt).toLocaleDateString()}
@@ -450,7 +468,19 @@ function CustomerDetails() {
                     </table>
                   </div>
                 )}
-              </div>
+                            </div>
+
+              {withdrawalRequests.length > 5 && (
+                <button
+                  type="button"
+                  className="wallet-history-toggle"
+                  onClick={() =>
+                    setShowAllWithdrawals((previous) => !previous)
+                  }
+                >
+                  {showAllWithdrawals ? "SHOW LESS" : "SHOW ALL"}
+                </button>
+              )}
 
               {/* TRANSACTION HISTORY */}
 
@@ -473,7 +503,7 @@ function CustomerDetails() {
                       </thead>
 
                       <tbody>
-                        {transactions.map((transaction) => (
+                        {visibleTransactions.map((transaction) => (
                           <tr key={transaction._id}>
                             <td>
                               {new Date(
@@ -499,6 +529,17 @@ function CustomerDetails() {
                   </div>
                 )}
               </div>
+              {transactions.length > 5 && (
+  <button
+    type="button"
+    className="wallet-history-toggle"
+    onClick={() =>
+      setShowAllTransactions((previous) => !previous)
+    }
+  >
+    {showAllTransactions ? "SHOW LESS" : "SHOW ALL"}
+  </button>
+)}
             </>
           )}
         </section>
