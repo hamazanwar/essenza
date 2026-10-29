@@ -101,6 +101,25 @@ const orderSchema = new mongoose.Schema(
       min: 0,
     },
 
+    couponId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Coupon",
+  default: null,
+},
+
+couponCode: {
+  type: String,
+  default: null,
+  trim: true,
+  uppercase: true,
+},
+
+couponDiscount: {
+  type: Number,
+  default: 0,
+  min: 0,
+},
+
     deliveryCharge: {
       type: Number,
       default: 0,

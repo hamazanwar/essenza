@@ -45,6 +45,15 @@ const validateCouponData = (data) => {
   }
 
   if (
+  discountType === "FIXED" &&
+  Number(discountValue) > Number(minOrderAmount)
+) {
+  throw new Error(
+    "Fixed discount cannot exceed the minimum order amount."
+  );
+}
+
+  if (
     maxDiscount !== null &&
     maxDiscount !== "" &&
     (!Number.isFinite(Number(maxDiscount)) ||

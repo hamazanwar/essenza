@@ -19,15 +19,22 @@ const {
   createWalletOrderService
 } = require("../services/orderService");
 
+const {
+  getValidCoupon,
+  reserveCoupon,
+  releaseCouponReservation,
+} = require("../services/couponRedemptionService");
+
 const createOrder = async (req, res) => {
   try {
     const userId = req.user.userId;
 
     const {
-      addressId,
-      items,
-      paymentMethod,
-    } = req.body;
+  addressId,
+  items,
+  paymentMethod,
+  couponId,
+} = req.body;
 
     if (paymentMethod !== "COD") {
   return res.status(400).json({
@@ -38,11 +45,12 @@ const createOrder = async (req, res) => {
 }
 
     const order = await createOrderService({
-      userId,
-      addressId,
-      items,
-      paymentMethod,
-    });
+  userId,
+  addressId,
+  items,
+  paymentMethod,
+  couponId: couponId || null,
+});
 
     res.status(201).json({
       success: true,
@@ -62,7 +70,7 @@ const createOrder = async (req, res) => {
 const createWalletOrder = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { addressId, items } = req.body;
+    const { addressId, items, couponId } = req.body;
 
     if (!addressId) {
       return res.status(400).json({
@@ -79,10 +87,11 @@ const createWalletOrder = async (req, res) => {
     }
 
     const order = await createWalletOrderService({
-      userId,
-      addressId,
-      items,
-    });
+  userId,
+  addressId,
+  items,
+  couponId: couponId || null,
+});
 
     return res.status(201).json({
       success: true,
@@ -177,7 +186,7 @@ const cancelOrder = async (req, res) => {
 const createOnlinePaymentOrder = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { addressId, items } = req.body;
+const { addressId, items, couponId } = req.body;
 
     if (!addressId) {
       return res.status(400).json({
@@ -292,32 +301,85 @@ for (const item of items) {
 
 subtotal = Math.round(subtotal * 100) / 100;
 
+const { coupon, discount: couponDiscount } =
+  await getValidCoupon({
+    couponId,
+    subtotal,
+  });
+
 const deliveryCharge = 0;
 
 const totalAmount = Math.round(
-  (subtotal + deliveryCharge) * 100
+  (subtotal - couponDiscount + deliveryCharge) * 100
 ) / 100;
 
-    const razorpayOrder =
-  await createRazorpayOrderService(totalAmount);
+    
+let couponReservation = null;
+let razorpayOrder = null;
+let paymentAttempt = null;
 
+try {
+  // Reserve coupon capacity before creating the payment order.
+  if (coupon) {
+    couponReservation = await reserveCoupon({
+      couponId: coupon._id,
+      subtotal,
+    });
+  }
 
-await PaymentAttempt.create({
-  userId,
-  addressId,
-  items: validatedItems.map((item) => ({
-    productId: item.productId,
-    variantId: item.variantId,
-    quantity: item.quantity,
-    originalPrice: item.originalPrice,
-    unitPrice: item.unitPrice,
-    discountAmount: item.discountAmount,
-    offerId: item.offerId,
-  })),
-  razorpayOrderId: razorpayOrder.id,
-  amount: razorpayOrder.amount,
-  status: "CREATED",
-});
+  razorpayOrder = await createRazorpayOrderService(totalAmount);
+
+  const attempts = await PaymentAttempt.create([
+    {
+      userId,
+      addressId,
+      items: validatedItems.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        originalPrice: item.originalPrice,
+        unitPrice: item.unitPrice,
+        discountAmount: item.discountAmount,
+        offerId: item.offerId,
+      })),
+      razorpayOrderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      status: "CREATED",
+      couponId: coupon?._id || null,
+      couponCode: coupon?.code || null,
+      couponDiscount,
+      couponReservationStatus: coupon ? "RESERVED" : "NONE",
+    },
+  ]);
+
+  paymentAttempt = attempts[0];
+} catch (error) {
+  // Release a reservation if payment-attempt creation failed.
+ if (couponReservation && coupon) {
+  try {
+    // No PaymentAttempt exists yet, so this reservation cannot
+    // be released through releaseCouponReservation().
+    // Roll back the reserved counter directly.
+    await require("../models/Coupon").updateOne(
+      {
+        _id: coupon._id,
+        reservedCount: { $gt: 0 },
+      },
+      {
+        $inc: { reservedCount: -1 },
+      }
+    );
+  } catch (releaseError) {
+    console.error(
+      "Coupon reservation release failed:",
+      releaseError
+    );
+  }
+}
+
+  throw error;
+}
+
 
 
     return res.status(201).json({
@@ -452,6 +514,10 @@ const verifyOnlinePayment = async (req, res) => {
   items: claimedAttempt.items,
   razorpayPaymentId: razorpay_payment_id,
   expectedAmount: claimedAttempt.amount,
+  paymentAttemptId: claimedAttempt._id,
+  couponId: claimedAttempt.couponId,
+  couponCode: claimedAttempt.couponCode,
+  couponDiscount: claimedAttempt.couponDiscount,
 });
 
     claimedAttempt.status = "PAID";

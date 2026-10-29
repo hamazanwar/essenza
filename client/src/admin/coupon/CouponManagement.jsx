@@ -109,6 +109,16 @@ function CouponManagement() {
     }
 
     if (
+  form.discountType === "FIXED" &&
+  Number(form.discountValue) > Number(form.minOrderAmount || 0)
+) {
+  setError(
+    "Fixed discount cannot exceed the minimum order amount.",
+  );
+  return;
+}
+
+    if (
       !form.startDate ||
       !form.expiryDate ||
       new Date(form.expiryDate) <= new Date(form.startDate)

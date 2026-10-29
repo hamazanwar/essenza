@@ -98,6 +98,31 @@ offerId: {
       min: 1,
     },
 
+    couponId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Coupon",
+  default: null,
+},
+
+couponCode: {
+  type: String,
+  default: null,
+  trim: true,
+  uppercase: true,
+},
+
+couponDiscount: {
+  type: Number,
+  default: 0,
+  min: 0,
+},
+
+couponReservationStatus: {
+  type: String,
+  enum: ["NONE", "RESERVED", "COMPLETED", "RELEASED"],
+  default: "NONE",
+},
+
     status: {
       type: String,
       enum: ["CREATED", "PROCESSING", "PAID", "FAILED"],

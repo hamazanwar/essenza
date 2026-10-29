@@ -145,16 +145,21 @@ function Payment() {
       quantity: Number(item.quantity),
     }));
 
+    const couponPayload = checkoutData.appliedCoupon
+  ? { couponId: checkoutData.appliedCoupon._id }
+  : {};
+
     // Keep the existing COD flow.
     if (paymentMethod === "cod") {
       try {
        const response = await api.post(
   "/orders",
   {
-    addressId: selectedAddress._id,
-    items: orderItems,
-    paymentMethod: "COD",
-  },
+  addressId: selectedAddress._id,
+  items: orderItems,
+  paymentMethod: "COD",
+  ...couponPayload,
+},
   { headers },
 );
 
@@ -180,9 +185,10 @@ function Payment() {
        const response = await api.post(
   "/orders/wallet-payment",
   {
-    addressId: selectedAddress._id,
-    items: orderItems,
-  },
+  addressId: selectedAddress._id,
+  items: orderItems,
+  ...couponPayload,
+},
   { headers },
 );
 
@@ -219,9 +225,10 @@ function Payment() {
     const response = await api.post(
   "/orders/create-payment-order",
   {
-    addressId: selectedAddress._id,
-    items: orderItems,
-  },
+  addressId: selectedAddress._id,
+  items: orderItems,
+  ...couponPayload,
+},
   { headers },
 );
 
