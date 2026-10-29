@@ -60,21 +60,21 @@ const reviewsPerPage = 8;
     fetchReviews();
   }, []);
 
-  const filteredReviews = reviews.filter((review) => {
-    const searchText = search.trim().toLowerCase();
+const filteredReviews = reviews.filter((review) => {
+  const searchText = search.trim().toLowerCase();
 
-    const matchesSearch =
-      !searchText ||
-      review.userId?.name?.toLowerCase().includes(searchText) ||
-      review.userId?.email?.toLowerCase().includes(searchText) ||
-      review.productId?.name?.toLowerCase().includes(searchText) ||
-      review.comment?.toLowerCase().includes(searchText);
+  // Search only by product name
+  const productName = review.productId?.name?.toLowerCase() || "";
 
-    const matchesRating =
-      ratingFilter === "ALL" || String(review.rating) === ratingFilter;
+  const matchesSearch =
+    !searchText || productName.includes(searchText);
 
-    return matchesSearch && matchesRating;
-  });
+  const matchesRating =
+    ratingFilter === "ALL" ||
+    String(review.rating) === ratingFilter;
+
+  return matchesSearch && matchesRating;
+});
 
   const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
 
@@ -181,11 +181,11 @@ await api.delete(`/reviews/admin/${deleteTarget._id}`, {
 
           <div className="admin-reviews-filters">
             <input
-              type="search"
-              placeholder="Search customer, product or review..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
+  type="search"
+  placeholder="Search product name to view its reviews..."
+  value={search}
+  onChange={(event) => setSearch(event.target.value)}
+/>
 
             <select
               value={ratingFilter}
