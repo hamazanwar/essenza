@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // Adjust path/capitalization to your actual model
+const User = require("../models/user"); 
 
 const protect = async (req, res, next) => {
   try {

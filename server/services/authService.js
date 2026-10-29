@@ -939,6 +939,84 @@ const user = await User.findOne({
     };
 };
 
+// ==========================================
+// CHANGE PASSWORD
+// ==========================================
+
+const changePasswordService = async ({
+    userId,
+    currentPassword,
+    newPassword,
+    confirmPassword
+}) => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        const error = new Error(
+            "Please fill in all password fields"
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (newPassword.length < 8) {
+        const error = new Error(
+            "New password must be at least 8 characters"
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (newPassword !== confirmPassword) {
+        const error = new Error(
+            "New password and confirm password do not match"
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (currentPassword === newPassword) {
+        const error = new Error(
+            "New password must be different from your current password"
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        const error = new Error("User not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // Google-login accounts may not have a password.
+    if (!user.password) {
+        const error = new Error(
+            "This account does not have a password. Please use Forgot Password to set one."
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const isCurrentPasswordCorrect = await bcrypt.compare(
+        currentPassword,
+        user.password
+    );
+
+    if (!isCurrentPasswordCorrect) {
+        const error = new Error("Current password is incorrect");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return {
+        message: "Password changed successfully"
+    };
+};
+
 
 module.exports = {
     registerUserService,
@@ -949,5 +1027,6 @@ module.exports = {
     logoutUserService,
     forgotPasswordService,
     verifyResetOtpService,
-    resetPasswordService
+    resetPasswordService,
+    changePasswordService
 };

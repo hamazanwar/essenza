@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../bars/Navbar";
 import Footer from "../bars/Footer";
 import api from "../../services/api";
+import { Eye, EyeOff } from "lucide-react";
 
 function Profile() {
   const navigate = useNavigate();
@@ -27,6 +28,18 @@ function Profile() {
   const [addressLoading, setAddressLoading] = useState(false);
   const [deleteAddressId, setDeleteAddressId] = useState(null);
   const [profileImageLoading, setProfileImageLoading] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+
+const [currentPassword, setCurrentPassword] = useState("");
+const [newPassword, setNewPassword] = useState("");
+const [confirmPassword, setConfirmPassword] = useState("");
+
+const [passwordLoading, setPasswordLoading] = useState(false);
+const [passwordMessage, setPasswordMessage] = useState("");
+const [passwordError, setPasswordError] = useState("");
+const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+const [showNewPassword, setShowNewPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const fileInputRef = useRef(null);
 
   // ==========================================
@@ -366,6 +379,64 @@ function Profile() {
       );
     }
   };
+
+  // ==========================================
+// CHANGE PASSWORD
+// ==========================================
+
+const handleChangePassword = async (event) => {
+  event.preventDefault();
+
+  setPasswordMessage("");
+  setPasswordError("");
+
+  if (newPassword !== confirmPassword) {
+    setPasswordError("New passwords do not match.");
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    setPasswordError("New password must be at least 8 characters.");
+    return;
+  }
+
+  setPasswordLoading(true);
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await api.patch(
+      "/users/change-password",
+      {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    setPasswordMessage(
+      response.data.message || "Password changed successfully.",
+    );
+
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowPasswordForm(false);
+  } catch (error) {
+    console.error("Change password error:", error);
+
+    setPasswordError(
+      error.response?.data?.message || "Unable to change password.",
+    );
+  } finally {
+    setPasswordLoading(false);
+  }
+};
 
   // ==========================================
   // LOGOUT
@@ -835,6 +906,122 @@ const data = response.data;
               </div>
             )}
           </section>
+
+          {/* ==================================
+    CHANGE PASSWORD
+================================== */}
+
+<section className="profile-password-section">
+  <div className="profile-password-heading">
+    <div>
+      <p>ACCOUNT SECURITY</p>
+      <h2>CHANGE PASSWORD</h2>
+    </div>
+
+    <button
+      type="button"
+      className="profile-password-toggle"
+      onClick={() => {
+        setShowPasswordForm((previous) => !previous);
+        setPasswordMessage("");
+        setPasswordError("");
+      }}
+    >
+      {showPasswordForm ? "CANCEL" : "CHANGE PASSWORD"}
+    </button>
+  </div>
+
+  {passwordMessage && (
+    <p className="profile-password-success" role="status">
+      {passwordMessage}
+    </p>
+  )}
+
+  {passwordError && (
+    <p className="profile-password-error" role="alert">
+      {passwordError}
+    </p>
+  )}
+
+  {showPasswordForm && (
+    <form
+      className="profile-password-form"
+      onSubmit={handleChangePassword}
+    >
+      <label htmlFor="currentPassword">CURRENT PASSWORD</label>
+      <div className="profile-password-input-wrapper">
+  <input
+    id="currentPassword"
+    type={showCurrentPassword ? "text" : "password"}
+    autoComplete="current-password"
+    value={currentPassword}
+    onChange={(event) => setCurrentPassword(event.target.value)}
+    placeholder="Enter current password"
+    required
+  />
+
+  <button
+    type="button"
+    className="profile-password-eye"
+    onClick={() => setShowCurrentPassword((previous) => !previous)}
+    aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
+  >
+    {showCurrentPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+  </button>
+</div>
+
+      <label htmlFor="newPassword">NEW PASSWORD</label>
+      <div className="profile-password-input-wrapper">
+  <input
+    id="newPassword"
+    type={showNewPassword ? "text" : "password"}
+    autoComplete="new-password"
+    value={newPassword}
+    onChange={(event) => setNewPassword(event.target.value)}
+    placeholder="Enter new password (minimum 8 characters)"
+    minLength={8}
+    required
+  />
+
+  <button
+    type="button"
+    className="profile-password-eye"
+    onClick={() => setShowNewPassword((previous) => !previous)}
+    aria-label={showNewPassword ? "Hide new password" : "Show new password"}
+  >
+    {showNewPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+  </button>
+</div>
+
+      <label htmlFor="confirmPassword">CONFIRM NEW PASSWORD</label>
+      <div className="profile-password-input-wrapper">
+  <input
+    id="confirmPassword"
+    type={showConfirmPassword ? "text" : "password"}
+    autoComplete="new-password"
+    value={confirmPassword}
+    onChange={(event) => setConfirmPassword(event.target.value)}
+    placeholder="Re-enter new password"
+    minLength={8}
+    required
+  />
+
+  <button
+    type="button"
+    className="profile-password-eye"
+    onClick={() => setShowConfirmPassword((previous) => !previous)}
+    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+  >
+    {showConfirmPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+  </button>
+</div>
+
+      <button type="submit" disabled={passwordLoading}>
+        {passwordLoading ? "UPDATING..." : "UPDATE PASSWORD"}
+      </button>
+    </form>
+  )}
+</section>
 
           {/* ==================================
               LOGOUT

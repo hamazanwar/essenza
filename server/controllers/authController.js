@@ -7,7 +7,8 @@ const {
     logoutUserService,
     forgotPasswordService,
     verifyResetOtpService,
-    resetPasswordService
+    resetPasswordService,
+    changePasswordService
 } = require("../services/authService");
 
 
@@ -332,6 +333,31 @@ const resetPassword = async (req, res) => {
     }
 };
 
+// ==========================================
+// CHANGE PASSWORD
+// ==========================================
+
+const changePassword = async (req, res) => {
+    try {
+        const result = await changePasswordService({
+            userId: req.user.userId,
+            currentPassword: req.body.currentPassword,
+            newPassword: req.body.newPassword,
+            confirmPassword: req.body.confirmPassword
+        });
+
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Change password error:", error);
+
+        res.status(error.statusCode || 500).json({
+            message: error.statusCode
+                ? error.message
+                : "Unable to change password"
+        });
+    }
+};
+
 
 module.exports = {
     registerUser,
@@ -342,5 +368,6 @@ module.exports = {
     verifyResetOtp,
     resetPassword,
     verifyEmailOtp,
-    resendEmailOtp
+    resendEmailOtp,
+    changePassword
 };

@@ -8143,3 +8143,204 @@ body {
 .cart-container > .cart-stock-error {
   color: #dc2626;
 }
+
+
+/* ==========================================
+   PROFILE - CHANGE PASSWORD
+========================================== */
+
+.profile-password-section {
+  margin-top: 40px;
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #dedede;
+}
+
+.profile-password-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #dedede;
+}
+
+.profile-password-heading p {
+  margin: 0 0 8px;
+  color: #888;
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+
+.profile-password-heading h2 {
+  margin: 0;
+  color: #111;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.profile-password-toggle,
+.profile-password-form button {
+  padding: 14px 22px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.profile-password-toggle:hover,
+.profile-password-form button:hover {
+  background: #fff;
+  color: #111;
+}
+
+.profile-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+  padding-top: 25px;
+}
+
+.profile-password-form label {
+  margin-top: 8px;
+  color: #555;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+
+.profile-password-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #111;
+  font-size: 14px;
+  outline: none;
+}
+
+.profile-password-form input:focus {
+  border-color: #111;
+}
+
+.profile-password-form button {
+  align-self: flex-start;
+  margin-top: 15px;
+}
+
+.profile-password-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-password-success,
+.profile-password-error {
+  margin: 18px 0 0;
+  padding: 12px 15px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.profile-password-success {
+  border: 1px solid #b9d8c0;
+  background: #f2faf4;
+  color: #226735;
+}
+
+.profile-password-error {
+  border: 1px solid #e5bcbc;
+  background: #fff5f5;
+  color: #a32626;
+}
+
+@media (max-width: 600px) {
+  .profile-password-section {
+    padding: 20px;
+  }
+
+  .profile-password-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-password-heading h2 {
+    font-size: 21px;
+  }
+
+  .profile-password-toggle {
+    width: 100%;
+  }
+
+  .profile-password-form {
+    max-width: 100%;
+  }
+
+  .profile-password-form button {
+    width: 100%;
+  }
+}
+
+/* Password input with Lucide eye button */
+
+/* Fix password visibility eye buttons */
+
+.profile-password-input-wrapper {
+  position: relative !important;
+  width: 100%;
+}
+
+.profile-password-input-wrapper input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 45px !important;
+}
+
+.profile-password-input-wrapper .profile-password-eye {
+  position: absolute !important;
+  top: 50% !important;
+  right: 10px !important;
+  left: auto !important;
+  transform: translateY(-50%) !important;
+
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+
+  color: #111 !important;
+  cursor: pointer;
+}
+
+.profile-password-input-wrapper .profile-password-eye:hover,
+.profile-password-input-wrapper .profile-password-eye:focus,
+.profile-password-input-wrapper .profile-password-eye:active {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.profile-password-input-wrapper .profile-password-eye svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  stroke-width: 1.8;
+}
