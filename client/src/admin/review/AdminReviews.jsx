@@ -12,6 +12,9 @@ function AdminReviews() {
   const [ratingFilter, setRatingFilter] = useState("ALL");
   const [actionLoading, setActionLoading] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+const reviewsPerPage = 8;
 
   const getImageUrl = (image) => {
   if (!image) return "";
@@ -72,6 +75,30 @@ function AdminReviews() {
 
     return matchesSearch && matchesRating;
   });
+
+  const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+
+const safeCurrentPage = Math.min(
+  currentPage,
+  Math.max(totalPages, 1)
+);
+
+const startIndex = (safeCurrentPage - 1) * reviewsPerPage;
+
+const paginatedReviews = filteredReviews.slice(
+  startIndex,
+  startIndex + reviewsPerPage
+);
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [search, ratingFilter]);
+
+useEffect(() => {
+  if (currentPage > totalPages && totalPages > 0) {
+    setCurrentPage(totalPages);
+  }
+}, [currentPage, totalPages]);
 
   const updateVisibility = async (review) => {
     try {
@@ -183,8 +210,9 @@ await api.delete(`/reviews/admin/${deleteTarget._id}`, {
               <p>Customer reviews matching your search will appear here.</p>
             </div>
           ) : (
+            <>
             <div className="admin-reviews-list">
-              {filteredReviews.map((review) => (
+              {paginatedReviews.map((review) => (
                 <article className="admin-review-card" key={review._id}>
                   <div className="admin-review-product">
                     {review.productId?.productImage?.[0] ? (
@@ -259,6 +287,42 @@ await api.delete(`/reviews/admin/${deleteTarget._id}`, {
                 </article>
               ))}
             </div>
+            
+            {totalPages > 1 && (
+  <div className="admin-reviews-pagination">
+    <button
+      type="button"
+      onClick={() => setCurrentPage((page) => page - 1)}
+      disabled={safeCurrentPage === 1}
+    >
+      Previous
+    </button>
+
+    {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+      (page) => (
+        <button
+          type="button"
+          key={page}
+          className={
+            safeCurrentPage === page ? "active" : ""
+          }
+          onClick={() => setCurrentPage(page)}
+        >
+          {page}
+        </button>
+      )
+    )}
+
+    <button
+      type="button"
+      onClick={() => setCurrentPage((page) => page + 1)}
+      disabled={safeCurrentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
+)}
+</>
           )}
         </main>
 
