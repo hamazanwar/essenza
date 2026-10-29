@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import api from "../../services/api";
 import AdminNavbar from "../bars/AdminNavbar";
+import AdminFooter from "../bars/AdminFooter";
 
 
 
@@ -271,8 +272,10 @@ await fetchOffers();
   };
 
   return (
+    <>
+    <AdminNavbar />
     <div className="admin-layout">
-      <AdminNavbar />
+      
 
       <main className="admin-main-content coupon-management-page">
         <div className="coupon-page-header">
@@ -638,6 +641,8 @@ await fetchOffers();
         </div>
       )}
     </div>
+    <AdminFooter/>
+    </>
   );
 }
 

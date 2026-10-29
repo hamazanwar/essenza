@@ -1,13 +1,17 @@
+const mongoose = require("mongoose");
 const Address = require("../models/Address");
 const Product = require("../models/product");
 const Variant = require("../models/variant");
 const PaymentAttempt = require("../models/PaymentAttempt");
+const Coupon = require("../models/Coupon");
 const Offer = require("../models/Offer");
 
 const {
   createRazorpayOrderService,
   verifyRazorpayPaymentService,
-  fetchVerifiedPaymentService
+  fetchVerifiedPaymentService,
+  fetchRazorpayOrderService,
+  fetchRazorpayOrderPaymentsService
 } = require("../services/razorpayService");
 
 const {
@@ -182,9 +186,77 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+const cleanupAbandonedCouponReservations = async () => {
+  const cutoff = new Date(Date.now() - 30 * 60 * 1000);
+
+  const attempts = await PaymentAttempt.find({
+    status: "CREATED",
+    couponReservationStatus: "RESERVED",
+    createdAt: { $lt: cutoff },
+    couponId: { $ne: null },
+  }).limit(50);
+
+  for (const attempt of attempts) {
+    try {
+      // Check Razorpay before releasing the reservation.
+      const result = await fetchRazorpayOrderPaymentsService(
+        attempt.razorpayOrderId
+      );
+
+      const payments = result.items || [];
+
+      const hasActivePayment = payments.some((payment) =>
+        ["created", "authorized", "captured"].includes(payment.status)
+      );
+
+      if (hasActivePayment) continue;
+
+      // Release the reservation and fail the attempt atomically.
+      const session = await mongoose.startSession();
+
+      try {
+        await session.withTransaction(async () => {
+          const currentAttempt = await PaymentAttempt.findOne({
+            _id: attempt._id,
+            status: "CREATED",
+            couponReservationStatus: "RESERVED",
+            createdAt: { $lt: cutoff },
+          }).session(session);
+
+          if (!currentAttempt) return;
+
+          await releaseCouponReservation({
+            paymentAttemptId: currentAttempt._id,
+            session,
+          });
+
+          await PaymentAttempt.updateOne(
+            {
+              _id: currentAttempt._id,
+              status: "CREATED",
+              couponReservationStatus: "RELEASED",
+            },
+            { $set: { status: "FAILED" } },
+            { session }
+          );
+        });
+      } finally {
+        await session.endSession();
+      }
+    } catch (error) {
+      // If Razorpay cannot be checked, keep the reservation.
+      console.error(
+        `Coupon cleanup skipped for attempt ${attempt._id}:`,
+        error.message
+      );
+    }
+  }
+};
+
 
 const createOnlinePaymentOrder = async (req, res) => {
   try {
+    await cleanupAbandonedCouponReservations();
     const userId = req.user.userId;
 const { addressId, items, couponId } = req.body;
 
@@ -314,12 +386,13 @@ const totalAmount = Math.round(
 ) / 100;
 
     
+
 let couponReservation = null;
 let razorpayOrder = null;
 let paymentAttempt = null;
 
 try {
-  // Reserve coupon capacity before creating the payment order.
+  // Reserve coupon capacity before creating the Razorpay order.
   if (coupon) {
     couponReservation = await reserveCoupon({
       couponId: coupon._id,
@@ -352,30 +425,34 @@ try {
     },
   ]);
 
-  paymentAttempt = attempts[0];
+    paymentAttempt = attempts[0];
 } catch (error) {
-  // Release a reservation if payment-attempt creation failed.
- if (couponReservation && coupon) {
-  try {
-    // No PaymentAttempt exists yet, so this reservation cannot
-    // be released through releaseCouponReservation().
-    // Roll back the reserved counter directly.
-    await require("../models/Coupon").updateOne(
-      {
-        _id: coupon._id,
-        reservedCount: { $gt: 0 },
-      },
-      {
-        $inc: { reservedCount: -1 },
+  // Release the reservation if Razorpay order or attempt creation fails.
+  if (couponReservation && coupon) {
+    try {
+      const releaseResult = await Coupon.updateOne(
+        {
+          _id: coupon._id,
+          reservedCount: { $gt: 0 },
+        },
+        {
+          $inc: { reservedCount: -1 },
+        }
+      );
+
+      if (releaseResult.modifiedCount !== 1) {
+        console.error(
+          "Coupon reservation could not be released:",
+          coupon._id.toString()
+        );
       }
-    );
-  } catch (releaseError) {
-    console.error(
-      "Coupon reservation release failed:",
-      releaseError
-    );
+    } catch (releaseError) {
+      console.error(
+        "Coupon reservation release failed:",
+        releaseError
+      );
+    }
   }
-}
 
   throw error;
 }
@@ -561,6 +638,7 @@ const verifyOnlinePayment = async (req, res) => {
     });
   }
 };
+
 
 
 

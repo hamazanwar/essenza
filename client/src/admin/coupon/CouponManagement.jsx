@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import AdminNavbar from "../bars/AdminNavbar";
+import AdminFooter from "../bars/AdminFooter";
 
 import api from "../../services/api";
 
@@ -293,8 +294,10 @@ const handleConfirmAction = async () => {
   };
 
   return (
+    <>
+    <AdminNavbar />
     <div className="admin-layout">
-      <AdminNavbar />
+      
 
       <main className="admin-main-content coupon-management-page">
         <div className="coupon-page-header">
@@ -737,6 +740,8 @@ const handleConfirmAction = async () => {
         </div>
       )}
     </div>
+    <AdminFooter/>
+    </>
   );
 }
 

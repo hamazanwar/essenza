@@ -82,8 +82,30 @@ const fetchVerifiedPaymentService = async ({
 };
 
 
+const fetchRazorpayOrderService = async (razorpayOrderId) => {
+  if (!razorpayOrderId) {
+    throw new Error("Razorpay order ID is required.");
+  }
+
+  return razorpay.orders.fetch(razorpayOrderId);
+};
+
+
+const fetchRazorpayOrderPaymentsService = async (razorpayOrderId) => {
+  if (!razorpayOrderId) {
+    throw new Error("Razorpay order ID is required.");
+  }
+
+  return razorpay.orders.fetchPayments(razorpayOrderId);
+};
+
+
+
+
 module.exports = {
   createRazorpayOrderService,
   verifyRazorpayPaymentService,
-  fetchVerifiedPaymentService
+  fetchVerifiedPaymentService,
+  fetchRazorpayOrderService,
+  fetchRazorpayOrderPaymentsService
 };
