@@ -11,6 +11,8 @@ function AdminReturnManagement() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [adminNote, setAdminNote] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("ALL");
+const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -186,7 +188,7 @@ const allReturnItems = returnRequests
       item,
     })),
   )
-  .filter(({ request }) => {
+  .filter(({ request, item }) => {
     const search = searchTerm.trim().toLowerCase();
 
     const customerName = String(
@@ -195,7 +197,15 @@ const allReturnItems = returnRequests
         "",
     ).toLowerCase();
 
-    return customerName.includes(search);
+    const matchesSearch = customerName.includes(search);
+
+    const matchesType =
+      typeFilter === "ALL" || request.requestType === typeFilter;
+
+    const matchesStatus =
+      statusFilter === "ALL" || item.status === statusFilter;
+
+    return matchesSearch && matchesType && matchesStatus;
   });
 
   // Pagination calculations
@@ -253,6 +263,58 @@ const allReturnItems = returnRequests
       CLEAR
     </button>
   )}
+</div>
+
+<div className="admin-return-filters">
+
+  <div>
+    <label htmlFor="return-type-filter">REQUEST TYPE</label>
+
+    <select
+      id="return-type-filter"
+      value={typeFilter}
+      onChange={(event) => {
+        setTypeFilter(event.target.value);
+        setCurrentPage(1);
+      }}
+    >
+      <option value="ALL">ALL TYPES</option>
+      <option value="RETURN">RETURN</option>
+      <option value="EXCHANGE">EXCHANGE</option>
+    </select>
+  </div>
+
+  <div>
+    <label htmlFor="return-status-filter">REQUEST STATUS</label>
+
+    <select
+      id="return-status-filter"
+      value={statusFilter}
+      onChange={(event) => {
+        setStatusFilter(event.target.value);
+        setCurrentPage(1);
+      }}
+    >
+      <option value="ALL">ALL STATUSES</option>
+      <option value="PENDING">PENDING</option>
+      <option value="APPROVED">APPROVED</option>
+      <option value="REJECTED">REJECTED</option>
+      <option value="COMPLETED">COMPLETED</option>
+    </select>
+  </div>
+
+  <button
+    type="button"
+    onClick={() => {
+      setTypeFilter("ALL");
+      setStatusFilter("ALL");
+      setSearchTerm("");
+      setCurrentPage(1);
+    }}
+  >
+    CLEAR FILTERS
+  </button>
+
 </div>
 
           {error && (

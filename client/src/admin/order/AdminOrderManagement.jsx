@@ -15,6 +15,7 @@ function AdminOrderManagement() {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   const getImageUrl = (image) => {
   if (!image) return "";
@@ -74,12 +75,20 @@ const filteredOrders = orders.filter((order) => {
   const shortOrderId = orderId.slice(-6);
 
   const matchesSearch =
-    !search ||
-    customerName.includes(search) ||
-    orderId.includes(search) ||
-    shortOrderId.includes(search);
+  !search ||
+  customerName.includes(search) ||
+  orderId.includes(search) ||
+  shortOrderId.includes(search);
 
-  return matchesStartDate && matchesEndDate && matchesSearch;
+const matchesStatus =
+  statusFilter === "ALL" || order.orderStatus === statusFilter;
+
+return (
+  matchesStartDate &&
+  matchesEndDate &&
+  matchesSearch &&
+  matchesStatus
+);
 });
 
   // Pagination calculations
@@ -233,6 +242,27 @@ const filteredOrders = orders.filter((order) => {
             />
           </div>
 
+          <div className="admin-order-date-field">
+  <label htmlFor="order-status-filter">ORDER STATUS</label>
+
+  <select
+    id="order-status-filter"
+    value={statusFilter}
+    onChange={(event) => {
+      setStatusFilter(event.target.value);
+      setCurrentPage(1);
+    }}
+  >
+    <option value="ALL">ALL ORDERS</option>
+    <option value="PENDING">PENDING</option>
+    <option value="CONFIRMED">CONFIRMED</option>
+    <option value="SHIPPED">SHIPPED</option>
+    <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY</option>
+    <option value="DELIVERED">DELIVERED</option>
+    <option value="CANCELLED">CANCELLED</option>
+  </select>
+</div>
+
           <button
             type="button"
             className="admin-order-clear-filter"
@@ -240,6 +270,7 @@ const filteredOrders = orders.filter((order) => {
               setStartDate("");
               setEndDate("");
               setCurrentPage(1);
+              setStatusFilter("ALL");
             }}
           >
             CLEAR FILTER

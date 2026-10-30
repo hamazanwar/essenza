@@ -7364,3 +7364,128 @@
   background: #111;
   color: #fff;
 }
+
+/* FILTER SECTION */
+.admin-return-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 25px 0 18px;
+}
+
+.admin-return-search input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.admin-return-search input:focus {
+  border-color: #222;
+}
+
+.admin-return-search button {
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #222;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.admin-return-search button:hover {
+  background: #444;
+}
+
+/* FILTER DROPDOWNS */
+.admin-return-filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 18px;
+  margin-bottom: 22px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+}
+
+.admin-return-filters > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 190px;
+}
+
+.admin-return-filters label {
+  color: #555;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.admin-return-filters select {
+  width: 100%;
+  height: 42px;
+  padding: 0 35px 0 12px;
+  border: 1px solid #d5d5d5;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #222;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.admin-return-filters select:focus {
+  border-color: #222;
+}
+
+/* CLEAR FILTERS */
+.admin-return-filters > button {
+  height: 42px;
+  padding: 0 20px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #222;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-return-filters > button:hover {
+  background: #fff;
+  color: #222;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .admin-return-filters {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .admin-return-filters > div {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-return-filters > button {
+    width: 100%;
+  }
+}
