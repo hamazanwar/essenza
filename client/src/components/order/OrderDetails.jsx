@@ -142,14 +142,18 @@ function OrderDetails() {
 
     pdf.setFont("helvetica", "normal");
 
-    const address = order.addressId || {};
+   const address = order.deliveryAddress || order.addressId || {};
 
-    const addressLines = [
-      address.fullName,
-      address.address,
-      [address.city, address.state, address.pincode].filter(Boolean).join(", "),
-    ].filter(Boolean);
-
+const addressLines = [
+  address.fullName,
+  address.phoneNumber
+    ? `Phone: ${address.phoneNumber}`
+    : "Phone: Not provided",
+  address.address,
+  [address.city, address.state, address.pincode]
+    .filter(Boolean)
+    .join(", "),
+].filter(Boolean);
     if (addressLines.length === 0) {
       addressLines.push("Address information unavailable");
     }
@@ -272,7 +276,7 @@ addLabelValue("TOTAL", formatAmount(totalAmount));
     );
   }
 
-  const address = order.addressId || {};
+  const address = order.deliveryAddress || order.addressId || {};
 
   // Calculate invoice amounts from the saved order items
 const originalSubtotal = (order.items || []).reduce(
@@ -452,15 +456,19 @@ const currentStageIndex = orderStages.indexOf(currentStatus);
             <section className="order-details-card">
               <h2>DELIVERY ADDRESS</h2>
 
-              <div className="order-details-address">
-                <strong>{address.fullName || "Customer"}</strong>
-                <p>{address.address || "Address unavailable"}</p>
-                <p>
-                  {[address.city, address.state, address.pincode]
-                    .filter(Boolean)
-                    .join(", ")}
-                </p>
-              </div>
+             <div className="order-details-address">
+  <strong>{address.fullName || "Customer"}</strong>
+
+  <p>{address.phoneNumber || "Phone number not provided"}</p>
+
+  <p>{address.address || "Address unavailable"}</p>
+
+  <p>
+    {[address.city, address.state, address.pincode]
+      .filter(Boolean)
+      .join(", ")}
+  </p>
+</div>
             </section>
 
             <section className="order-details-card">
@@ -539,6 +547,22 @@ const currentStageIndex = orderStages.indexOf(currentStatus);
                   <p>{formatDate(order.createdAt)}</p>
                 </div>
               </div>
+
+              <div className="order-invoice-preview-address">
+  <h3>DELIVERY ADDRESS</h3>
+
+  <strong>{address.fullName || "Customer"}</strong>
+
+  <p>{address.phoneNumber || "Phone number not provided"}</p>
+
+  <p>{address.address || "Address unavailable"}</p>
+
+  <p>
+    {[address.city, address.state, address.pincode]
+      .filter(Boolean)
+      .join(", ")}
+  </p>
+</div>
 
               <div className="order-invoice-preview-items">
                 {(order.items || []).map((item, index) => (

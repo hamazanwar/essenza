@@ -46,6 +46,15 @@ const createOrderService = async ({
 
       if (!address) throw new Error("Delivery address not found.");
 
+      const deliveryAddress = {
+  fullName: address.fullName,
+  phoneNumber: address.phoneNumber || "",
+  address: address.address,
+  city: address.city,
+  state: address.state,
+  pincode: address.pincode,
+};
+
       const orderItems = [];
       let subtotal = 0;
 
@@ -175,6 +184,7 @@ const createOrderService = async ({
           {
             userId,
             addressId,
+            deliveryAddress,
             items: orderItems,
             subtotal,
             deliveryCharge,
@@ -268,6 +278,15 @@ const createPaidOnlineOrderService = async ({
       if (!address) {
         throw new Error("Delivery address not found.");
       }
+
+      const deliveryAddress = {
+  fullName: address.fullName,
+  phoneNumber: address.phoneNumber || "",
+  address: address.address,
+  city: address.city,
+  state: address.state,
+  pincode: address.pincode,
+};
 
       const orderItems = [];
       let subtotal = 0;
@@ -385,6 +404,7 @@ const createPaidOnlineOrderService = async ({
           {
             userId,
             addressId,
+            deliveryAddress,
             items: orderItems,
             subtotal,
             deliveryCharge,
@@ -468,6 +488,15 @@ const createWalletOrderService = async ({
       if (!address) {
         throw new Error("Delivery address not found.");
       }
+
+      const deliveryAddress = {
+  fullName: address.fullName,
+  phoneNumber: address.phoneNumber || "",
+  address: address.address,
+  city: address.city,
+  state: address.state,
+  pincode: address.pincode,
+};
 
       const orderItems = [];
       let subtotal = 0;
@@ -657,6 +686,7 @@ const createWalletOrderService = async ({
           {
             userId,
             addressId,
+            deliveryAddress,
             items: orderItems,
             subtotal,
             deliveryCharge,

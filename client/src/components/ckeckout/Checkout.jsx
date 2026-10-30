@@ -44,6 +44,7 @@ function Checkout() {
 
 const [newAddress, setNewAddress] = useState({
   fullName: "",
+  phoneNumber: "",
   address: "",
   city: "",
   state: "",
@@ -279,6 +280,7 @@ const [addressFormError, setAddressFormError] = useState("");
   const handleOpenAddressForm = () => {
   setNewAddress({
     fullName: "",
+     phoneNumber: "",
     address: "",
     city: "",
     state: "",
@@ -329,13 +331,14 @@ const handleSaveCheckoutAddress = async (event) => {
 
     setShowAddressForm(false);
 
-    setNewAddress({
-      fullName: "",
-      address: "",
-      city: "",
-      state: "",
-      pincode: "",
-    });
+   setNewAddress({
+  fullName: "",
+  phoneNumber: "",
+  address: "",
+  city: "",
+  state: "",
+  pincode: "",
+});
   } catch (error) {
     console.error("Save checkout address error:", error);
 
@@ -550,6 +553,26 @@ const total =
         required
       />
 
+      <label htmlFor="checkout-phoneNumber">PHONE NUMBER</label>
+
+<input
+  id="checkout-phoneNumber"
+  type="tel"
+  inputMode="numeric"
+  value={newAddress.phoneNumber}
+  onChange={(event) =>
+    setNewAddress({
+      ...newAddress,
+      phoneNumber: event.target.value.replace(/\D/g, "").slice(0, 10),
+    })
+  }
+  placeholder="Enter 10-digit mobile number"
+  maxLength={10}
+  pattern="[6-9][0-9]{9}"
+  title="Enter a valid 10-digit Indian mobile number"
+  required
+/>
+
       <label htmlFor="checkout-address">ADDRESS</label>
       <input
         id="checkout-address"
@@ -664,11 +687,13 @@ const total =
               )}
             </div>
 
-            <p>{address.address}</p>
+            <p>{address.phoneNumber || "Phone number not provided"}</p>
 
-            <p>
-              {address.city}, {address.state} - {address.pincode}
-            </p>
+<p>{address.address}</p>
+
+<p>
+  {address.city}, {address.state} - {address.pincode}
+</p>
           </div>
         </label>
       ))}

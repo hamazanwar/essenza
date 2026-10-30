@@ -72,6 +72,36 @@ offerId: {
   { _id: false }
 );
 
+const deliveryAddressSchema = new mongoose.Schema(
+    {
+        fullName: {
+            type: String,
+            required: true
+        },
+        phoneNumber: {
+    type: String,
+    default: "",
+},
+        address: {
+            type: String,
+            required: true
+        },
+        city: {
+            type: String,
+            required: true
+        },
+        state: {
+            type: String,
+            required: true
+        },
+        pincode: {
+            type: String,
+            required: true
+        }
+    },
+    { _id: false }
+);
+
 const orderSchema = new mongoose.Schema(
   {
     userId: {
@@ -85,6 +115,11 @@ const orderSchema = new mongoose.Schema(
       ref: "Address",
       required: true,
     },
+
+    deliveryAddress: {
+    type: deliveryAddressSchema,
+    required: false
+},
 
     items: {
       type: [orderItemSchema],

@@ -354,23 +354,31 @@ const filteredOrders = orders.filter((order) => {
                       </td>
 
                       {/* ADDRESS */}
-                      <td>
-                        {order.addressId ? (
-                          <div className="admin-order-address">
-                            <strong>{order.addressId.fullName}</strong>
+<td>
+  {(() => {
+    const address = order.deliveryAddress || order.addressId;
 
-                            <span>{order.addressId.address}</span>
+    return address ? (
+      <div className="admin-order-address">
+        <strong>{address.fullName || "Customer"}</strong>
 
-                            <span>
-                              {order.addressId.city}, {order.addressId.state}
-                            </span>
+        <span>
+          Phone: {address.phoneNumber || "Not provided"}
+        </span>
 
-                            <span>{order.addressId.pincode}</span>
-                          </div>
-                        ) : (
-                          "Address unavailable"
-                        )}
-                      </td>
+        <span>{address.address || "Address unavailable"}</span>
+
+        <span>
+          {address.city}, {address.state}
+        </span>
+
+        <span>{address.pincode}</span>
+      </div>
+    ) : (
+      "Address unavailable"
+    );
+  })()}
+</td>
 
                       {/* PAYMENT */}
                       <td>

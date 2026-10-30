@@ -20,6 +20,7 @@ function Profile() {
   const [editingAddressId, setEditingAddressId] = useState(null);
 
   const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
@@ -169,6 +170,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setEditingAddressId(null);
 
     setFullName("");
+    setPhoneNumber("");
     setAddress("");
     setCity("");
     setState("");
@@ -186,6 +188,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setEditingAddressId(addressItem._id);
 
     setFullName(addressItem.fullName || "");
+    setPhoneNumber(addressItem.phoneNumber || "");
     setAddress(addressItem.address || "");
     setCity(addressItem.city || "");
     setState(addressItem.state || "");
@@ -204,19 +207,25 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const handleSaveAddress = async (event) => {
     event.preventDefault();
 
+    if (!/^[6-9]\d{9}$/.test(phoneNumber.trim())) {
+  setError("Please enter a valid 10-digit Indian mobile number.");
+  return;
+}
+
     setAddressLoading(true);
     setError("");
 
     try {
       const token = localStorage.getItem("token");
 
-      const addressData = {
-        fullName,
-        address,
-        city,
-        state,
-        pincode,
-      };
+     const addressData = {
+  fullName,
+  phoneNumber: phoneNumber.trim(),
+  address,
+  city,
+  state,
+  pincode,
+};
 
       let response;
 
@@ -280,6 +289,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       // ==========================================
 
       setFullName("");
+      setPhoneNumber("");
       setAddress("");
       setCity("");
       setState("");
@@ -305,6 +315,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setEditingAddressId(null);
 
     setFullName("");
+    setPhoneNumber("");
     setAddress("");
     setCity("");
     setState("");
@@ -733,6 +744,23 @@ const data = response.data;
                   required
                 />
 
+                {/* PHONE NUMBER */}
+
+<label>PHONE NUMBER</label>
+
+<input
+  type="tel"
+  value={phoneNumber}
+  onChange={(event) =>
+    setPhoneNumber(event.target.value.replace(/\D/g, "").slice(0, 10))
+  }
+  placeholder="Enter 10-digit mobile number"
+  inputMode="numeric"
+  maxLength={10}
+  pattern="[6-9][0-9]{9}"
+  required
+/>
+
                 {/* ADDRESS */}
 
                 <label>ADDRESS</label>
@@ -831,6 +859,11 @@ const data = response.data;
                     {/* ADDRESS NAME */}
 
                     <h3>{addressItem.fullName}</h3>
+
+                    {/* phone */}
+                    <p>
+  Phone: {addressItem.phoneNumber || "Not available"}
+</p>
 
                     {/* ADDRESS */}
 

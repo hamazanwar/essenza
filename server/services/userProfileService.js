@@ -87,12 +87,23 @@ const addUserAddress = async (
 ) => {
 
     const {
-        fullName,
-        address,
-        city,
-        state,
-        pincode
-    } = addressData;
+  fullName,
+  phoneNumber,
+  address,
+  city,
+  state,
+  pincode,
+} = addressData;
+
+const cleanedPhoneNumber = String(phoneNumber || "").trim();
+
+if (!/^[6-9]\d{9}$/.test(cleanedPhoneNumber)) {
+  const error = new Error(
+    "Please enter a valid 10-digit Indian mobile number."
+  );
+  error.statusCode = 400;
+  throw error;
+}
 
 
     // Check required fields
@@ -129,6 +140,7 @@ const addUserAddress = async (
         userId,
 
         fullName,
+        phoneNumber: cleanedPhoneNumber,
 
         address,
 
@@ -233,12 +245,23 @@ const updateUserAddress = async (
 ) => {
 
     const {
-        fullName,
-        address,
-        city,
-        state,
-        pincode
-    } = addressData;
+  fullName,
+  phoneNumber,
+  address,
+  city,
+  state,
+  pincode,
+} = addressData;
+
+const cleanedPhoneNumber = String(phoneNumber || "").trim();
+
+if (!/^[6-9]\d{9}$/.test(cleanedPhoneNumber)) {
+  const error = new Error(
+    "Please enter a valid 10-digit Indian mobile number."
+  );
+  error.statusCode = 400;
+  throw error;
+}
 
 
     // Check required fields
@@ -268,12 +291,13 @@ const updateUserAddress = async (
                 userId
             },
             {
-                fullName: fullName.trim(),
-                address: address.trim(),
-                city: city.trim(),
-                state: state.trim(),
-                pincode: pincode.trim()
-            },
+  fullName,
+ phoneNumber: cleanedPhoneNumber,
+  address,
+  city,
+  state,
+  pincode,
+},
             {
                 new: true,
                 runValidators: true

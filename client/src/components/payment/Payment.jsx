@@ -331,17 +331,22 @@ function Payment() {
           <section className="payment-section">
             <h2>DELIVERY ADDRESS</h2>
 
-            {selectedAddress && (
-              <div className="payment-address-card">
-                <strong>{selectedAddress.fullName}</strong>
-                <p>{selectedAddress.address}</p>
+           {selectedAddress && (
+  <div className="payment-address-card">
+    <strong>{selectedAddress.fullName}</strong>
 
-                <p>
-                  {selectedAddress.city}, {selectedAddress.state} -{" "}
-                  {selectedAddress.pincode}
-                </p>
-              </div>
-            )}
+    <p>
+      {selectedAddress.phoneNumber || "Phone number not provided"}
+    </p>
+
+    <p>{selectedAddress.address}</p>
+
+    <p>
+      {selectedAddress.city}, {selectedAddress.state} -{" "}
+      {selectedAddress.pincode}
+    </p>
+  </div>
+)}
           </section>
 
           {/* ORDER SUMMARY */}

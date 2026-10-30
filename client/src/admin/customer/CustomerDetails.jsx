@@ -308,7 +308,9 @@ const visibleTransactions = showAllTransactions
 
                   <h3>{address.fullName}</h3>
 
-                  <p>{address.address}</p>
+<p>Phone: {address.phoneNumber || "Not provided"}</p>
+
+<p>{address.address}</p>
 
                   <p>
                     {address.city}, {address.state}
