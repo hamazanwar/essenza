@@ -26,7 +26,7 @@ function Navbar() {
   // CHECK LOGIN STATUS
   // ==========================================
 
-  const isLoggedIn = !!localStorage.getItem("token");
+  const isLoggedIn = !!sessionStorage.getItem("token");
 
   // ==========================================
   // FETCH ACTIVE CATEGORIES
@@ -52,7 +52,7 @@ function Navbar() {
 
   useEffect(() => {
     const fetchNavbarCounts = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         setCartCount(0);

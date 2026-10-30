@@ -52,7 +52,7 @@ function Payment() {
     try {
       setWalletLoading(true);
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
      const response = await api.get("/wallet", {
   headers: {
@@ -120,7 +120,7 @@ function Payment() {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       navigate("/login");

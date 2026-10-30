@@ -28,8 +28,8 @@ function AdminLogin() {
 
       console.log("Admin login successful:", data);
 
-      localStorage.setItem("adminToken", data.token);
-      localStorage.setItem("admin", JSON.stringify(data.admin));
+      sessionStorage.setItem("adminToken", data.token);
+sessionStorage.setItem("admin", JSON.stringify(data.admin));
 
       navigate("/admin/dashboard", { replace: true });
     } catch (error) {

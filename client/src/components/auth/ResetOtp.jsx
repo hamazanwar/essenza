@@ -14,6 +14,21 @@ function ResetOtp() {
   const [resending, setResending] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
 
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+useEffect(() => {
+  const hasAccess =
+    sessionStorage.getItem("resetOtpStarted") === "true" &&
+    localStorage.getItem("resetEmail");
+
+  if (!hasAccess) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  setIsAuthorized(true);
+}, [navigate]);
+
   const email = localStorage.getItem("resetEmail");
 
   // ========================================
@@ -65,12 +80,16 @@ function ResetOtp() {
       setMessage(response.data.message);
 
       // Save OTP for reset password page
-      localStorage.setItem("resetOtp", otp);
+localStorage.setItem("resetOtp", otp);
 
-      // Go to reset password page
-      setTimeout(() => {
-        navigate("/reset-password");
-      }, 1000);
+// Move authorization to the reset password page
+sessionStorage.removeItem("resetOtpStarted");
+sessionStorage.setItem("resetPasswordStarted", "true");
+
+// Go to reset password page
+setTimeout(() => {
+  navigate("/reset-password", { replace: true });
+}, 1000);
     } catch (error) {
       console.log("Reset OTP verification error:", error);
 
@@ -127,6 +146,8 @@ function ResetOtp() {
       setResending(false);
     }
   };
+
+  if (!isAuthorized) return null;
 
   return (
     <div className="forgot-page">
@@ -186,9 +207,18 @@ function ResetOtp() {
         </div>
 
         <div className="back-login">
-          <button type="button" onClick={() => navigate("/login")}>
-            ← BACK TO LOGIN
-          </button>
+          <button
+  type="button"
+  onClick={() => {
+    sessionStorage.removeItem("resetOtpStarted");
+    sessionStorage.removeItem("forgotPasswordStarted");
+    localStorage.removeItem("resetEmail");
+    localStorage.removeItem("resetOtp");
+    navigate("/login", { replace: true });
+  }}
+>
+  ← BACK TO LOGIN
+</button>
         </div>
       </div>
     </div>

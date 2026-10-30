@@ -29,7 +29,7 @@ function Cart() {
   useEffect(() => {
     const getCart = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         if (!token) {
           setError("Please login to view your cart.");
@@ -59,7 +59,7 @@ function Cart() {
   // UPDATE QUANTITY
   const updateQuantity = async (itemId, newQuantity) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         setError("Please login to update your cart.");
@@ -92,7 +92,7 @@ function Cart() {
   // REMOVE ITEM
   const removeItem = async (itemId) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         setError("Please login to remove items.");
@@ -120,7 +120,7 @@ function Cart() {
   // CHECK STOCK BEFORE PROCEEDING TO CHECKOUT
   const handleProceedToCheckout = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         setError("Please login to continue.");

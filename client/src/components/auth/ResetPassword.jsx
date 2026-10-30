@@ -1,10 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { Eye, EyeOff } from "lucide-react";
 
 function ResetPassword() {
   const navigate = useNavigate();
+
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+useEffect(() => {
+  const hasAccess =
+    sessionStorage.getItem("resetPasswordStarted") === "true" &&
+    localStorage.getItem("resetEmail") &&
+    localStorage.getItem("resetOtp");
+
+  if (!hasAccess) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  setIsAuthorized(true);
+}, [navigate]);
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -47,14 +63,19 @@ function ResetPassword() {
       console.log("Reset password response:", response.data);
 
       // Remove reset information
-      localStorage.removeItem("resetEmail");
-      localStorage.removeItem("resetOtp");
+localStorage.removeItem("resetEmail");
+localStorage.removeItem("resetOtp");
 
-      setSuccess("Password reset successfully");
+// Clear temporary authentication permissions
+sessionStorage.removeItem("forgotPasswordStarted");
+sessionStorage.removeItem("resetOtpStarted");
+sessionStorage.removeItem("resetPasswordStarted");
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+setSuccess("Password reset successfully");
+
+setTimeout(() => {
+  navigate("/login", { replace: true });
+}, 2000);
     } catch (error) {
       console.log("Reset password error:", error);
 
@@ -67,6 +88,8 @@ function ResetPassword() {
       setLoading(false);
     }
   };
+
+  if (!isAuthorized) return null;
 
   return (
     <div className="reset-page">

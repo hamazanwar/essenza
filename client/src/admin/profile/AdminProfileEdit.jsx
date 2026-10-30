@@ -17,7 +17,7 @@ function AdminProfileEdit() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = sessionStorage.getItem("adminToken");
 
         if (!token) {
           navigate("/admin/login", { replace: true });
@@ -61,7 +61,7 @@ function AdminProfileEdit() {
     try {
       setSaving(true);
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.patch(
   "/admin/profile",
@@ -76,17 +76,17 @@ function AdminProfileEdit() {
       const updatedAdmin = response.data.admin;
 
       const storedAdmin = JSON.parse(
-        localStorage.getItem("admin") || "{}"
+        sessionStorage.getItem("admin") || "{}"
       );
 
-      localStorage.setItem(
-        "admin",
-        JSON.stringify({
-          ...storedAdmin,
-          ...updatedAdmin,
-          name: updatedAdmin?.name || name.trim(),
-        })
-      );
+      sessionStorage.setItem(
+  "admin",
+  JSON.stringify({
+    ...storedAdmin,
+    ...updatedAdmin,
+    name: updatedAdmin?.name || name.trim(),
+  })
+);
 
       setSuccess("Profile updated successfully.");
 

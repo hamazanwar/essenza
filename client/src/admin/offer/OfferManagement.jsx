@@ -51,7 +51,7 @@ useEffect(() => {
   setCurrentPage(1);
 }, [searchTerm]);
 
-  const getToken = () => localStorage.getItem("adminToken");
+  const getToken = () => sessionStorage.getItem("adminToken");
 
   const getErrorMessage = (err) =>
     err.response?.data?.message || "Something went wrong. Please try again.";

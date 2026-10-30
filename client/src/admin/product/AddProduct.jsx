@@ -193,7 +193,7 @@ const [fieldErrors, setFieldErrors] = useState({});
   // FETCH CATEGORIES
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.get("/admin/categories", {
   headers: {
@@ -269,7 +269,7 @@ const [fieldErrors, setFieldErrors] = useState({});
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       // CREATE FORM DATA
       const formData = new FormData();

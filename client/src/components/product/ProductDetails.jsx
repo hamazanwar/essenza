@@ -97,7 +97,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
 
   useEffect(() => {
   const fetchWishlistStatus = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       setIsWishlisted(false);
@@ -137,7 +137,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
 
       setReviews(response.data.reviews || []);
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (token) {
         try {
@@ -175,7 +175,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
   };
 
   const handleSaveReview = async (reviewId) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       navigate("/login");
@@ -214,7 +214,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const handleDeleteReview = async () => {
     const reviewId = deleteConfirmReviewId;
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!reviewId) return;
 
@@ -294,7 +294,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
   };
 
   const toggleProductWishlist = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
     navigate("/login");
@@ -340,7 +340,7 @@ const [wishlistLoading, setWishlistLoading] = useState(false);
 
   
 const addToCart = async () => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   setCartMessage("");
   setCartError("");
@@ -637,7 +637,7 @@ const addToCart = async () => {
                   type="button"
                   className="buy-now-button"
                   onClick={() => {
-                    const token = localStorage.getItem("token");
+                    const token = sessionStorage.getItem("token");
 
                     if (!token) {
                       navigate("/login");

@@ -48,7 +48,7 @@ const visibleTransactions = showAllTransactions
       setWalletLoading(true);
       setWalletError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.get(`/admin/customers/${id}/wallet`, {
   headers: {
@@ -76,7 +76,7 @@ const visibleTransactions = showAllTransactions
       setReviewMessage("");
       setReviewError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.patch(
   `/admin/customers/${id}/wallet/withdrawals/${requestId}`,
@@ -120,7 +120,7 @@ const visibleTransactions = showAllTransactions
       setReviewMessage("");
       setReviewError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.patch(
         `/admin/customers/${id}/wallet/withdrawals/${requestId}/complete`,
@@ -157,7 +157,7 @@ const visibleTransactions = showAllTransactions
   useEffect(() => {
     const fetchCustomerDetails = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = sessionStorage.getItem("adminToken");
 
         const response = await api.get(`/admin/customers/${id}`, {
   headers: {

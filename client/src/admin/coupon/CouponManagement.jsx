@@ -38,7 +38,7 @@ function CouponManagement() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const getToken = () => localStorage.getItem("adminToken");
+  const getToken = () => sessionStorage.getItem("adminToken");
 
   const getErrorMessage = (err) =>
     err.response?.data?.message ||

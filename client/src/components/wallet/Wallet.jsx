@@ -22,7 +22,7 @@ function Wallet() {
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const response = await api.get(API_URL, {
   headers: {
@@ -75,7 +75,7 @@ function Wallet() {
         });
       }
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       // Create Razorpay order
       const orderResponse = await api.post(
@@ -181,7 +181,7 @@ function Wallet() {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const response = await api.post(
   `${API_URL}/withdraw`,

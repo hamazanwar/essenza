@@ -61,7 +61,7 @@ const response = await api.get("/products", { params });
 
   useEffect(() => {
     const fetchWishlist = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         setWishlistProducts([]);
@@ -168,7 +168,7 @@ const response = await api.get("/products", { params });
   // ================================
 
   const toggleWishlist = async (productId) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       navigate("/login");

@@ -16,7 +16,7 @@ const [search, setSearch] = useState("");
 
   const handleCustomerStatus = async (customerId) => {
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
      const response = await api.patch(
   `/admin/customers/${customerId}/status`,
@@ -75,7 +75,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = sessionStorage.getItem("adminToken");
 
         const response = await api.get("/admin/customers", {
   headers: {

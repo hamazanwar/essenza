@@ -35,7 +35,7 @@ const reviewsPerPage = 8;
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
      const response = await api.get("/reviews/admin", {
   headers: {
@@ -105,7 +105,7 @@ useEffect(() => {
       setActionLoading(review._id);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
      const response = await api.patch(
   `/reviews/admin/${review._id}/visibility`,
@@ -140,7 +140,7 @@ useEffect(() => {
       setActionLoading(deleteTarget._id);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 await api.delete(`/reviews/admin/${deleteTarget._id}`, {
   headers: {
     Authorization: `Bearer ${token}`,

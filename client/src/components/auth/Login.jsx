@@ -33,10 +33,10 @@ function Login() {
       console.log("Login response:", data);
 
       // Save JWT token
-      localStorage.setItem("token", data.token);
+      sessionStorage.setItem("token", data.token);
 
       // Save user information
-      localStorage.setItem("user", JSON.stringify(data.user));
+      sessionStorage.setItem("user", JSON.stringify(data.user));
 
       // Go to Home page
       navigate("/", { replace: true });
@@ -85,9 +85,15 @@ function Login() {
             <div className="password-label-row">
               <label>PASSWORD</label>
 
-              <Link to="/forgot-password" className="forgot-link">
-                FORGOT PASSWORD?
-              </Link>
+              <Link
+  to="/forgot-password"
+  className="forgot-link"
+  onClick={() => {
+    sessionStorage.setItem("forgotPasswordStarted", "true");
+  }}
+>
+  FORGOT PASSWORD?
+</Link>
             </div>
 
             <div className="login-password-wrapper">
@@ -142,9 +148,9 @@ function Login() {
 
               const data = response.data;
 
-              localStorage.setItem("token", data.token);
+              sessionStorage.setItem("token", data.token);
 
-              localStorage.setItem("user", JSON.stringify(data.user));
+              sessionStorage.setItem("user", JSON.stringify(data.user));
 
               navigate("/", { replace: true });
             } catch (error) {

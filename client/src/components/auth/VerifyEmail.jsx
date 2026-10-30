@@ -11,6 +11,21 @@ function VerifyEmail() {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+// Prevent direct access to the verification page
+useEffect(() => {
+  const hasVerification =
+    sessionStorage.getItem("verificationStarted") === "true" &&
+    localStorage.getItem("verificationEmail");
+
+  if (!hasVerification) {
+    navigate("/register", { replace: true });
+    return;
+  }
+
+  setIsAuthorized(true);
+}, [navigate]);
 
   // Get email saved during registration
   const email = localStorage.getItem("verificationEmail");
@@ -66,10 +81,11 @@ function VerifyEmail() {
 
       // Remove email after successful verification
       localStorage.removeItem("verificationEmail");
+sessionStorage.removeItem("verificationStarted");
 
       // Go to login
       setTimeout(() => {
-        navigate("/login");
+        navigate("/login", { replace: true });
       }, 1000);
     } catch (error) {
       console.log("OTP verification error:", error);
@@ -127,6 +143,8 @@ function VerifyEmail() {
       setResending(false);
     }
   };
+
+  if (!isAuthorized) return null;
 
   return (
     <div className="verify-page">

@@ -39,22 +39,61 @@ import AdminSalesReport from "./admin/sales/AdminSalesReport";
 import AdminProfileEdit from "./admin/profile/AdminProfileEdit";
 import AdminReturnManagement from "./admin/return/AdminReturnManagement";
 
+
 function GuestOnly({ children }) {
-  const token = localStorage.getItem("token");
-  const location = useLocation();
+  const token = sessionStorage.getItem("token");
 
   if (token) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+    return <Navigate to="/" replace />;
   }
 
   return children;
 }
 
 function AdminGuestOnly({ children }) {
-  const adminToken = localStorage.getItem("adminToken");
+  const adminToken = sessionStorage.getItem("adminToken");
 
   if (adminToken) {
     return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return children;
+}
+
+// Only logged-in users can access user pages
+function UserOnly({ children }) {
+  const token = sessionStorage.getItem("token");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
+// Only logged-in admins can access admin pages
+function AdminOnly({ children }) {
+  const adminToken = sessionStorage.getItem("adminToken");
+
+  if (!adminToken) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  return children;
+}
+
+// Protect temporary authentication flows
+function FlowProtected({ children, storageKey }) {
+  const token = sessionStorage.getItem("token");
+
+  if (token) {
+    return <Navigate to="/" replace />;
+  }
+
+  const hasAccess = sessionStorage.getItem(storageKey) === "true";
+
+  if (!hasAccess) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -87,38 +126,69 @@ function App() {
           </AdminGuestOnly>
         }
       />
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-otp" element={<ResetOtp />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+     <Route
+  path="/verify-email"
+  element={
+    <FlowProtected storageKey="verificationStarted">
+      <VerifyEmail />
+    </FlowProtected>
+  }
+/>
+
+<Route
+  path="/forgot-password"
+  element={
+    <FlowProtected storageKey="forgotPasswordStarted">
+      <ForgotPassword />
+    </FlowProtected>
+  }
+/>
+
+<Route
+  path="/reset-otp"
+  element={
+    <FlowProtected storageKey="resetOtpStarted">
+      <ResetOtp />
+    </FlowProtected>
+  }
+/>
+
+<Route
+  path="/reset-password"
+  element={
+    <FlowProtected storageKey="resetPasswordStarted">
+      <ResetPassword />
+    </FlowProtected>
+  }
+/>
       <Route path="/" element={<Home />} />
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/profile" element={<UserOnly><Profile /></UserOnly>} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/profile" element={<AdminProfile />} />
-      <Route path="/admin/customers" element={<CustomerManagement />} />
-      <Route path="/admin/customers/:id" element={<CustomerDetails />} />
-      <Route path="/admin/categories" element={<CategoryManagement />} />
-      <Route path="/admin/products" element={<ProductManagement />} />
-      <Route path="/admin/products/add" element={<AddProduct />} />
+      <Route path="/admin/dashboard" element={<AdminOnly><AdminDashboard /></AdminOnly>} />
+      <Route path="/admin/profile" element={<AdminOnly><AdminProfile /></AdminOnly>} />
+     <Route path="/admin/customers" element={<AdminOnly><CustomerManagement /></AdminOnly>} />
+      <Route path="/admin/customers/:id" element={<AdminOnly><CustomerDetails /></AdminOnly>} />
+<Route path="/admin/categories" element={<AdminOnly><CategoryManagement /></AdminOnly>} />
+      <Route path="/admin/products" element={<AdminOnly><ProductManagement /></AdminOnly>} />
+      <Route path="/admin/products/add" element={<AdminOnly><AddProduct /></AdminOnly>} />
       <Route path="/shop" element={<Shop />} />
       <Route path="/product/:productId" element={<ProductDetails />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/wishlist" element={<Wishlist />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/payment" element={<Payment />} />
-      <Route path="/order-confirmation" element={<OrderConfirmation />} />
-      <Route path="/my-orders" element={<MyOrders />} />
-      <Route path="/admin/orders" element={<AdminOrderManagement />} />
-      <Route path="/my-orders/:orderId" element={<OrderDetails />} />
-      <Route path="/admin/coupons" element={<CouponManagement />} />
-      <Route path="/wallet" element={<Wallet />} />
-      <Route path="/admin/offers" element={<OfferManagement />} />
-      <Route path="/admin/reviews" element={<AdminReviews />} />
-      <Route path="/admin/sales-report" element={<AdminSalesReport />} />
-      <Route path="/admin/profile/edit" element={<AdminProfileEdit />} />
-      <Route path="/admin/returns" element={<AdminReturnManagement />} />
+      <Route path="/cart" element={<UserOnly><Cart /></UserOnly>} />
+      <Route path="/wishlist" element={<UserOnly><Wishlist /></UserOnly>} />
+     <Route path="/checkout" element={<UserOnly><Checkout /></UserOnly>} />
+      <Route path="/payment" element={<UserOnly><Payment /></UserOnly>} />
+      <Route path="/order-confirmation" element={<UserOnly><OrderConfirmation /></UserOnly>} />
+ <Route path="/my-orders" element={<UserOnly><MyOrders /></UserOnly>} />
+      <Route path="/admin/orders" element={<AdminOnly><AdminOrderManagement /></AdminOnly>} />
+   <Route path="/my-orders/:orderId" element={<UserOnly><OrderDetails /></UserOnly>} />
+     <Route path="/admin/coupons" element={<AdminOnly><CouponManagement /></AdminOnly>} />
+      <Route path="/wallet" element={<UserOnly><Wallet /></UserOnly>} />
+     <Route path="/admin/offers" element={<AdminOnly><OfferManagement /></AdminOnly>} />
+     <Route path="/admin/reviews" element={<AdminOnly><AdminReviews /></AdminOnly>} />
+      <Route path="/admin/sales-report" element={<AdminOnly><AdminSalesReport /></AdminOnly>} />
+      <Route path="/admin/profile/edit" element={<AdminOnly><AdminProfileEdit /></AdminOnly>} />
+      <Route path="/admin/returns" element={<AdminOnly><AdminReturnManagement /></AdminOnly>} />
     </Routes>
   );
 }

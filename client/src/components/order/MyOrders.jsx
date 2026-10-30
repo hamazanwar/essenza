@@ -131,7 +131,7 @@ const [returnError, setReturnError] = useState("");
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         if (!token) {
           navigate("/login");
@@ -182,7 +182,7 @@ const [returnError, setReturnError] = useState("");
 
   const handleCancelOrder = async (orderId) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         navigate("/login");
@@ -267,7 +267,7 @@ const [returnError, setReturnError] = useState("");
     if (!reviewTarget) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         navigate("/login");
@@ -315,7 +315,7 @@ const [returnError, setReturnError] = useState("");
   if (!selectedReturnOrder || !selectedReturnItem) return;
 
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       navigate("/login");

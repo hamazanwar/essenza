@@ -21,7 +21,7 @@ const [statusFilter, setStatusFilter] = useState("ALL");
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       if (!token) {
         setError("Admin session not found. Please log in again.");
@@ -72,7 +72,7 @@ const [statusFilter, setStatusFilter] = useState("ALL");
       setUpdating(true);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       await api.patch(
         `/admin/returns/${request._id}`,
@@ -109,7 +109,7 @@ const [statusFilter, setStatusFilter] = useState("ALL");
       setUpdating(true);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       await api.patch(
         `/admin/returns/${request._id}/complete`,
@@ -139,7 +139,7 @@ const [statusFilter, setStatusFilter] = useState("ALL");
       setUpdating(true);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       await api.patch(
         `/admin/returns/${request._id}/complete-exchange`,

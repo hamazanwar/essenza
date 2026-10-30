@@ -45,11 +45,12 @@ function Register() {
 
       console.log(data);
 
-      // Save email for OTP verification page
-      localStorage.setItem("verificationEmail", data.email);
+      // Save email and create a pending verification session
+localStorage.setItem("verificationEmail", data.email);
+sessionStorage.setItem("verificationStarted", "true");
 
-      // Go to email verification page
-      navigate("/verify-email");
+// Go to email verification page
+navigate("/verify-email", { replace: true });
     } catch (error) {
       console.log("Registration error:", error);
 
@@ -76,9 +77,9 @@ function Register() {
       const data = response.data;
 
       // Google authentication is already successful
-      localStorage.setItem("token", data.token);
+      sessionStorage.setItem("token", data.token);
 
-      localStorage.setItem("user", JSON.stringify(data.user));
+      sessionStorage.setItem("user", JSON.stringify(data.user));
 
       // Go to Home
       navigate("/");

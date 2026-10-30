@@ -50,7 +50,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         // CHECK LOGIN
         if (!token) {
@@ -131,7 +131,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
      const response = await api.patch(
   "/users/profile",
@@ -151,7 +151,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       setUser(data.user);
 
       // Update localStorage
-      localStorage.setItem("user", JSON.stringify(data.user));
+      sessionStorage.setItem("user", JSON.stringify(data.user));
 
       // Close edit form
       setShowProfileEdit(false);
@@ -216,7 +216,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
      const addressData = {
   fullName,
@@ -332,7 +332,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       await api.delete(`/users/address/${addressId}`, {
   headers: {
@@ -363,7 +363,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
      await api.patch(
   `/users/address/${addressId}/default`,
@@ -414,7 +414,7 @@ const handleChangePassword = async (event) => {
   setPasswordLoading(true);
 
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const response = await api.patch(
       "/users/change-password",
@@ -454,8 +454,8 @@ const handleChangePassword = async (event) => {
   // ==========================================
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+sessionStorage.removeItem("user");
 
     navigate("/");
   };
@@ -486,7 +486,7 @@ const handleChangePassword = async (event) => {
       setProfileImageLoading(true);
       setError("");
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const formData = new FormData();
       formData.append("profileImage", file);
@@ -505,7 +505,7 @@ const data = response.data;
       };
 
       setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      sessionStorage.setItem("user", JSON.stringify(updatedUser));
     } catch (error) {
       console.error("Profile image upload error:", error);
       setError(error.message || "Failed to upload profile image");
@@ -521,7 +521,7 @@ const data = response.data;
       setProfileImageLoading(true);
       setError("");
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
     const response = await api.delete("/users/profile/image", {
   headers: {
@@ -537,7 +537,7 @@ const data = response.data;
       };
 
       setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      sessionStorage.setItem("user", JSON.stringify(updatedUser));
     } catch (error) {
       console.error("Remove profile image error:", error);
       setError(error.message || "Failed to remove profile image");

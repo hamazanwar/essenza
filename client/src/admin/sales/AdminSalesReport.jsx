@@ -21,7 +21,7 @@ const dailySalesPerPage = 8;
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.get("/admin/sales-report", {
   params: {

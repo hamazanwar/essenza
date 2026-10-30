@@ -1,9 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 function ForgotPassword() {
   const navigate = useNavigate();
+
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+useEffect(() => {
+  const token = sessionStorage.getItem("token");
+  const adminToken = sessionStorage.getItem("adminToken");
+
+  if (token) {
+    sessionStorage.removeItem("forgotPasswordStarted");
+    navigate("/", { replace: true });
+    return;
+  }
+
+  if (adminToken) {
+    sessionStorage.removeItem("forgotPasswordStarted");
+    navigate("/admin/dashboard", { replace: true });
+    return;
+  }
+
+  const hasAccess =
+    sessionStorage.getItem("forgotPasswordStarted") === "true";
+
+  if (!hasAccess) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  setIsAuthorized(true);
+}, [navigate]);
 
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -26,10 +55,13 @@ function ForgotPassword() {
       setMessage(response.data.message);
 
       // Save email for OTP page
-      localStorage.setItem("resetEmail", email);
+localStorage.setItem("resetEmail", email);
 
-      // Go to OTP page
-      navigate("/reset-otp");
+// Authorize access to Reset OTP page
+sessionStorage.setItem("resetOtpStarted", "true");
+
+// Go to OTP page
+navigate("/reset-otp", { replace: true });
     } catch (error) {
       console.log("Forgot password error:", error);
 
@@ -42,6 +74,8 @@ function ForgotPassword() {
       setLoading(false);
     }
   };
+
+  if (!isAuthorized) return null;
 
   return (
     <div className="forgot-page">
@@ -78,9 +112,15 @@ function ForgotPassword() {
         </form>
 
         <div className="back-login">
-          <button type="button" onClick={() => navigate("/login")}>
-            ← BACK TO LOGIN
-          </button>
+          <button
+  type="button"
+  onClick={() => {
+    sessionStorage.removeItem("forgotPasswordStarted");
+    navigate("/login", { replace: true });
+  }}
+>
+  ← BACK TO LOGIN
+</button>
         </div>
       </div>
     </div>

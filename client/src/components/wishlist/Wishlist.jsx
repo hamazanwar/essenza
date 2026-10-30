@@ -35,7 +35,7 @@ function Wishlist() {
 
   useEffect(() => {
     const fetchWishlist = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         navigate("/login");
@@ -69,7 +69,7 @@ function Wishlist() {
   // ==========================================
 
   const removeFromWishlist = async (productId) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
       navigate("/login");
@@ -95,7 +95,7 @@ function Wishlist() {
 
   
 const addWishlistProductToCart = async (product) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
   if (!token) {
     navigate("/login");

@@ -65,7 +65,7 @@ const currentProducts = filteredProducts.slice(
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.get("/admin/products", {
         headers: {
@@ -88,7 +88,7 @@ const currentProducts = filteredProducts.slice(
 
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.get("/admin/categories", {
         headers: {
@@ -127,7 +127,7 @@ const currentProducts = filteredProducts.slice(
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const formData = new FormData();
 
@@ -242,7 +242,7 @@ const currentProducts = filteredProducts.slice(
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.patch(
         `/admin/products/${productId}/status`,
@@ -276,7 +276,7 @@ const currentProducts = filteredProducts.slice(
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.delete(`/admin/products/${productId}`, {
         headers: {
@@ -530,7 +530,7 @@ const currentProducts = filteredProducts.slice(
                                   // Existing variant → delete from database
                                   if (variant.id) {
                                     const token =
-                                      localStorage.getItem("adminToken");
+                                      sessionStorage.getItem("adminToken");
 
                                     await api.delete(
                                       `/admin/variants/${variant.id}`,
@@ -727,7 +727,7 @@ const currentProducts = filteredProducts.slice(
                             setSuccess("");
                             setVariantError("");
 
-                            const token = localStorage.getItem("adminToken");
+                            const token = sessionStorage.getItem("adminToken");
 
                             try {
                               const response = await api.get(

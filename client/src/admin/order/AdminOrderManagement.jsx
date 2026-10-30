@@ -33,7 +33,7 @@ function AdminOrderManagement() {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.get("/admin/orders", {
   headers: {
@@ -134,7 +134,7 @@ return (
     try {
       setUpdatingStatus(true);
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
      const response = await api.patch(
   `/admin/orders/${statusConfirmation.orderId}/status`,

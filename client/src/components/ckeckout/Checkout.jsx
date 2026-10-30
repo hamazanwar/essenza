@@ -61,7 +61,7 @@ const [addressFormError, setAddressFormError] = useState("");
   useEffect(() => {
     const fetchCheckoutItems = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         if (!token) {
           navigate("/login");
@@ -236,7 +236,7 @@ const [addressFormError, setAddressFormError] = useState("");
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         if (!token) {
           navigate("/login");
@@ -303,7 +303,7 @@ const handleSaveCheckoutAddress = async (event) => {
     setAddressSaving(true);
     setAddressFormError("");
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const response = await api.post(
       "/users/address",

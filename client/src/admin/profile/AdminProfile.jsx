@@ -17,7 +17,7 @@ function AdminProfile() {
   useEffect(() => {
     const fetchAdminProfile = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = sessionStorage.getItem("adminToken");
 
        const response = await api.get("/admin/profile", {
   headers: {
@@ -56,7 +56,7 @@ function AdminProfile() {
     setSuccess("");
 
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const formData = new FormData();
 
@@ -186,8 +186,8 @@ function AdminProfile() {
         <button
           className="admin-profile-logout-btn"
           onClick={() => {
-            localStorage.removeItem("adminToken");
-            localStorage.removeItem("admin");
+            sessionStorage.removeItem("adminToken");
+            sessionStorage.removeItem("admin");
             window.location.replace("/admin/login");
           }}
         >

@@ -76,8 +76,8 @@ function AdminNavbar() {
   type="button"
   className="admin-sidebar-logout"
   onClick={() => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("admin");
+    sessionStorage.removeItem("adminToken");
+    sessionStorage.removeItem("admin");
     window.location.replace("/admin/login");
   }}
 >

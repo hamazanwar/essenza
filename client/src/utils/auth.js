@@ -3,7 +3,7 @@
 // ==========================================
 
 export const isLoggedIn = () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     return !!token;
 };
@@ -15,7 +15,7 @@ export const isLoggedIn = () => {
 
 export const requireLogin = (navigate, path) => {
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (!token) {
         navigate("/register");

@@ -29,7 +29,7 @@ function AdminDashboard() {
         setLoading(true);
         setError("");
 
-        const token = localStorage.getItem("adminToken");
+        const token = sessionStorage.getItem("adminToken");
 
         const response = await api.get("/admin/orders", {
   headers: {

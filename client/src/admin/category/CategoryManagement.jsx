@@ -17,7 +17,7 @@ function CategoryManagement() {
 
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.get("/admin/categories", {
         headers: {
@@ -60,7 +60,7 @@ function CategoryManagement() {
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.post(
         "/admin/categories",
@@ -104,7 +104,7 @@ function CategoryManagement() {
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.patch(
         `/admin/categories/${categoryId}`,
@@ -142,7 +142,7 @@ function CategoryManagement() {
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.patch(
         `/admin/categories/${categoryId}/status`,
@@ -176,7 +176,7 @@ function CategoryManagement() {
       setError("");
       setSuccess("");
 
-      const token = localStorage.getItem("adminToken");
+      const token = sessionStorage.getItem("adminToken");
 
       const response = await api.delete(`/admin/categories/${categoryId}`, {
         headers: {
