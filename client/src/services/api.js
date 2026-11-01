@@ -10,7 +10,9 @@ api.interceptors.request.use((config) => {
   const adminToken = sessionStorage.getItem("adminToken");
   const userToken = sessionStorage.getItem("token");
 
-  const isAdminRequest = config.url?.startsWith("/admin/");
+  const isAdminRequest =
+  config.url?.startsWith("/admin/") ||
+  config.url?.startsWith("/reviews/admin");
 
   const token = isAdminRequest ? adminToken : userToken;
 
